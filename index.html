@@ -27,7 +27,7 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 950px; /* Tăng chiều rộng để chứa đủ thông tin mới */
             margin: 0 auto;
         }
 
@@ -127,7 +127,7 @@
             box-shadow: var(--shadow);
             margin-bottom: 20px;
             position: relative;
-            height: 300px; /* Chiều cao cố định cho biểu đồ */
+            height: 300px;
         }
 
         /* --- CONTROLS --- */
@@ -199,7 +199,7 @@
 
         .sem-info { font-size: 0.9rem; color: var(--text-light); }
 
-        /* --- INPUTS & ROWS --- */
+        /* --- INPUTS & ROWS (UPDATED LAYOUT) --- */
         .semester-content {
             display: none;
             padding: 20px;
@@ -211,13 +211,13 @@
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
         .subject-row {
-            display: flex; flex-wrap: wrap; gap: 10px; padding: 15px;
+            display: flex; flex-wrap: wrap; gap: 12px; padding: 15px;
             background: white; border: 1px solid #e5e7eb; border-radius: 8px;
             margin-bottom: 10px; align-items: flex-end; position: relative;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
-        .field-group { flex: 1; min-width: 90px; }
+        .field-group { flex: 1; min-width: 80px; }
         .field-group label { display: block; font-size: 0.7rem; color: var(--text-light); margin-bottom: 5px; font-weight: 700; text-transform: uppercase; }
 
         input, select {
@@ -226,11 +226,18 @@
         }
         input:focus, select:focus { border-color: #764ba2; box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1); }
 
+        /* Kết quả hiển thị */
         .preview-box {
-            text-align: center; font-weight: bold; padding: 8px;
+            text-align: center; font-weight: bold; padding: 8px 4px;
             background: #f3f4f6; border-radius: 6px; font-size: 0.9rem; color: #555;
+            min-height: 20px; display: flex; align-items: center; justify-content: center;
+            border: 1px solid #e5e7eb;
         }
         
+        .result-badge {
+            font-size: 0.75rem; padding: 4px 8px; border-radius: 12px; font-weight: 700; text-transform: uppercase; display: inline-block; white-space: nowrap;
+        }
+
         .btn-add {
             width: 100%; padding: 12px; border: 2px dashed #cbd5e1; background: none;
             color: #64748b; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;
@@ -244,41 +251,37 @@
         .btn-del:hover { background: #ef4444; color: white; }
 
         /* --- STYLING CHO BADGE (RANKING) --- */
+        /* Dashboard Badges */
         .dash-badge { 
-            padding: 8px 15px; 
-            font-size: 1.1rem; 
-            font-weight: 800;
-            border-radius: 30px; 
-            text-transform: uppercase;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            display: inline-block;
-            min-width: 120px;
-            text-align: center;
+            padding: 8px 15px; font-size: 1.1rem; font-weight: 800; border-radius: 30px; 
+            text-transform: uppercase; box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
+            display: inline-block; min-width: 120px; text-align: center;
         }
-
         .rank-gold { background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%); color: #6a4803; border: 1px solid #ffeeba; }
         .rank-silver { background: linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%); color: #424242; border: 1px solid #f8f9fa; }
         .rank-bronze { background: linear-gradient(135deg, #d98e54 0%, #a0522d 100%); color: white; border: 1px solid #e0a884; }
         .rank-gray { background: #6c757d; color: white; }
         .rank-red { background: #dc3545; color: white; }
 
-        .list-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; }
-        .bg-xs { background: #dcfce7; color: #15803d; }
-        .bg-g { background: #dbeafe; color: #1d4ed8; }
-        .bg-k { background: #ffedd5; color: #9a3412; }
-        .bg-tb { background: #f3f4f6; color: #4b5563; }
+        /* Subject Badges (Theo bảng quy đổi) */
+        .bg-gioi { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .bg-kha { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+        .bg-tb { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+        .bg-tbyeu { background: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; }
+        .bg-kem { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
-        @media (max-width: 650px) {
+        @media (max-width: 768px) {
             .dashboard { grid-template-columns: 1fr; gap: 10px; }
             .stat-item { flex-direction: row; justify-content: space-between; padding: 15px 20px; min-height: auto; align-items: center; }
             .stat-content-area { justify-content: flex-end; width: auto; flex: none; margin-bottom: 0; }
             .stat-label { margin-top: 0; order: 1; }
             .stat-content-area { order: 2; }
             .stat-value { font-size: 1.5rem; }
-            .dash-badge { font-size: 0.9rem; padding: 5px 10px; min-width: auto; }
-            .subject-row { flex-direction: column; align-items: stretch; }
+            .subject-row { flex-direction: column; align-items: stretch; gap: 8px; }
             .btn-del { position: absolute; top: 10px; right: 10px; }
             .app-title { font-size: 1.4rem; }
+            /* Mobile layout adjustment for new columns */
+            .field-group { width: 100%; }
         }
     </style>
 </head>
@@ -307,7 +310,7 @@
             <div class="stat-content-area" id="academic-rank-area">
                 <span class="dash-badge rank-gray">---</span>
             </div>
-            <div class="stat-label">Xếp Loại</div>
+            <div class="stat-label">Xếp Loại Toàn Khóa</div>
         </div>
     </div>
 
@@ -327,11 +330,11 @@
 <script>
     const TOTAL_SEMESTERS = 8;
     let semestersData = {};
-    let gpaChartInstance = null; // Biến lưu biểu đồ
+    let gpaChartInstance = null;
 
     function init() {
         const container = document.getElementById('semesters-container');
-        const savedData = localStorage.getItem('gpaData_v3'); 
+        const savedData = localStorage.getItem('gpaData_v4'); // Đổi key lên v4
         if (savedData) semestersData = JSON.parse(savedData);
 
         for (let i = 1; i <= TOTAL_SEMESTERS; i++) {
@@ -375,8 +378,9 @@
         const s1 = data ? data.s1 : '';
         const s2 = data ? data.s2 : '';
 
+        // Giao diện dòng môn học được cập nhật thêm các ô hiển thị mới
         div.innerHTML = `
-            <div class="field-group" style="flex: 2;">
+            <div class="field-group" style="flex: 2; min-width: 150px;">
                 <label>Tên Môn</label>
                 <input type="text" class="inp-name" value="${name}" placeholder="Nhập tên môn...">
             </div>
@@ -384,7 +388,7 @@
                 <label>Số TC</label>
                 <input type="number" class="inp-credit" value="${credit}" min="0">
             </div>
-            <div class="field-group">
+            <div class="field-group" style="min-width: 100px;">
                 <label>Tỷ lệ</label>
                 <select class="inp-ratio" onchange="calculateAll(false)">
                     <option value="40-60" ${ratio === '40-60' ? 'selected' : ''}>40/60</option>
@@ -401,14 +405,20 @@
                 <label>Điểm CK</label>
                 <input type="number" class="inp-s2" value="${s2}" step="0.1" placeholder="..." oninput="calculateAll(false)">
             </div>
-            <div class="field-group" style="flex: 0.5;">
+            
+            <div class="field-group" style="flex: 0.8; text-align: center;">
                 <label>Hệ 10</label>
                 <div class="preview-box preview-10">...</div>
             </div>
-            <div class="field-group" style="flex: 0.5;">
-                <label>Hệ 4</label>
-                <div class="preview-box preview-4">...</div>
+            <div class="field-group" style="flex: 1; text-align: center;">
+                <label>Quy Đổi</label>
+                <div class="preview-box preview-convert" style="color: #667eea;">...</div>
             </div>
+             <div class="field-group" style="flex: 0.8; text-align: center;">
+                <label>Xếp Loại</label>
+                <div class="preview-rank">...</div>
+            </div>
+
             <button class="btn-del" onclick="deleteRow(this, ${semId})"><i class="fas fa-times"></i></button>
         `;
         listDiv.appendChild(div);
@@ -424,27 +434,20 @@
         if (list && list.length > 0) list.forEach(data => addSubjectRow(semId, data));
     }
 
-    function getGrade4(score10) {
-        if (score10 >= 8.5) return 4.0;
-        if (score10 >= 8.0) return 3.5;
-        if (score10 >= 7.0) return 3.0;
-        if (score10 >= 6.5) return 2.5;
-        if (score10 >= 5.5) return 2.0;
-        if (score10 >= 5.0) return 1.5;
-        if (score10 >= 4.0) return 1.0;
-        return 0.0;
+    // --- LOGIC QUY ĐỔI MỚI THEO ẢNH BẠN GỬI ---
+    function getCourseResult(score10) {
+        // Dựa trên bảng quy đổi chính xác từ ảnh
+        if (score10 >= 8.5) return { g4: 4.0, char: 'A', text: 'Giỏi', css: 'bg-gioi' };
+        if (score10 >= 8.0) return { g4: 3.5, char: 'B+', text: 'Khá', css: 'bg-kha' };
+        if (score10 >= 7.0) return { g4: 3.0, char: 'B', text: 'Khá', css: 'bg-kha' };
+        if (score10 >= 6.5) return { g4: 2.5, char: 'C+', text: 'Trung bình', css: 'bg-tb' };
+        if (score10 >= 5.5) return { g4: 2.0, char: 'C', text: 'Trung bình', css: 'bg-tb' };
+        if (score10 >= 5.0) return { g4: 1.5, char: 'D+', text: 'TB Yếu', css: 'bg-tbyeu' };
+        if (score10 >= 4.0) return { g4: 1.0, char: 'D', text: 'TB Yếu', css: 'bg-tbyeu' };
+        return { g4: 0.0, char: 'F', text: 'Kém', css: 'bg-kem' };
     }
     
-    function getListRankBadge(gpa) {
-        let label = 'Yếu';
-        let cssClass = 'bg-tb';
-        if (gpa >= 3.6) { label = 'Xuất Sắc'; cssClass = 'bg-xs'; }
-        else if (gpa >= 3.2) { label = 'Giỏi'; cssClass = 'bg-g'; }
-        else if (gpa >= 2.5) { label = 'Khá'; cssClass = 'bg-k'; }
-        else if (gpa >= 2.0) { label = 'Trung Bình'; cssClass = 'bg-tb'; }
-        return `<span class="list-badge ${cssClass}">${label}</span>`;
-    }
-
+    // Hàm xếp loại tổng kết (Vẫn giữ logic Gold/Silver cho Dashboard)
     function updateDashboardRank(gpa) {
         const area = document.getElementById('academic-rank-area');
         let label = '---';
@@ -457,21 +460,16 @@
             else if (gpa >= 2.0) { label = 'Trung Bình'; cssClass = 'rank-gray'; }
             else { label = 'Yếu'; cssClass = 'rank-red'; }
         }
-
         area.innerHTML = `<span class="dash-badge ${cssClass}">${label}</span>`;
     }
 
-    // --- HÀM VẼ BIỂU ĐỒ ---
     function updateChart(dataPoints) {
         const ctx = document.getElementById('gpaChart').getContext('2d');
         const labels = Array.from({length: TOTAL_SEMESTERS}, (_, i) => `Kỳ ${i+1}`);
-        
-        // Tạo gradient màu tím
         let gradient = ctx.createLinearGradient(0, 0, 0, 400);
         gradient.addColorStop(0, 'rgba(118, 75, 162, 0.5)');
         gradient.addColorStop(1, 'rgba(118, 75, 162, 0.0)');
 
-        // Nếu biểu đồ đã có thì hủy đi vẽ lại
         if (gpaChartInstance) gpaChartInstance.destroy();
 
         gpaChartInstance = new Chart(ctx, {
@@ -480,7 +478,7 @@
                 labels: labels,
                 datasets: [{
                     label: 'GPA Qua Các Kỳ',
-                    data: dataPoints, // Mảng điểm (ví dụ: [3.2, 3.5, 3.0, null...])
+                    data: dataPoints,
                     borderColor: '#764ba2',
                     backgroundColor: gradient,
                     borderWidth: 3,
@@ -490,29 +488,16 @@
                     pointRadius: 5,
                     pointHoverRadius: 7,
                     fill: true,
-                    tension: 0.4 // Làm mềm đường cong
+                    tension: 0.4 
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 4.0, // Cố định thang 4
-                        ticks: { stepSize: 0.5 }
-                    }
+                    y: { beginAtZero: true, max: 4.0, ticks: { stepSize: 0.5 } }
                 },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `GPA: ${context.parsed.y}`;
-                            }
-                        }
-                    }
-                }
+                plugins: { legend: { display: false } }
             }
         });
     }
@@ -521,8 +506,6 @@
         let grandTotalPoints = 0;
         let grandTotalCredits = 0;
         let newStorageData = {};
-        
-        // Mảng chứa GPA từng kỳ để vẽ biểu đồ
         let chartData = []; 
 
         for (let i = 1; i <= TOTAL_SEMESTERS; i++) {
@@ -541,25 +524,33 @@
                 
                 semData.push({name, credit, ratio: ratioStr, s1: isNaN(s1) ? '' : s1, s2: isNaN(s2) ? '' : s2});
 
+                // Các ô hiển thị kết quả
                 const prev10 = row.querySelector('.preview-10');
-                const prev4 = row.querySelector('.preview-4');
+                const prevConvert = row.querySelector('.preview-convert');
+                const prevRank = row.querySelector('.preview-rank');
                 
                 if (!isNaN(s1) && (ratioStr === '100-0' || !isNaN(s2))) {
                     const r = ratioStr.split('-').map(x => parseInt(x)/100);
                     let final10 = (ratioStr === '100-0') ? s1 : (s1 * r[0] + s2 * r[1]);
                     final10 = Math.round(final10 * 10) / 10;
-                    const g4 = getGrade4(final10);
+                    
+                    // Lấy kết quả quy đổi chi tiết
+                    const result = getCourseResult(final10);
                     
                     prev10.innerText = final10;
-                    prev4.innerText = g4;
+                    // Hiển thị: 3.5 - B+
+                    prevConvert.innerText = `${result.g4} - ${result.char}`;
+                    // Hiển thị Badge: Khá
+                    prevRank.innerHTML = `<span class="result-badge ${result.css}">${result.text}</span>`;
                     
                     if (credit > 0) {
-                        semPoints += g4 * credit;
+                        semPoints += result.g4 * credit;
                         semCredits += credit;
                     }
                 } else {
                     prev10.innerText = '...';
-                    prev4.innerText = '...';
+                    prevConvert.innerText = '...';
+                    prevRank.innerHTML = '...';
                 }
             });
 
@@ -568,16 +559,13 @@
             const summaryDiv = document.getElementById(`summary-${i}`);
             if (semCredits > 0) {
                 const semGPA = (semPoints / semCredits).toFixed(2);
-                summaryDiv.innerHTML = `GPA: <strong>${semGPA}</strong> | ${semCredits} tín | ${getListRankBadge(semGPA)}`;
-                
+                summaryDiv.innerHTML = `GPA: <strong>${semGPA}</strong> | ${semCredits} tín`;
                 grandTotalPoints += semPoints;
                 grandTotalCredits += semCredits;
-                
-                // Thêm vào dữ liệu biểu đồ
                 chartData.push(semGPA);
             } else {
                 summaryDiv.innerHTML = `<span style="opacity:0.6; font-style:italic">Chưa có dữ liệu</span>`;
-                chartData.push(null); // Không có điểm thì để trống trên biểu đồ
+                chartData.push(null);
             }
         }
 
@@ -590,12 +578,11 @@
             updateDashboardRank(0);
         }
 
-        // Vẽ lại biểu đồ
         updateChart(chartData);
 
         if (save) {
-            localStorage.setItem('gpaData_v3', JSON.stringify(newStorageData));
-            alert("Dữ liệu đã được lưu thành công!");
+            localStorage.setItem('gpaData_v4', JSON.stringify(newStorageData));
+            alert("Dữ liệu đã được cập nhật!");
         }
     }
 
