@@ -27,7 +27,7 @@
         }
 
         .container {
-            max-width: 950px; /* Tăng chiều rộng để chứa đủ thông tin mới */
+            max-width: 950px;
             margin: 0 auto;
         }
 
@@ -199,7 +199,7 @@
 
         .sem-info { font-size: 0.9rem; color: var(--text-light); }
 
-        /* --- INPUTS & ROWS (UPDATED LAYOUT) --- */
+        /* --- INPUTS & ROWS --- */
         .semester-content {
             display: none;
             padding: 20px;
@@ -280,7 +280,6 @@
             .subject-row { flex-direction: column; align-items: stretch; gap: 8px; }
             .btn-del { position: absolute; top: 10px; right: 10px; }
             .app-title { font-size: 1.4rem; }
-            /* Mobile layout adjustment for new columns */
             .field-group { width: 100%; }
         }
     </style>
@@ -334,7 +333,8 @@
 
     function init() {
         const container = document.getElementById('semesters-container');
-        const savedData = localStorage.getItem('gpaData_v4'); // Đổi key lên v4
+        // Nâng cấp lên v5 để reset dữ liệu cũ, tránh lỗi khi đổi logic ô Tín chỉ
+        const savedData = localStorage.getItem('gpaData_v5'); 
         if (savedData) semestersData = JSON.parse(savedData);
 
         for (let i = 1; i <= TOTAL_SEMESTERS; i++) {
@@ -373,12 +373,12 @@
         div.className = 'subject-row';
         
         const name = data ? data.name : '';
-        const credit = data ? data.credit : 3;
+        // SỬA ĐỔI: Nếu không có data cũ thì để trống (không mặc định là 3 nữa)
+        const credit = data ? data.credit : ''; 
         const ratio = data ? data.ratio : '40-60';
         const s1 = data ? data.s1 : '';
         const s2 = data ? data.s2 : '';
 
-        // Giao diện dòng môn học được cập nhật thêm các ô hiển thị mới
         div.innerHTML = `
             <div class="field-group" style="flex: 2; min-width: 150px;">
                 <label>Tên Môn</label>
@@ -386,7 +386,7 @@
             </div>
             <div class="field-group">
                 <label>Số TC</label>
-                <input type="number" class="inp-credit" value="${credit}" min="0">
+                <input type="number" class="inp-credit" value="${credit}" min="0" placeholder="...">
             </div>
             <div class="field-group" style="min-width: 100px;">
                 <label>Tỷ lệ</label>
@@ -410,8 +410,8 @@
                 <label>Hệ 10</label>
                 <div class="preview-box preview-10">...</div>
             </div>
-            <div class="field-group" style="flex: 1; text-align: center;">
-                <label>Quy Đổi</label>
+            <div class="field-group" style="flex: 1.2; text-align: center;">
+                <label>Hệ 4 - Điểm chữ</label>
                 <div class="preview-box preview-convert" style="color: #667eea;">...</div>
             </div>
              <div class="field-group" style="flex: 0.8; text-align: center;">
@@ -434,9 +434,8 @@
         if (list && list.length > 0) list.forEach(data => addSubjectRow(semId, data));
     }
 
-    // --- LOGIC QUY ĐỔI MỚI THEO ẢNH BẠN GỬI ---
+    // Logic quy đổi (Dựa trên ảnh bảng điểm)
     function getCourseResult(score10) {
-        // Dựa trên bảng quy đổi chính xác từ ảnh
         if (score10 >= 8.5) return { g4: 4.0, char: 'A', text: 'Giỏi', css: 'bg-gioi' };
         if (score10 >= 8.0) return { g4: 3.5, char: 'B+', text: 'Khá', css: 'bg-kha' };
         if (score10 >= 7.0) return { g4: 3.0, char: 'B', text: 'Khá', css: 'bg-kha' };
@@ -447,7 +446,6 @@
         return { g4: 0.0, char: 'F', text: 'Kém', css: 'bg-kem' };
     }
     
-    // Hàm xếp loại tổng kết (Vẫn giữ logic Gold/Silver cho Dashboard)
     function updateDashboardRank(gpa) {
         const area = document.getElementById('academic-rank-area');
         let label = '---';
@@ -517,14 +515,23 @@
 
             rows.forEach(row => {
                 const name = row.querySelector('.inp-name').value;
-                const credit = parseFloat(row.querySelector('.inp-credit').value) || 0;
+                // Nếu người dùng chưa nhập TC thì coi là 0 để không bị lỗi NaN
+                const creditVal = row.querySelector('.inp-credit').value;
+                const credit = (creditVal === '') ? 0 : parseFloat(creditVal);
+                
                 const ratioStr = row.querySelector('.inp-ratio').value;
                 const s1 = parseFloat(row.querySelector('.inp-s1').value);
                 const s2 = parseFloat(row.querySelector('.inp-s2').value);
                 
-                semData.push({name, credit, ratio: ratioStr, s1: isNaN(s1) ? '' : s1, s2: isNaN(s2) ? '' : s2});
+                // Lưu lại cả chuỗi rỗng của TC để lần sau hiển thị lại đúng ô trống
+                semData.push({
+                    name, 
+                    credit: creditVal, // Lưu giá trị gốc (có thể là rỗng)
+                    ratio: ratioStr, 
+                    s1: isNaN(s1) ? '' : s1, 
+                    s2: isNaN(s2) ? '' : s2
+                });
 
-                // Các ô hiển thị kết quả
                 const prev10 = row.querySelector('.preview-10');
                 const prevConvert = row.querySelector('.preview-convert');
                 const prevRank = row.querySelector('.preview-rank');
@@ -534,13 +541,10 @@
                     let final10 = (ratioStr === '100-0') ? s1 : (s1 * r[0] + s2 * r[1]);
                     final10 = Math.round(final10 * 10) / 10;
                     
-                    // Lấy kết quả quy đổi chi tiết
                     const result = getCourseResult(final10);
                     
                     prev10.innerText = final10;
-                    // Hiển thị: 3.5 - B+
                     prevConvert.innerText = `${result.g4} - ${result.char}`;
-                    // Hiển thị Badge: Khá
                     prevRank.innerHTML = `<span class="result-badge ${result.css}">${result.text}</span>`;
                     
                     if (credit > 0) {
@@ -581,8 +585,8 @@
         updateChart(chartData);
 
         if (save) {
-            localStorage.setItem('gpaData_v4', JSON.stringify(newStorageData));
-            alert("Dữ liệu đã được cập nhật!");
+            localStorage.setItem('gpaData_v5', JSON.stringify(newStorageData));
+            alert("Dữ liệu đã được cập nhật thành công!");
         }
     }
 
