@@ -3,312 +3,437 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý GPA Đại Học</title>
+    <title>Hệ Thống Quản Lý GPA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #0056b3; /* Xanh dương đậm chuyên nghiệp */
-            --secondary-color: #f8f9fa;
-            --border-color: #dee2e6;
-            --success-color: #28a745;
-            --warning-color: #ffc107;
-            --text-color: #333;
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-light: #6b7280;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f6f9;
-            color: var(--text-color);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--secondary-bg);
+            color: var(--text-main);
             margin: 0;
-            padding: 10px;
-            font-size: 14px;
+            padding: 20px;
+            line-height: 1.5;
         }
 
         .container {
             max-width: 900px;
             margin: 0 auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            overflow: hidden;
         }
 
-        /* Header Thống kê chung */
-        .dashboard {
-            background: var(--primary-color);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
+        /* --- APP HEADER --- */
+        .app-header {
             text-align: center;
+            margin-bottom: 25px;
         }
 
-        .stat-box {
-            margin: 10px;
-            min-width: 150px;
+        .app-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        .app-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        /* --- DASHBOARD HEADER --- */
+        .dashboard {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 25px -5px rgba(118, 75, 162, 0.4);
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+            align-items: stretch; /* Kéo dãn các ô bằng nhau */
+        }
+
+        /* Trang trí nền mờ */
+        .dashboard::before {
+            content: '';
+            position: absolute;
+            top: -50px; left: -50px;
+            width: 200px; height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Căn giữa dọc */
+            align-items: center; /* Căn giữa ngang */
+            padding: 20px 10px;
+            height: 100%; /* Chiều cao full ô lưới */
+            box-sizing: border-box;
+            z-index: 1;
+        }
+
+        /* Khu vực hiển thị con số hoặc Badge */
+        .stat-content-area {
+            flex: 1; /* Chiếm phần lớn không gian */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            width: 100%;
         }
 
         .stat-value {
-            font-size: 28px;
-            font-weight: bold;
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
         .stat-label {
-            font-size: 13px;
-            opacity: 0.9;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 1px;
+            opacity: 0.9;
+            font-weight: 600;
+            margin-top: auto; /* Đẩy label xuống dưới cùng */
         }
 
-        /* Accordion cho các kỳ học */
-        .semester-block {
-            border-bottom: 1px solid var(--border-color);
+        /* --- CONTROLS --- */
+        .controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .btn-save {
+            background: var(--text-main);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            background: #000;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+
+        /* --- SEMESTER LIST --- */
+        .semester-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
         }
 
         .semester-header {
-            background-color: #fff;
-            padding: 15px 20px;
+            padding: 18px 25px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-weight: 600;
-            user-select: none;
-            transition: background 0.2s;
-        }
-
-        .semester-header:hover {
-            background-color: #f1f3f5;
-        }
-
-        .semester-title {
-            color: var(--primary-color);
-            font-size: 16px;
-        }
-
-        .semester-summary {
-            font-size: 13px;
-            color: #666;
-        }
-
-        .semester-content {
-            display: none; /* Ẩn mặc định */
-            padding: 15px;
-            background-color: #fafafa;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .semester-content.active {
-            display: block;
-        }
-
-        /* Bảng môn học */
-        .subject-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 10px;
             background: white;
+            transition: background 0.2s;
+            user-select: none;
         }
 
-        .subject-table th {
-            text-align: left;
-            padding: 10px;
-            background-color: #e9ecef;
-            font-size: 12px;
-            color: #495057;
+        .semester-header:hover { background-color: #f9fafb; }
+
+        .sem-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #374151;
+            display: flex; align-items: center; gap: 12px;
+        }
+        
+        .sem-icon {
+            color: #8b5cf6;
+            background: #f3e8ff;
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            font-size: 0.9rem;
         }
 
-        .subject-table td {
-            padding: 8px;
-            border-bottom: 1px solid var(--border-color);
-            vertical-align: middle;
+        .sem-info { font-size: 0.9rem; color: var(--text-light); }
+
+        /* --- INPUTS & ROWS --- */
+        .semester-content {
+            display: none;
+            padding: 20px;
+            background: #f8fafc;
+            border-top: 1px solid #eee;
+            animation: slideDown 0.3s ease-out;
+        }
+        .semester-content.active { display: block; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .subject-row {
+            display: flex; flex-wrap: wrap; gap: 10px; padding: 15px;
+            background: white; border: 1px solid #e5e7eb; border-radius: 8px;
+            margin-bottom: 10px; align-items: flex-end; position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
-        /* Input Styles */
+        .field-group { flex: 1; min-width: 90px; }
+        .field-group label { display: block; font-size: 0.7rem; color: var(--text-light); margin-bottom: 5px; font-weight: 700; text-transform: uppercase; }
+
         input, select {
-            width: 100%;
-            padding: 6px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 13px;
+            width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px;
+            font-size: 0.9rem; outline: none; transition: 0.2s;
         }
+        input:focus, select:focus { border-color: #764ba2; box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1); }
 
-        input:focus {
-            border-color: var(--primary-color);
-            outline: none;
+        .preview-box {
+            text-align: center; font-weight: bold; padding: 8px;
+            background: #f3f4f6; border-radius: 6px; font-size: 0.9rem; color: #555;
         }
+        
+        .btn-add {
+            width: 100%; padding: 12px; border: 2px dashed #cbd5e1; background: none;
+            color: #64748b; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;
+        }
+        .btn-add:hover { border-color: #764ba2; color: #764ba2; background: #f3e8ff; }
 
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            transition: 0.2s;
+        .btn-del {
+            background: #fee2e2; color: #ef4444; border: none; width: 28px; height: 28px;
+            border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .btn-del:hover { background: #ef4444; color: white; }
+
+        /* --- STYLING CHO BADGE (RANKING) --- */
+        /* Badge cơ bản trong Dashboard */
+        .dash-badge { 
+            padding: 8px 15px; 
+            font-size: 1.1rem; 
+            font-weight: 800;
+            border-radius: 30px; 
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             display: inline-block;
+            min-width: 120px;
+            text-align: center;
         }
 
-        .btn-add { background-color: #28a745; color: white; margin-top: 10px; }
-        .btn-add:hover { background-color: #218838; }
-
-        .btn-del { background-color: #dc3545; color: white; padding: 4px 8px; font-size: 12px; }
-        .btn-calc { background-color: var(--primary-color); color: white; width: 100%; margin-top: 20px; padding: 12px; font-size: 16px; text-transform: uppercase; }
-        .btn-calc:hover { background-color: #004494; }
-
-        .badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
+        /* Màu Badge - Kim Loại */
+        .rank-gold {
+            background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%);
+            color: #6a4803; /* Màu chữ nâu đậm cho dễ đọc trên nền vàng */
+            border: 1px solid #ffeeba;
+        }
+        .rank-silver {
+            background: linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%);
+            color: #424242; /* Màu chữ xám đậm */
+            border: 1px solid #f8f9fa;
+        }
+        .rank-bronze {
+            background: linear-gradient(135deg, #d98e54 0%, #a0522d 100%);
+            color: white;
+            border: 1px solid #e0a884;
+        }
+        .rank-gray {
+            background: #6c757d;
             color: white;
         }
-        .rank-xs { background-color: #28a745; } /* Xuất sắc */
-        .rank-g { background-color: #17a2b8; }  /* Giỏi */
-        .rank-k { background-color: #ffc107; color: black; } /* Khá */
-        .rank-tb { background-color: #6c757d; } /* Trung bình */
-        .rank-y { background-color: #dc3545; }  /* Yếu */
+        .rank-red {
+            background: #dc3545;
+            color: white;
+        }
 
-        /* Responsive */
-        @media (max-width: 600px) {
-            .subject-table thead { display: none; }
-            .subject-table tr { display: block; margin-bottom: 15px; border: 1px solid #ddd; padding: 10px; background: white; border-radius: 5px; }
-            .subject-table td { display: block; text-align: right; padding: 5px 0; border: none; }
-            .subject-table td::before { content: attr(data-label); float: left; font-weight: bold; color: #555; }
-            .stat-box { width: 45%; margin: 5px; }
+        /* Badge nhỏ trong danh sách học kỳ */
+        .list-badge {
+            padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700;
+        }
+        .bg-xs { background: #dcfce7; color: #15803d; }
+        .bg-g { background: #dbeafe; color: #1d4ed8; }
+        .bg-k { background: #ffedd5; color: #9a3412; }
+        .bg-tb { background: #f3f4f6; color: #4b5563; }
+
+        /* Responsive Mobile */
+        @media (max-width: 650px) {
+            .dashboard { grid-template-columns: 1fr; gap: 10px; }
+            .stat-item { flex-direction: row; justify-content: space-between; padding: 15px 20px; min-height: auto; align-items: center; }
+            .stat-content-area { justify-content: flex-end; width: auto; flex: none; margin-bottom: 0; }
+            .stat-label { margin-top: 0; order: 1; }
+            .stat-content-area { order: 2; }
+            .stat-value { font-size: 1.5rem; }
+            .dash-badge { font-size: 0.9rem; padding: 5px 10px; min-width: auto; }
+            .subject-row { flex-direction: column; align-items: stretch; }
+            .btn-del { position: absolute; top: 10px; right: 10px; }
+            .app-title { font-size: 1.4rem; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <div class="app-header">
+        <h1 class="app-title"><i class="fas fa-university"></i> Hệ thống quản lý điểm GPA</h1>
+        <div class="app-subtitle">Theo dõi lộ trình học tập toàn khóa</div>
+    </div>
+
     <div class="dashboard">
-        <div class="stat-box">
-            <div class="stat-value" id="total-gpa">0.00</div>
-            <div class="stat-label">GPA Tích Lũy (Hệ 4)</div>
+        <div class="stat-item">
+            <div class="stat-content-area">
+                <div class="stat-value" id="total-gpa">0.00</div>
+            </div>
+            <div class="stat-label">GPA Tích Lũy</div>
         </div>
-        <div class="stat-box">
-            <div class="stat-value" id="total-credits">0</div>
+        <div class="stat-item">
+            <div class="stat-content-area">
+                <div class="stat-value" id="total-credits">0</div>
+            </div>
             <div class="stat-label">Tổng Tín Chỉ</div>
         </div>
-        <div class="stat-box">
-            <div class="stat-value" id="academic-rank">---</div>
-            <div class="stat-label">Xếp Loại Học Lực</div>
+        <div class="stat-item">
+            <div class="stat-content-area" id="academic-rank-area">
+                <span class="dash-badge rank-gray">---</span>
+            </div>
+            <div class="stat-label">Xếp Loại</div>
         </div>
     </div>
 
-    <div style="padding: 10px 20px; background: #fff; text-align: right; border-bottom: 1px solid #eee;">
-        <button class="btn btn-calc" onclick="calculateAll(true)" style="margin: 0; width: auto;">💾 Lưu Dữ Liệu & Tính Toán</button>
+    <div class="controls">
+        <button class="btn-save" onclick="calculateAll(true)">
+            <i class="fas fa-save"></i> Lưu Dữ Liệu
+        </button>
     </div>
 
-    <div id="semesters-container">
-        </div>
+    <div id="semesters-container"></div>
 </div>
 
 <script>
     const TOTAL_SEMESTERS = 8;
-    
-    // Cấu trúc dữ liệu mẫu
     let semestersData = {};
 
-    // Khởi tạo giao diện
     function init() {
         const container = document.getElementById('semesters-container');
-        
-        // Tải dữ liệu cũ nếu có
-        const savedData = localStorage.getItem('gpaData_v2');
-        if (savedData) {
-            semestersData = JSON.parse(savedData);
-        }
+        const savedData = localStorage.getItem('gpaData_v3'); 
+        if (savedData) semestersData = JSON.parse(savedData);
 
         for (let i = 1; i <= TOTAL_SEMESTERS; i++) {
-            // Nếu chưa có data cho kỳ này thì tạo mảng rỗng
             if (!semestersData[i]) semestersData[i] = [];
             
             const semDiv = document.createElement('div');
-            semDiv.className = 'semester-block';
+            semDiv.className = 'semester-card';
             semDiv.innerHTML = `
                 <div class="semester-header" onclick="toggleSemester(${i})">
-                    <span class="semester-title">Học Kỳ ${i}</span>
-                    <span class="semester-summary" id="summary-${i}">Chưa có dữ liệu</span>
+                    <div class="sem-title">
+                        <div class="sem-icon"><i class="fas fa-folder-open"></i></div>
+                        Học Kỳ ${i}
+                    </div>
+                    <div class="sem-info" id="summary-${i}">Chưa có dữ liệu</div>
                 </div>
                 <div class="semester-content" id="content-${i}">
-                    <table class="subject-table" id="table-${i}">
-                        <thead>
-                            <tr>
-                                <th style="width: 25%">Tên Môn</th>
-                                <th style="width: 10%">TC</th>
-                                <th style="width: 15%">Tỷ lệ (%)</th>
-                                <th style="width: 15%">QT/Tiểu luận</th>
-                                <th style="width: 15%">Cuối Kỳ</th>
-                                <th style="width: 15%">Kết Quả</th>
-                                <th style="width: 5%"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-${i}"></tbody>
-                    </table>
-                    <button class="btn btn-add" onclick="addSubjectRow(${i})">+ Thêm môn học</button>
+                    <div id="list-${i}"></div>
+                    <button class="btn-add" onclick="addSubjectRow(${i})">
+                        <i class="fas fa-plus"></i> Thêm môn học
+                    </button>
                 </div>
             `;
             container.appendChild(semDiv);
-            
-            // Render các môn học đã lưu
             renderSubjects(i);
         }
-        calculateAll(false); // Tính toán lại khi load trang
+        calculateAll(false);
     }
 
     function toggleSemester(id) {
-        const content = document.getElementById(`content-${id}`);
-        content.classList.toggle('active');
+        document.getElementById(`content-${id}`).classList.toggle('active');
     }
 
     function addSubjectRow(semId, data = null) {
-        const tbody = document.getElementById(`tbody-${semId}`);
-        const tr = document.createElement('tr');
+        const listDiv = document.getElementById(`list-${semId}`);
+        const div = document.createElement('div');
+        div.className = 'subject-row';
         
-        const subjectName = data ? data.name : '';
+        const name = data ? data.name : '';
         const credit = data ? data.credit : 3;
         const ratio = data ? data.ratio : '40-60';
         const s1 = data ? data.s1 : '';
         const s2 = data ? data.s2 : '';
 
-        tr.innerHTML = `
-            <td data-label="Tên Môn"><input type="text" class="inp-name" value="${subjectName}" placeholder="Nhập tên môn"></td>
-            <td data-label="Tín chỉ"><input type="number" class="inp-credit" value="${credit}" min="0"></td>
-            <td data-label="Tỷ lệ">
+        div.innerHTML = `
+            <div class="field-group" style="flex: 2;">
+                <label>Tên Môn</label>
+                <input type="text" class="inp-name" value="${name}" placeholder="Nhập tên môn...">
+            </div>
+            <div class="field-group">
+                <label>Số TC</label>
+                <input type="number" class="inp-credit" value="${credit}" min="0">
+            </div>
+            <div class="field-group">
+                <label>Tỷ lệ</label>
                 <select class="inp-ratio" onchange="calculateAll(false)">
-                    <option value="40-60" ${ratio === '40-60' ? 'selected' : ''}>40% - 60%</option>
-                    <option value="50-50" ${ratio === '50-50' ? 'selected' : ''}>50% - 50%</option>
-                    <option value="30-70" ${ratio === '30-70' ? 'selected' : ''}>30% - 70%</option>
-                    <option value="20-80" ${ratio === '20-80' ? 'selected' : ''}>20% - 80%</option>
-                    <option value="100-0" ${ratio === '100-0' ? 'selected' : ''}>100% (Đồ án)</option>
+                    <option value="40-60" ${ratio === '40-60' ? 'selected' : ''}>40/60</option>
+                    <option value="50-50" ${ratio === '50-50' ? 'selected' : ''}>50/50</option>
+                    <option value="30-70" ${ratio === '30-70' ? 'selected' : ''}>30/70</option>
+                    <option value="100-0" ${ratio === '100-0' ? 'selected' : ''}>100%</option>
                 </select>
-            </td>
-            <td data-label="Điểm QT"><input type="number" class="inp-s1" value="${s1}" step="0.1" placeholder="0-10" oninput="calculateAll(false)"></td>
-            <td data-label="Điểm CK"><input type="number" class="inp-s2" value="${s2}" step="0.1" placeholder="0-10" oninput="calculateAll(false)"></td>
-            <td data-label="Kết quả" class="preview-cell" style="font-weight:bold; color:#0056b3;">...</td>
-            <td><button class="btn btn-del" onclick="deleteRow(this, ${semId})">Xóa</button></td>
+            </div>
+            <div class="field-group">
+                <label>Điểm QT</label>
+                <input type="number" class="inp-s1" value="${s1}" step="0.1" placeholder="..." oninput="calculateAll(false)">
+            </div>
+            <div class="field-group">
+                <label>Điểm CK</label>
+                <input type="number" class="inp-s2" value="${s2}" step="0.1" placeholder="..." oninput="calculateAll(false)">
+            </div>
+            <div class="field-group" style="flex: 0.5;">
+                <label>Hệ 10</label>
+                <div class="preview-box preview-10">...</div>
+            </div>
+            <div class="field-group" style="flex: 0.5;">
+                <label>Hệ 4</label>
+                <div class="preview-box preview-4">...</div>
+            </div>
+            <button class="btn-del" onclick="deleteRow(this, ${semId})"><i class="fas fa-times"></i></button>
         `;
-        tbody.appendChild(tr);
+        listDiv.appendChild(div);
     }
 
     function deleteRow(btn, semId) {
-        btn.closest('tr').remove();
+        btn.closest('.subject-row').remove();
         calculateAll(false);
     }
 
     function renderSubjects(semId) {
-        const dataList = semestersData[semId];
-        if (dataList && dataList.length > 0) {
-            dataList.forEach(data => addSubjectRow(semId, data));
-        } else {
-            addSubjectRow(semId); // Thêm 1 dòng trống mặc định
-        }
+        const list = semestersData[semId];
+        if (list && list.length > 0) list.forEach(data => addSubjectRow(semId, data));
     }
 
-    // Logic tính điểm
     function getGrade4(score10) {
         if (score10 >= 8.5) return 4.0;
         if (score10 >= 8.0) return 3.5;
@@ -320,12 +445,32 @@
         return 0.0;
     }
     
-    function getRank(gpa) {
-        if (gpa >= 3.6) return '<span class="badge rank-xs">Xuất Sắc</span>';
-        if (gpa >= 3.2) return '<span class="badge rank-g">Giỏi</span>';
-        if (gpa >= 2.5) return '<span class="badge rank-k">Khá</span>';
-        if (gpa >= 2.0) return '<span class="badge rank-tb">Trung Bình</span>';
-        return '<span class="badge rank-y">Yếu/Kém</span>';
+    // Hàm lấy Badge nhỏ cho danh sách
+    function getListRankBadge(gpa) {
+        let label = 'Yếu';
+        let cssClass = 'bg-tb';
+        if (gpa >= 3.6) { label = 'Xuất Sắc'; cssClass = 'bg-xs'; }
+        else if (gpa >= 3.2) { label = 'Giỏi'; cssClass = 'bg-g'; }
+        else if (gpa >= 2.5) { label = 'Khá'; cssClass = 'bg-k'; }
+        else if (gpa >= 2.0) { label = 'Trung Bình'; cssClass = 'bg-tb'; }
+        return `<span class="list-badge ${cssClass}">${label}</span>`;
+    }
+
+    // Hàm lấy Badge to đẹp cho Dashboard
+    function updateDashboardRank(gpa) {
+        const area = document.getElementById('academic-rank-area');
+        let label = '---';
+        let cssClass = 'rank-gray';
+
+        if (gpa > 0) {
+            if (gpa >= 3.6) { label = 'Xuất Sắc'; cssClass = 'rank-gold'; }
+            else if (gpa >= 3.2) { label = 'Giỏi'; cssClass = 'rank-silver'; }
+            else if (gpa >= 2.5) { label = 'Khá'; cssClass = 'rank-bronze'; }
+            else if (gpa >= 2.0) { label = 'Trung Bình'; cssClass = 'rank-gray'; }
+            else { label = 'Yếu'; cssClass = 'rank-red'; }
+        }
+
+        area.innerHTML = `<span class="dash-badge ${cssClass}">${label}</span>`;
     }
 
     function calculateAll(save = true) {
@@ -334,8 +479,8 @@
         let newStorageData = {};
 
         for (let i = 1; i <= TOTAL_SEMESTERS; i++) {
-            const tbody = document.getElementById(`tbody-${i}`);
-            const rows = tbody.querySelectorAll('tr');
+            const listDiv = document.getElementById(`list-${i}`);
+            const rows = listDiv.querySelectorAll('.subject-row');
             let semPoints = 0;
             let semCredits = 0;
             let semData = [];
@@ -347,11 +492,10 @@
                 const s1 = parseFloat(row.querySelector('.inp-s1').value);
                 const s2 = parseFloat(row.querySelector('.inp-s2').value);
                 
-                // Lưu data
                 semData.push({name, credit, ratio: ratioStr, s1: isNaN(s1) ? '' : s1, s2: isNaN(s2) ? '' : s2});
 
-                // Tính toán hiển thị
-                const previewCell = row.querySelector('.preview-cell');
+                const prev10 = row.querySelector('.preview-10');
+                const prev4 = row.querySelector('.preview-4');
                 
                 if (!isNaN(s1) && (ratioStr === '100-0' || !isNaN(s2))) {
                     const r = ratioStr.split('-').map(x => parseInt(x)/100);
@@ -359,50 +503,49 @@
                     final10 = Math.round(final10 * 10) / 10;
                     const g4 = getGrade4(final10);
                     
-                    previewCell.innerHTML = `${final10} <br><small>(4.0: ${g4})</small>`;
+                    prev10.innerText = final10;
+                    prev4.innerText = g4;
                     
                     if (credit > 0) {
                         semPoints += g4 * credit;
                         semCredits += credit;
                     }
                 } else {
-                    previewCell.innerHTML = '...';
+                    prev10.innerText = '...';
+                    prev4.innerText = '...';
                 }
             });
 
             newStorageData[i] = semData;
 
-            // Cập nhật Header từng kỳ
-            const summarySpan = document.getElementById(`summary-${i}`);
+            const summaryDiv = document.getElementById(`summary-${i}`);
             if (semCredits > 0) {
                 const semGPA = (semPoints / semCredits).toFixed(2);
-                summarySpan.innerHTML = `GPA: <strong>${semGPA}</strong> | Tín chỉ: ${semCredits} | ${getRank(semGPA)}`;
+                summaryDiv.innerHTML = `GPA: <strong>${semGPA}</strong> | ${semCredits} tín | ${getListRankBadge(semGPA)}`;
                 
                 grandTotalPoints += semPoints;
                 grandTotalCredits += semCredits;
             } else {
-                summarySpan.innerHTML = `Chưa có dữ liệu`;
+                summaryDiv.innerHTML = `<span style="opacity:0.6; font-style:italic">Chưa có dữ liệu</span>`;
             }
         }
 
-        // Cập nhật Tổng thể
         if (grandTotalCredits > 0) {
             const totalGPA = (grandTotalPoints / grandTotalCredits).toFixed(2);
             document.getElementById('total-gpa').innerText = totalGPA;
             document.getElementById('total-credits').innerText = grandTotalCredits;
-            document.getElementById('academic-rank').innerHTML = getRank(totalGPA);
+            updateDashboardRank(totalGPA);
+        } else {
+            updateDashboardRank(0);
         }
 
-        // Lưu vào LocalStorage
         if (save) {
-            localStorage.setItem('gpaData_v2', JSON.stringify(newStorageData));
-            alert("Đã lưu dữ liệu thành công!");
+            localStorage.setItem('gpaData_v3', JSON.stringify(newStorageData));
+            alert("Dữ liệu đã được lưu thành công!");
         }
     }
 
-    // Chạy khi mở trang
     init();
-
 </script>
 
 </body>
