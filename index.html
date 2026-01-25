@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ Thống Quản Lý GPA</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -66,10 +67,8 @@
             gap: 20px;
             position: relative;
             overflow: hidden;
-            align-items: stretch; /* Kéo dãn các ô bằng nhau */
         }
 
-        /* Trang trí nền mờ */
         .dashboard::before {
             content: '';
             position: absolute;
@@ -87,17 +86,16 @@
             border: 1px solid rgba(255,255,255,0.2);
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Căn giữa dọc */
-            align-items: center; /* Căn giữa ngang */
+            justify-content: center;
+            align-items: center;
             padding: 20px 10px;
-            height: 100%; /* Chiều cao full ô lưới */
+            height: 100%;
             box-sizing: border-box;
             z-index: 1;
         }
 
-        /* Khu vực hiển thị con số hoặc Badge */
         .stat-content-area {
-            flex: 1; /* Chiếm phần lớn không gian */
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -118,7 +116,18 @@
             letter-spacing: 1px;
             opacity: 0.9;
             font-weight: 600;
-            margin-top: auto; /* Đẩy label xuống dưới cùng */
+            margin-top: auto;
+        }
+
+        /* --- CHART SECTION --- */
+        .chart-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            position: relative;
+            height: 300px; /* Chiều cao cố định cho biểu đồ */
         }
 
         /* --- CONTROLS --- */
@@ -235,7 +244,6 @@
         .btn-del:hover { background: #ef4444; color: white; }
 
         /* --- STYLING CHO BADGE (RANKING) --- */
-        /* Badge cơ bản trong Dashboard */
         .dash-badge { 
             padding: 8px 15px; 
             font-size: 1.1rem; 
@@ -248,41 +256,18 @@
             text-align: center;
         }
 
-        /* Màu Badge - Kim Loại */
-        .rank-gold {
-            background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%);
-            color: #6a4803; /* Màu chữ nâu đậm cho dễ đọc trên nền vàng */
-            border: 1px solid #ffeeba;
-        }
-        .rank-silver {
-            background: linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%);
-            color: #424242; /* Màu chữ xám đậm */
-            border: 1px solid #f8f9fa;
-        }
-        .rank-bronze {
-            background: linear-gradient(135deg, #d98e54 0%, #a0522d 100%);
-            color: white;
-            border: 1px solid #e0a884;
-        }
-        .rank-gray {
-            background: #6c757d;
-            color: white;
-        }
-        .rank-red {
-            background: #dc3545;
-            color: white;
-        }
+        .rank-gold { background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%); color: #6a4803; border: 1px solid #ffeeba; }
+        .rank-silver { background: linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%); color: #424242; border: 1px solid #f8f9fa; }
+        .rank-bronze { background: linear-gradient(135deg, #d98e54 0%, #a0522d 100%); color: white; border: 1px solid #e0a884; }
+        .rank-gray { background: #6c757d; color: white; }
+        .rank-red { background: #dc3545; color: white; }
 
-        /* Badge nhỏ trong danh sách học kỳ */
-        .list-badge {
-            padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700;
-        }
+        .list-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; }
         .bg-xs { background: #dcfce7; color: #15803d; }
         .bg-g { background: #dbeafe; color: #1d4ed8; }
         .bg-k { background: #ffedd5; color: #9a3412; }
         .bg-tb { background: #f3f4f6; color: #4b5563; }
 
-        /* Responsive Mobile */
         @media (max-width: 650px) {
             .dashboard { grid-template-columns: 1fr; gap: 10px; }
             .stat-item { flex-direction: row; justify-content: space-between; padding: 15px 20px; min-height: auto; align-items: center; }
@@ -326,9 +311,13 @@
         </div>
     </div>
 
+    <div class="chart-card">
+        <canvas id="gpaChart"></canvas>
+    </div>
+
     <div class="controls">
         <button class="btn-save" onclick="calculateAll(true)">
-            <i class="fas fa-save"></i> Lưu Dữ Liệu
+            <i class="fas fa-save"></i> Lưu Dữ Liệu & Tính Toán
         </button>
     </div>
 
@@ -338,6 +327,7 @@
 <script>
     const TOTAL_SEMESTERS = 8;
     let semestersData = {};
+    let gpaChartInstance = null; // Biến lưu biểu đồ
 
     function init() {
         const container = document.getElementById('semesters-container');
@@ -445,7 +435,6 @@
         return 0.0;
     }
     
-    // Hàm lấy Badge nhỏ cho danh sách
     function getListRankBadge(gpa) {
         let label = 'Yếu';
         let cssClass = 'bg-tb';
@@ -456,7 +445,6 @@
         return `<span class="list-badge ${cssClass}">${label}</span>`;
     }
 
-    // Hàm lấy Badge to đẹp cho Dashboard
     function updateDashboardRank(gpa) {
         const area = document.getElementById('academic-rank-area');
         let label = '---';
@@ -473,10 +461,69 @@
         area.innerHTML = `<span class="dash-badge ${cssClass}">${label}</span>`;
     }
 
+    // --- HÀM VẼ BIỂU ĐỒ ---
+    function updateChart(dataPoints) {
+        const ctx = document.getElementById('gpaChart').getContext('2d');
+        const labels = Array.from({length: TOTAL_SEMESTERS}, (_, i) => `Kỳ ${i+1}`);
+        
+        // Tạo gradient màu tím
+        let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(118, 75, 162, 0.5)');
+        gradient.addColorStop(1, 'rgba(118, 75, 162, 0.0)');
+
+        // Nếu biểu đồ đã có thì hủy đi vẽ lại
+        if (gpaChartInstance) gpaChartInstance.destroy();
+
+        gpaChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'GPA Qua Các Kỳ',
+                    data: dataPoints, // Mảng điểm (ví dụ: [3.2, 3.5, 3.0, null...])
+                    borderColor: '#764ba2',
+                    backgroundColor: gradient,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#764ba2',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    fill: true,
+                    tension: 0.4 // Làm mềm đường cong
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 4.0, // Cố định thang 4
+                        ticks: { stepSize: 0.5 }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `GPA: ${context.parsed.y}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     function calculateAll(save = true) {
         let grandTotalPoints = 0;
         let grandTotalCredits = 0;
         let newStorageData = {};
+        
+        // Mảng chứa GPA từng kỳ để vẽ biểu đồ
+        let chartData = []; 
 
         for (let i = 1; i <= TOTAL_SEMESTERS; i++) {
             const listDiv = document.getElementById(`list-${i}`);
@@ -525,8 +572,12 @@
                 
                 grandTotalPoints += semPoints;
                 grandTotalCredits += semCredits;
+                
+                // Thêm vào dữ liệu biểu đồ
+                chartData.push(semGPA);
             } else {
                 summaryDiv.innerHTML = `<span style="opacity:0.6; font-style:italic">Chưa có dữ liệu</span>`;
+                chartData.push(null); // Không có điểm thì để trống trên biểu đồ
             }
         }
 
@@ -538,6 +589,9 @@
         } else {
             updateDashboardRank(0);
         }
+
+        // Vẽ lại biểu đồ
+        updateChart(chartData);
 
         if (save) {
             localStorage.setItem('gpaData_v3', JSON.stringify(newStorageData));
