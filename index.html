@@ -197,7 +197,13 @@
             font-size: 0.9rem;
         }
 
-        .sem-info { font-size: 0.9rem; color: var(--text-light); }
+        .sem-info { 
+            font-size: 0.9rem; 
+            color: var(--text-light); 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
         /* --- INPUTS & ROWS --- */
         .semester-content {
@@ -262,6 +268,14 @@
         .rank-bronze { background: linear-gradient(135deg, #d98e54 0%, #a0522d 100%); color: white; border: 1px solid #e0a884; }
         .rank-gray { background: #6c757d; color: white; }
         .rank-red { background: #dc3545; color: white; }
+
+        /* List Badges (Học kỳ & Môn học) */
+        .list-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; display: inline-block; }
+        .bg-xs { background: #16a34a; color: white; }
+        .bg-g { background: #0ea5e9; color: white; }
+        .bg-k { background: #f59e0b; color: white; }
+        .bg-tb { background: #6b7280; color: white; }
+        .bg-y { background: #dc2626; color: white; }
 
         /* Subject Badges (Theo bảng quy đổi) */
         .bg-gioi { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
@@ -333,8 +347,8 @@
 
     function init() {
         const container = document.getElementById('semesters-container');
-        // Nâng cấp lên v5 để reset dữ liệu cũ, tránh lỗi khi đổi logic ô Tín chỉ
-        const savedData = localStorage.getItem('gpaData_v5'); 
+        // Nâng cấp lên v6 để reset dữ liệu cũ
+        const savedData = localStorage.getItem('gpaData_v6'); 
         if (savedData) semestersData = JSON.parse(savedData);
 
         for (let i = 1; i <= TOTAL_SEMESTERS; i++) {
@@ -373,7 +387,6 @@
         div.className = 'subject-row';
         
         const name = data ? data.name : '';
-        // SỬA ĐỔI: Nếu không có data cũ thì để trống (không mặc định là 3 nữa)
         const credit = data ? data.credit : ''; 
         const ratio = data ? data.ratio : '40-60';
         const s1 = data ? data.s1 : '';
@@ -434,7 +447,7 @@
         if (list && list.length > 0) list.forEach(data => addSubjectRow(semId, data));
     }
 
-    // Logic quy đổi (Dựa trên ảnh bảng điểm)
+    // Logic quy đổi môn học
     function getCourseResult(score10) {
         if (score10 >= 8.5) return { g4: 4.0, char: 'A', text: 'Giỏi', css: 'bg-gioi' };
         if (score10 >= 8.0) return { g4: 3.5, char: 'B+', text: 'Khá', css: 'bg-kha' };
@@ -445,7 +458,19 @@
         if (score10 >= 4.0) return { g4: 1.0, char: 'D', text: 'TB Yếu', css: 'bg-tbyeu' };
         return { g4: 0.0, char: 'F', text: 'Kém', css: 'bg-kem' };
     }
+
+    // Hàm lấy Badge xếp loại cho từng học kỳ
+    function getListRankBadge(gpa) {
+        let label = 'Yếu';
+        let cssClass = 'bg-y';
+        if (gpa >= 3.6) { label = 'Xuất Sắc'; cssClass = 'bg-xs'; }
+        else if (gpa >= 3.2) { label = 'Giỏi'; cssClass = 'bg-g'; }
+        else if (gpa >= 2.5) { label = 'Khá'; cssClass = 'bg-k'; }
+        else if (gpa >= 2.0) { label = 'Trung Bình'; cssClass = 'bg-tb'; }
+        return `<span class="list-badge ${cssClass}">${label}</span>`;
+    }
     
+    // Hàm xếp loại tổng kết toàn khóa (Dashboard)
     function updateDashboardRank(gpa) {
         const area = document.getElementById('academic-rank-area');
         let label = '---';
@@ -515,7 +540,6 @@
 
             rows.forEach(row => {
                 const name = row.querySelector('.inp-name').value;
-                // Nếu người dùng chưa nhập TC thì coi là 0 để không bị lỗi NaN
                 const creditVal = row.querySelector('.inp-credit').value;
                 const credit = (creditVal === '') ? 0 : parseFloat(creditVal);
                 
@@ -523,10 +547,9 @@
                 const s1 = parseFloat(row.querySelector('.inp-s1').value);
                 const s2 = parseFloat(row.querySelector('.inp-s2').value);
                 
-                // Lưu lại cả chuỗi rỗng của TC để lần sau hiển thị lại đúng ô trống
                 semData.push({
                     name, 
-                    credit: creditVal, // Lưu giá trị gốc (có thể là rỗng)
+                    credit: creditVal, 
                     ratio: ratioStr, 
                     s1: isNaN(s1) ? '' : s1, 
                     s2: isNaN(s2) ? '' : s2
@@ -560,10 +583,21 @@
 
             newStorageData[i] = semData;
 
+            // Cập nhật tiêu đề từng học kỳ
             const summaryDiv = document.getElementById(`summary-${i}`);
             if (semCredits > 0) {
                 const semGPA = (semPoints / semCredits).toFixed(2);
-                summaryDiv.innerHTML = `GPA: <strong>${semGPA}</strong> | ${semCredits} tín`;
+                // Thêm phần Xếp loại học lực vào đây
+                const rankBadge = getListRankBadge(semGPA);
+                
+                summaryDiv.innerHTML = `
+                    GPA: <strong>${semGPA}</strong> 
+                    <span style="margin:0 8px; color:#ddd">|</span> 
+                    ${semCredits} tín
+                    <span style="margin:0 8px; color:#ddd">|</span>
+                    ${rankBadge}
+                `;
+                
                 grandTotalPoints += semPoints;
                 grandTotalCredits += semCredits;
                 chartData.push(semGPA);
@@ -585,7 +619,7 @@
         updateChart(chartData);
 
         if (save) {
-            localStorage.setItem('gpaData_v5', JSON.stringify(newStorageData));
+            localStorage.setItem('gpaData_v6', JSON.stringify(newStorageData));
             alert("Dữ liệu đã được cập nhật thành công!");
         }
     }
