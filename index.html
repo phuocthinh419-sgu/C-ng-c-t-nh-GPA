@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý GPA - V11</title>
+    <title>Hệ Thống Quản Lý GPA - V12 (Excel)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -19,6 +20,7 @@
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --modal-overlay: rgba(0, 0, 0, 0.5);
             --btn-strategy-bg: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --btn-excel-bg: #107c41; /* Màu xanh Excel */
         }
 
         body.dark-mode {
@@ -140,8 +142,7 @@
         
         .btn-save { background: var(--text-main); color: var(--card-bg); }
         .btn-strategy { background: var(--btn-strategy-bg); color: white; }
-        .btn-outline { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); }
-        .btn-outline:hover { background: var(--bg-color); border-color: #8b5cf6; color: #8b5cf6; }
+        .btn-excel { background: var(--btn-excel-bg); color: white; } /* Nút Excel màu xanh */
 
         .btn-add { width: 100%; padding: 12px; border: 2px dashed var(--border-color); background: none; color: var(--text-light); border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn-add:hover { border-color: #8b5cf6; color: #8b5cf6; background: rgba(139, 92, 246, 0.05); }
@@ -245,16 +246,17 @@
             <i class="fas fa-chess"></i> Chiến Lược
         </button>
         <div class="controls-right">
-            <button class="btn btn-outline" onclick="exportData()" title="Tải file dữ liệu về máy">
-                <i class="fas fa-file-export"></i> Xuất File
+            <button class="btn btn-excel" onclick="exportExcel()" title="Tải file Excel về máy">
+                <i class="fas fa-file-excel"></i> Xuất Excel
             </button>
-            <button class="btn btn-outline" onclick="triggerImport()" title="Tải file dữ liệu lên hệ thống">
-                <i class="fas fa-file-import"></i> Nạp File
+            <button class="btn btn-excel" onclick="triggerImport()" title="Tải file Excel lên hệ thống">
+                <i class="fas fa-file-upload"></i> Nạp Excel
             </button>
+            
             <button class="btn btn-save" onclick="calculateAll(true)">
                 <i class="fas fa-save"></i> Lưu Dữ Liệu
             </button>
-            <input type="file" id="file-input" style="display:none" accept=".json" onchange="importData(this)">
+            <input type="file" id="file-input" style="display:none" accept=".xlsx, .xls" onchange="importExcel(this)">
         </div>
     </div>
 
@@ -316,7 +318,7 @@
 
 <script>
     const TOTAL_SEMESTERS = 8;
-    const STORAGE_KEY = 'gpaData_v11';
+    const STORAGE_KEY = 'gpaData_v12'; // V12 for Excel
     let semestersData = {};
     let gpaChartInstance = null;
     let currentCalcData = { s1: 0, r1: 0, r2: 0 };
@@ -324,7 +326,6 @@
     let currentTotalCredits = 0;
 
     function init() {
-        // Theme
         try {
             const theme = localStorage.getItem('theme');
             if (theme === 'dark') document.body.classList.add('dark-mode');
@@ -332,12 +333,11 @@
         updateThemeIcon();
         loadProfile();
 
-        // Load Data - Migration Logic
         const container = document.getElementById('semesters-container');
-        // Check for v11 first, then v10, v8
+        // Check for v12, then v11, v10...
         let savedData = localStorage.getItem(STORAGE_KEY);
+        if(!savedData) savedData = localStorage.getItem('gpaData_v11');
         if(!savedData) savedData = localStorage.getItem('gpaData_v10');
-        if(!savedData) savedData = localStorage.getItem('gpaData_v8');
 
         if (savedData) semestersData = JSON.parse(savedData);
 
@@ -361,56 +361,105 @@
         calculateAll(false);
     }
 
-    // --- IMPORT / EXPORT FUNCTIONS ---
-    function exportData() {
-        const data = {
-            gpa: semestersData,
-            profile: JSON.parse(localStorage.getItem('userProfile') || '{}'),
-            theme: localStorage.getItem('theme') || 'light'
-        };
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        const name = document.getElementById('profile-name').value || "SinhVien";
-        downloadAnchorNode.setAttribute("download", `GPA_Backup_${name}.json`);
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
+    // --- EXCEL FUNCTIONS ---
+    function exportExcel() {
+        // 1. Prepare Data for Sheet 1 (Grades)
+        let gradeRows = [["Học Kỳ", "Tên Môn", "Số TC", "Tỷ Lệ", "Điểm QT", "Điểm CK"]];
+        for (let i = 1; i <= TOTAL_SEMESTERS; i++) {
+            if (semestersData[i] && semestersData[i].length > 0) {
+                semestersData[i].forEach(subj => {
+                    gradeRows.push([i, subj.name, subj.credit, subj.ratio, subj.s1, subj.s2]);
+                });
+            }
+        }
+
+        // 2. Prepare Data for Sheet 2 (Profile & Settings)
+        let profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+        let theme = localStorage.getItem('theme') || 'light';
+        let infoRows = [
+            ["Key", "Value"],
+            ["Name", profile.name || ""],
+            ["ID", profile.id || ""],
+            ["Theme", theme]
+        ];
+
+        // 3. Create Workbook
+        const wb = XLSX.utils.book_new();
+        const wsGrades = XLSX.utils.aoa_to_sheet(gradeRows);
+        const wsInfo = XLSX.utils.aoa_to_sheet(infoRows);
+
+        XLSX.utils.book_append_sheet(wb, wsGrades, "BangDiem");
+        XLSX.utils.book_append_sheet(wb, wsInfo, "HoSo");
+
+        // 4. Download
+        const name = profile.name || "BangDiem";
+        XLSX.writeFile(wb, `GPA_${name}.xlsx`);
     }
 
     function triggerImport() {
         document.getElementById('file-input').click();
     }
 
-    function importData(input) {
+    function importExcel(input) {
         const file = input.files[0];
         if (!file) return;
+
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
-                const data = JSON.parse(e.target.result);
-                if (data.gpa) {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(data.gpa));
-                    semestersData = data.gpa;
+                const data = new Uint8Array(e.target.result);
+                const wb = XLSX.read(data, {type: 'array'});
+
+                // 1. Parse Grades
+                const wsGrades = wb.Sheets["BangDiem"];
+                if (wsGrades) {
+                    const jsonData = XLSX.utils.sheet_to_json(wsGrades);
+                    // Reset data
+                    semestersData = {}; 
+                    jsonData.forEach(row => {
+                        const sem = row["Học Kỳ"];
+                        if (!semestersData[sem]) semestersData[sem] = [];
+                        semestersData[sem].push({
+                            name: row["Tên Môn"] || "",
+                            credit: row["Số TC"] || "",
+                            ratio: row["Tỷ Lệ"] || "40-60",
+                            s1: row["Điểm QT"],
+                            s2: row["Điểm CK"]
+                        });
+                    });
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(semestersData));
                 }
-                if (data.profile) localStorage.setItem('userProfile', JSON.stringify(data.profile));
-                if (data.theme) localStorage.setItem('theme', data.theme);
-                alert('Nạp dữ liệu thành công! Trang sẽ tải lại.');
+
+                // 2. Parse Profile
+                const wsInfo = wb.Sheets["HoSo"];
+                if (wsInfo) {
+                    const jsonInfo = XLSX.utils.sheet_to_json(wsInfo);
+                    let profile = {};
+                    let theme = 'light';
+                    jsonInfo.forEach(row => {
+                        if (row.Key === "Name") profile.name = row.Value;
+                        if (row.Key === "ID") profile.id = row.Value;
+                        if (row.Key === "Theme") theme = row.Value;
+                    });
+                    localStorage.setItem('userProfile', JSON.stringify(profile));
+                    localStorage.setItem('theme', theme);
+                }
+
+                alert('Nạp dữ liệu Excel thành công!');
                 location.reload();
             } catch (err) {
-                alert('File lỗi hoặc không đúng định dạng!');
                 console.error(err);
+                alert('File không hợp lệ hoặc cấu trúc sai!');
             }
         };
-        reader.readAsText(file);
+        reader.readAsArrayBuffer(file);
     }
 
     // --- STANDARD FUNCTIONS ---
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
-        localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-        updateThemeIcon();
-        calculateAll(false);
+        try { localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); } catch(e){}
+        updateThemeIcon(); calculateAll(false);
     }
     function updateThemeIcon() {
         const btn = document.querySelector('.theme-toggle');
@@ -422,8 +471,7 @@
         const name = document.getElementById('profile-name').value;
         const id = document.getElementById('profile-id').value;
         localStorage.setItem('userProfile', JSON.stringify({ name, id }));
-        loadProfile();
-        closeModal('profileModal');
+        loadProfile(); closeModal('profileModal');
     }
     function loadProfile() {
         let data = null; try{data=localStorage.getItem('userProfile')}catch(e){}
@@ -531,6 +579,8 @@
         if (req > 10) resDiv.innerHTML = `Không thể! (${req.toFixed(2)})`; else if (req < 0) resDiv.innerHTML = `Đã đạt!`; else resDiv.innerHTML = `Cần thi cuối kỳ: <span style="font-size:1.5rem; color:#d97706">${req.toFixed(2)}</span>`;
     }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    
+    // --- GRADE LOGIC ---
     function getCourseResult(score10) {
         if (score10 >= 8.5) return { g4: 4.0, char: 'A', text: 'Giỏi', css: 'bg-gioi' };
         if (score10 >= 8.0) return { g4: 3.5, char: 'B+', text: 'Khá', css: 'bg-kha' };
@@ -597,7 +647,9 @@
         if (grandCredits > 0) { currentTotalGPA = (grandPoints / grandCredits).toFixed(2); document.getElementById('total-gpa').innerText = currentTotalGPA; document.getElementById('total-credits').innerText = grandCredits; updateDashboardRank(currentTotalGPA); } 
         else { currentTotalGPA = 0; updateDashboardRank(0); }
         updateChart(chartData);
-        if (save) { localStorage.setItem(STORAGE_KEY, JSON.stringify(newData)); alert("Dữ liệu đã được lưu!"); }
+        if (save) { 
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newData)); alert("Dữ liệu đã được lưu!"); } catch(e){}
+        }
     }
     init();
 </script>
