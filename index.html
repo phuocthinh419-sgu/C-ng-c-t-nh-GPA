@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý GPA - V12 (Excel)</title>
+    <title>Hệ Thống Quản Lý GPA - V13 (Excel Fixed)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
@@ -20,7 +20,7 @@
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --modal-overlay: rgba(0, 0, 0, 0.5);
             --btn-strategy-bg: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            --btn-excel-bg: #107c41; /* Màu xanh Excel */
+            --btn-excel-bg: #107c41;
         }
 
         body.dark-mode {
@@ -46,7 +46,6 @@
 
         .container { max-width: 950px; margin: 0 auto; position: relative; }
 
-        /* THEME TOGGLE */
         .theme-toggle {
             position: absolute; top: 10px; right: 10px;
             background: var(--card-bg); border: 2px solid var(--border-color);
@@ -57,7 +56,6 @@
         }
         .theme-toggle:hover { transform: scale(1.05); border-color: #8b5cf6; }
 
-        /* HEADER & PROFILE */
         .app-header { text-align: center; margin-bottom: 25px; padding-top: 20px; }
         .app-title {
             font-size: 1.8rem; font-weight: 800; text-transform: uppercase;
@@ -68,7 +66,6 @@
         .user-info:hover { color: #8b5cf6; }
         .app-subtitle { font-size: 0.85rem; color: var(--text-light); }
 
-        /* DASHBOARD */
         .dashboard {
             background: var(--primary-gradient); color: white; padding: 30px;
             border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(118, 75, 162, 0.4);
@@ -88,7 +85,6 @@
         .stat-value { font-size: 2.5rem; font-weight: 800; line-height: 1; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
         .stat-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; font-weight: 600; margin-top: auto; }
 
-        /* CARDS */
         .chart-card, .semester-card {
             background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow);
             border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 20px;
@@ -111,7 +107,6 @@
         .semester-content.active { display: block; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* INPUTS */
         .subject-row {
             display: flex; flex-wrap: wrap; gap: 12px; padding: 15px;
             background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px;
@@ -133,7 +128,6 @@
             min-height: 20px; display: flex; align-items: center; justify-content: center;
         }
 
-        /* CONTROLS */
         .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .controls-right { display: flex; gap: 8px; flex-wrap: wrap; }
         
@@ -142,7 +136,7 @@
         
         .btn-save { background: var(--text-main); color: var(--card-bg); }
         .btn-strategy { background: var(--btn-strategy-bg); color: white; }
-        .btn-excel { background: var(--btn-excel-bg); color: white; } /* Nút Excel màu xanh */
+        .btn-excel { background: var(--btn-excel-bg); color: white; }
 
         .btn-add { width: 100%; padding: 12px; border: 2px dashed var(--border-color); background: none; color: var(--text-light); border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn-add:hover { border-color: #8b5cf6; color: #8b5cf6; background: rgba(139, 92, 246, 0.05); }
@@ -153,7 +147,6 @@
         .btn-calc-target { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
         .btn-calc-target:hover { background: #3b82f6; color: white; }
 
-        /* BADGES */
         .dash-badge { padding: 8px 15px; font-size: 1.1rem; font-weight: 800; border-radius: 30px; text-transform: uppercase; box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: inline-block; min-width: 120px; text-align: center; }
         .rank-gold { background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%); color: #6a4803; border: 1px solid #ffeeba; }
         .rank-silver { background: linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%); color: #424242; border: 1px solid #f8f9fa; }
@@ -175,7 +168,6 @@
         .bg-tbyeu { background: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; }
         .bg-kem { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
-        /* MODALS */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); z-index: 10000; display: none;
@@ -252,7 +244,6 @@
             <button class="btn btn-excel" onclick="triggerImport()" title="Tải file Excel lên hệ thống">
                 <i class="fas fa-file-upload"></i> Nạp Excel
             </button>
-            
             <button class="btn btn-save" onclick="calculateAll(true)">
                 <i class="fas fa-save"></i> Lưu Dữ Liệu
             </button>
@@ -318,7 +309,7 @@
 
 <script>
     const TOTAL_SEMESTERS = 8;
-    const STORAGE_KEY = 'gpaData_v12'; // V12 for Excel
+    const STORAGE_KEY = 'gpaData_v13'; 
     let semestersData = {};
     let gpaChartInstance = null;
     let currentCalcData = { s1: 0, r1: 0, r2: 0 };
@@ -334,10 +325,10 @@
         loadProfile();
 
         const container = document.getElementById('semesters-container');
-        // Check for v12, then v11, v10...
+        // Check for v13, then v12, v11...
         let savedData = localStorage.getItem(STORAGE_KEY);
+        if(!savedData) savedData = localStorage.getItem('gpaData_v12');
         if(!savedData) savedData = localStorage.getItem('gpaData_v11');
-        if(!savedData) savedData = localStorage.getItem('gpaData_v10');
 
         if (savedData) semestersData = JSON.parse(savedData);
 
@@ -363,7 +354,10 @@
 
     // --- EXCEL FUNCTIONS ---
     function exportExcel() {
-        // 1. Prepare Data for Sheet 1 (Grades)
+        // QUAN TRỌNG: Cập nhật dữ liệu từ màn hình vào biến semestersData trước khi xuất
+        calculateAll(false); 
+
+        // 1. Prepare Data
         let gradeRows = [["Học Kỳ", "Tên Môn", "Số TC", "Tỷ Lệ", "Điểm QT", "Điểm CK"]];
         for (let i = 1; i <= TOTAL_SEMESTERS; i++) {
             if (semestersData[i] && semestersData[i].length > 0) {
@@ -373,17 +367,11 @@
             }
         }
 
-        // 2. Prepare Data for Sheet 2 (Profile & Settings)
         let profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
         let theme = localStorage.getItem('theme') || 'light';
-        let infoRows = [
-            ["Key", "Value"],
-            ["Name", profile.name || ""],
-            ["ID", profile.id || ""],
-            ["Theme", theme]
-        ];
+        let infoRows = [["Key", "Value"], ["Name", profile.name || ""], ["ID", profile.id || ""], ["Theme", theme]];
 
-        // 3. Create Workbook
+        // 2. Create Workbook
         const wb = XLSX.utils.book_new();
         const wsGrades = XLSX.utils.aoa_to_sheet(gradeRows);
         const wsInfo = XLSX.utils.aoa_to_sheet(infoRows);
@@ -391,51 +379,39 @@
         XLSX.utils.book_append_sheet(wb, wsGrades, "BangDiem");
         XLSX.utils.book_append_sheet(wb, wsInfo, "HoSo");
 
-        // 4. Download
+        // 3. Download
         const name = profile.name || "BangDiem";
         XLSX.writeFile(wb, `GPA_${name}.xlsx`);
     }
 
-    function triggerImport() {
-        document.getElementById('file-input').click();
-    }
+    function triggerImport() { document.getElementById('file-input').click(); }
 
     function importExcel(input) {
         const file = input.files[0];
         if (!file) return;
-
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
                 const data = new Uint8Array(e.target.result);
                 const wb = XLSX.read(data, {type: 'array'});
-
-                // 1. Parse Grades
                 const wsGrades = wb.Sheets["BangDiem"];
                 if (wsGrades) {
                     const jsonData = XLSX.utils.sheet_to_json(wsGrades);
-                    // Reset data
                     semestersData = {}; 
                     jsonData.forEach(row => {
                         const sem = row["Học Kỳ"];
                         if (!semestersData[sem]) semestersData[sem] = [];
                         semestersData[sem].push({
-                            name: row["Tên Môn"] || "",
-                            credit: row["Số TC"] || "",
-                            ratio: row["Tỷ Lệ"] || "40-60",
-                            s1: row["Điểm QT"],
-                            s2: row["Điểm CK"]
+                            name: row["Tên Môn"] || "", credit: row["Số TC"] || "",
+                            ratio: row["Tỷ Lệ"] || "40-60", s1: row["Điểm QT"], s2: row["Điểm CK"]
                         });
                     });
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(semestersData));
                 }
-
-                // 2. Parse Profile
                 const wsInfo = wb.Sheets["HoSo"];
                 if (wsInfo) {
                     const jsonInfo = XLSX.utils.sheet_to_json(wsInfo);
-                    let profile = {};
-                    let theme = 'light';
+                    let profile = {}; let theme = 'light';
                     jsonInfo.forEach(row => {
                         if (row.Key === "Name") profile.name = row.Value;
                         if (row.Key === "ID") profile.id = row.Value;
@@ -444,13 +420,8 @@
                     localStorage.setItem('userProfile', JSON.stringify(profile));
                     localStorage.setItem('theme', theme);
                 }
-
-                alert('Nạp dữ liệu Excel thành công!');
-                location.reload();
-            } catch (err) {
-                console.error(err);
-                alert('File không hợp lệ hoặc cấu trúc sai!');
-            }
+                alert('Nạp dữ liệu Excel thành công!'); location.reload();
+            } catch (err) { console.error(err); alert('File lỗi!'); }
         };
         reader.readAsArrayBuffer(file);
     }
@@ -615,6 +586,8 @@
             options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 4.0, grid: { color: isDark?'#374151':'#e5e7eb' }, ticks: { color: isDark?'#9ca3af':'#666' } }, x: { grid: { display: false }, ticks: { color: isDark?'#9ca3af':'#666' } } }, plugins: { legend: { display: false } } }
         });
     }
+    
+    // --- MAIN LOGIC (FIXED) ---
     function calculateAll(save = true) {
         let grandPoints=0, grandCredits=0, newData={}, chartData=[];
         for (let i = 1; i <= TOTAL_SEMESTERS; i++) {
@@ -643,6 +616,10 @@
             if(semCredits>0) { const gpa=(semPoints/semCredits).toFixed(2); sumDiv.innerHTML=`GPA: <strong>${gpa}</strong> | ${semCredits} tín | ${getListRankBadge(gpa)}`; grandPoints+=semPoints; grandCredits+=semCredits; chartData.push(gpa); } 
             else { sumDiv.innerHTML=`<span style="opacity:0.6; font-style:italic">Chưa có dữ liệu</span>`; chartData.push(null); }
         }
+        
+        // CẬP NHẬT BIẾN TOÀN CỤC NGAY LẬP TỨC (Fix Lỗi Excel)
+        semestersData = newData;
+
         currentTotalCredits = grandCredits;
         if (grandCredits > 0) { currentTotalGPA = (grandPoints / grandCredits).toFixed(2); document.getElementById('total-gpa').innerText = currentTotalGPA; document.getElementById('total-credits').innerText = grandCredits; updateDashboardRank(currentTotalGPA); } 
         else { currentTotalGPA = 0; updateDashboardRank(0); }
