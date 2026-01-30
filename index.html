@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý GPA - V14 (Ultimate)</title>
+    <title>Hệ Thống Quản Lý GPA - V15</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
@@ -14,7 +14,6 @@
             --text-main: #1f2937; --text-light: #6b7280;
             --border-color: #e5e7eb; --input-bg: #ffffff; --input-border: #d1d5db;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --modal-overlay: rgba(0, 0, 0, 0.5);
             --btn-strategy-bg: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             --btn-excel-bg: #107c41;
         }
@@ -24,7 +23,6 @@
             --text-main: #f3f4f6; --text-light: #9ca3af;
             --border-color: #374151; --input-bg: #374151; --input-border: #4b5563;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-            --modal-overlay: rgba(255, 255, 255, 0.1);
         }
         body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; line-height: 1.5; transition: 0.3s; }
         .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; }
@@ -38,27 +36,24 @@
         .user-info:hover { color: #8b5cf6; }
         .app-subtitle { font-size: 0.85rem; color: var(--text-light); }
 
-        /* DASHBOARD - NEW PROGRESS CIRCLE */
+        /* DASHBOARD */
         .dashboard { background: var(--primary-gradient); color: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(118, 75, 162, 0.4); margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 15px; position: relative; overflow: hidden; align-items: center; }
         .dashboard::before { content: ''; position: absolute; top: -50px; left: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; z-index: 0; }
-        
-        .stat-item { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px); border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; height: 160px; box-sizing: border-box; z-index: 1; }
+        .stat-item { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px); border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; height: 160px; box-sizing: border-box; z-index: 1; position: relative; }
         .stat-value { font-size: 2.5rem; font-weight: 800; line-height: 1; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
         .stat-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; font-weight: 600; margin-top: 10px; text-align: center; }
 
-        /* PROGRESS CIRCLE STYLES */
+        /* PROGRESS CIRCLE */
         .progress-wrapper { position: relative; width: 120px; height: 120px; }
         .progress-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; pointer-events: none; }
         .progress-percent { font-size: 1.4rem; font-weight: 800; line-height: 1; display: block; }
         .progress-detail { font-size: 0.75rem; opacity: 0.9; display: block; margin-top: 2px; }
-        .edit-target-btn { position: absolute; top: 5px; right: 5px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; transition: 0.2s; }
+        .edit-target-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; transition: 0.2s; }
         .edit-target-btn:hover { background: rgba(255,255,255,0.4); }
 
-        /* CHARTS & LISTS */
+        /* CARDS & INPUTS */
         .chart-card, .semester-card { background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 20px; }
         .chart-card { padding: 20px; height: 300px; }
-        
-        /* SEMESTER HEADER */
         .semester-header { padding: 15px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); transition: background 0.2s; user-select: none; color: var(--text-main); }
         .semester-header:hover { background-color: var(--bg-color); }
         .sem-left { display: flex; align-items: center; gap: 10px; }
@@ -68,12 +63,10 @@
         .sem-actions { display: flex; align-items: center; gap: 10px; }
         .btn-sem-del { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1rem; padding: 5px; opacity: 0.6; transition: 0.2s; }
         .btn-sem-del:hover { opacity: 1; transform: scale(1.1); }
-
         .semester-content { display: none; padding: 20px; background: var(--bg-color); border-top: 1px solid var(--border-color); animation: slideDown 0.3s ease-out; }
         .semester-content.active { display: block; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* INPUTS */
         .subject-row { display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; align-items: flex-end; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .field-group { flex: 1; min-width: 80px; }
         .field-group label { display: block; font-size: 0.7rem; color: var(--text-light); margin-bottom: 5px; font-weight: 700; text-transform: uppercase; }
@@ -81,7 +74,7 @@
         input:focus, select:focus { border-color: #8b5cf6; box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2); }
         .preview-box { text-align: center; font-weight: bold; padding: 8px 4px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem; color: var(--text-light); min-height: 20px; display: flex; align-items: center; justify-content: center; }
 
-        /* CONTROLS */
+        /* BUTTONS */
         .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .controls-right { display: flex; gap: 8px; flex-wrap: wrap; }
         .btn { border: none; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; box-shadow: var(--shadow); transition: 0.3s; display: flex; align-items: center; gap: 8px; color: white; font-size: 0.9rem; }
@@ -93,8 +86,7 @@
         .btn-add:hover { border-color: #8b5cf6; color: #8b5cf6; background: rgba(139, 92, 246, 0.05); }
         .btn-add-sem { width: 100%; padding: 15px; border: 2px dashed #8b5cf6; background: rgba(139, 92, 246, 0.05); color: #8b5cf6; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 1rem; margin-top: 20px; text-transform: uppercase; }
         .btn-add-sem:hover { background: #8b5cf6; color: white; }
-
-        .btn-icon { width: 32px; height: 32px; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; margin-left: 5px; }
+        .btn-del, .btn-calc-target { width: 32px; height: 32px; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; margin-left: 5px; }
         .btn-del { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
         .btn-del:hover { background: #ef4444; color: white; }
         .btn-calc-target { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
@@ -126,15 +118,11 @@
         @media (max-width: 768px) {
             .dashboard { grid-template-columns: 1fr; gap: 10px; }
             .stat-item { height: auto; min-height: 120px; flex-direction: row; justify-content: space-between; padding: 15px 20px; }
+            .stat-item:nth-child(2) { flex-direction: column; justify-content: center; } /* Progress circle */
             .stat-content-area { justify-content: flex-end; width: auto; flex: none; margin-bottom: 0; }
             .stat-label { margin-top: 0; order: 1; text-align: left; }
             .stat-content-area { order: 2; }
             .stat-value { font-size: 1.5rem; }
-            /* Mobile adjustment for Progress Circle */
-            .stat-item:nth-child(2) { flex-direction: column; align-items: center; justify-content: center; }
-            .stat-item:nth-child(2) .stat-label { order: 2; margin-top: 10px; }
-            .stat-item:nth-child(2) .stat-content-area { order: 1; }
-            
             .subject-row { flex-direction: column; align-items: stretch; gap: 8px; }
             .field-group { width: 100%; }
             .controls { flex-direction: column-reverse; gap: 15px; }
@@ -173,7 +161,7 @@
                 </div>
             </div>
             <button class="edit-target-btn" onclick="openProfileModal()" title="Sửa Tổng Tín Chỉ"><i class="fas fa-pen"></i></button>
-            <div class="stat-label">Tiến Độ Học Tập</div>
+            <div class="stat-label" style="order:3; margin-top:5px;">Tiến Độ Học Tập</div>
         </div>
 
         <div class="stat-item">
@@ -230,7 +218,7 @@
             <input type="number" id="strat-target-gpa" placeholder="Ví dụ: 3.6" step="0.01">
         </div>
         <div class="modal-input-group">
-            <label>Tổng Tín Chỉ CTĐT (Hệ thống sẽ tự lấy từ Profile):</label>
+            <label>Tổng Tín Chỉ CTĐT:</label>
             <input type="number" id="strat-total-credits" placeholder="Ví dụ: 135" disabled style="background:#eee">
         </div>
         <button class="btn-calc-modal" onclick="calcStrategy()">Phân Tích</button>
@@ -252,7 +240,7 @@
         </div>
         <div class="modal-input-group">
             <label>Tổng Tín Chỉ Toàn Khóa (Để tính tiến độ):</label>
-            <input type="number" id="profile-target-credits" placeholder="Ví dụ: 130">
+            <input type="number" id="profile-target-credits" placeholder="Ví dụ: 135" value="135">
         </div>
         <button class="btn-calc-modal" onclick="saveProfile()">Cập Nhật</button>
         <button class="modal-close" onclick="closeModal('profileModal')">Đóng</button>
@@ -260,14 +248,14 @@
 </div>
 
 <script>
-    const STORAGE_KEY = 'gpaData_v14'; 
+    const STORAGE_KEY = 'gpaData_v15'; 
     let semestersData = {};
     let gpaChartInstance = null;
     let progressChartInstance = null;
     let currentCalcData = { s1: 0, r1: 0, r2: 0 };
     let currentTotalGPA = 0;
     let currentTotalCredits = 0;
-    let targetTotalCredits = 135; // Mặc định
+    let targetTotalCredits = 135;
 
     function init() {
         try {
@@ -277,16 +265,15 @@
         updateThemeIcon();
         loadProfile();
 
-        const container = document.getElementById('semesters-container');
-        // Logic Migration: Check v14 -> v13 -> v12...
+        // Migration Logic (Check v15 -> v14 -> v13...)
         let savedData = localStorage.getItem(STORAGE_KEY);
+        if(!savedData) savedData = localStorage.getItem('gpaData_v14');
         if(!savedData) savedData = localStorage.getItem('gpaData_v13');
         if(!savedData) savedData = localStorage.getItem('gpaData_v12');
 
         if (savedData) {
             semestersData = JSON.parse(savedData);
         } else {
-            // Dữ liệu mặc định 8 kỳ nếu chưa có gì
             for(let i=1; i<=8; i++) semestersData[i] = [];
         }
 
@@ -294,14 +281,11 @@
         calculateAll(false);
     }
 
-    // --- DYNAMIC SEMESTER LOGIC (V14) ---
+    // --- RENDER SEMESTERS ---
     function renderAllSemesters() {
         const container = document.getElementById('semesters-container');
-        container.innerHTML = ''; // Clear old
-        // Sort keys to ensure order 1, 2, 3...
-        const keys = Object.keys(semestersData).map(Number).sort((a,b)=>a-b);
-        
-        keys.forEach(i => {
+        container.innerHTML = '';
+        Object.keys(semestersData).map(Number).sort((a,b)=>a-b).forEach(i => {
             const semDiv = document.createElement('div');
             semDiv.className = 'semester-card';
             semDiv.id = `sem-card-${i}`;
@@ -313,7 +297,7 @@
                     </div>
                     <div class="sem-actions">
                         <div class="sem-info" id="summary-${i}">Chưa có dữ liệu</div>
-                        <button class="btn-sem-del" onclick="removeSemester(event, ${i})" title="Xóa học kỳ này"><i class="fas fa-trash-alt"></i></button>
+                        <button class="btn-sem-del" onclick="removeSemester(event, ${i})" title="Xóa học kỳ"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
                 <div class="semester-content" id="content-${i}">
@@ -322,12 +306,8 @@
                 </div>
             `;
             container.appendChild(semDiv);
-            
-            // Render subjects for this semester
             if (semestersData[i] && semestersData[i].length > 0) {
                 semestersData[i].forEach(data => addSubjectRow(i, data));
-            } else {
-                // Không tự thêm dòng trống nữa
             }
         });
     }
@@ -336,23 +316,105 @@
         const keys = Object.keys(semestersData).map(Number);
         const nextSem = (keys.length > 0 ? Math.max(...keys) : 0) + 1;
         semestersData[nextSem] = [];
-        renderAllSemesters(); // Re-render toàn bộ
+        renderAllSemesters();
         calculateAll(false);
-        // Scroll to bottom
         setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100);
     }
 
     function removeSemester(event, id) {
-        event.stopPropagation(); // Chặn sự kiện click vào header
+        event.stopPropagation();
         if (semestersData[id] && semestersData[id].length > 0) {
             if (!confirm(`Học kỳ ${id} đang có môn học. Bạn có chắc muốn xóa không?`)) return;
         }
         delete semestersData[id];
         renderAllSemesters();
-        calculateAll(true); // Save immediately
+        calculateAll(true);
     }
 
-    // --- PROGRESS CHART (V14) ---
+    // --- MAIN CALCULATION (FIXED) ---
+    function calculateAll(save = true) {
+        let grandPoints = 0, grandCredits = 0, newData = {}, chartData = [];
+        
+        Object.keys(semestersData).map(Number).sort((a,b)=>a-b).forEach(i => {
+            const listDiv = document.getElementById(`list-${i}`);
+            let semPoints = 0, semCredits = 0, semData = [];
+            
+            if(listDiv) {
+                // Read from DOM if rendered
+                const rows = listDiv.querySelectorAll('.subject-row');
+                rows.forEach(row => {
+                    const name = row.querySelector('.inp-name').value;
+                    const creditVal = row.querySelector('.inp-credit').value;
+                    const credit = creditVal===''?0:parseFloat(creditVal);
+                    const ratio = row.querySelector('.inp-ratio').value;
+                    const s1 = parseFloat(row.querySelector('.inp-s1').value);
+                    const s2 = parseFloat(row.querySelector('.inp-s2').value);
+                    semData.push({name, credit: creditVal, ratio, s1: isNaN(s1)?'':s1, s2: isNaN(s2)?'':s2});
+                    
+                    const p10=row.querySelector('.preview-10'), pC=row.querySelector('.preview-convert'), pR=row.querySelector('.preview-rank');
+                    if(!isNaN(s1) && (ratio==='100-0'||!isNaN(s2))) {
+                        const r = ratio.split('-').map(x=>parseInt(x)/100);
+                        let f10 = (ratio==='100-0')?s1:(s1*r[0]+s2*r[1]); f10 = Math.round(f10*10)/10;
+                        const res = getCourseResult(f10);
+                        p10.innerText=f10; pC.innerText=`${res.g4} - ${res.char}`; pR.innerHTML=`<span class="result-badge ${res.css}">${res.text}</span>`;
+                        if(credit>0){ semPoints+=res.g4*credit; semCredits+=credit; }
+                    } else { p10.innerText='...'; pC.innerText='...'; pR.innerHTML='...'; }
+                });
+            } else {
+                // Fallback to stored data if DOM not ready (rare but safe)
+                semData = semestersData[i] || [];
+                // Re-calculate totals from stored data to ensure correctness
+                semData.forEach(subj => {
+                    const credit = parseFloat(subj.credit) || 0;
+                    const s1 = parseFloat(subj.s1);
+                    const s2 = parseFloat(subj.s2);
+                    if(!isNaN(s1) && (subj.ratio==='100-0'||!isNaN(s2)) && credit > 0) {
+                        const r = subj.ratio.split('-').map(x=>parseInt(x)/100);
+                        let f10 = (subj.ratio==='100-0')?s1:(s1*r[0]+s2*r[1]);
+                        let f4 = getCourseResult(Math.round(f10*10)/10).g4;
+                        semPoints += f4 * credit;
+                        semCredits += credit;
+                    }
+                });
+            }
+
+            newData[i] = semData;
+            const sumDiv = document.getElementById(`summary-${i}`);
+            if(sumDiv) {
+                if(semCredits > 0) {
+                    const gpa = (semPoints/semCredits).toFixed(2);
+                    sumDiv.innerHTML = `GPA: <strong>${gpa}</strong> | ${semCredits} tín | ${getListRankBadge(gpa)}`;
+                    grandPoints += semPoints; grandCredits += semCredits; chartData.push(gpa);
+                } else {
+                    sumDiv.innerHTML = `<span style="opacity:0.6; font-style:italic">Chưa có dữ liệu</span>`;
+                    chartData.push(null);
+                }
+            }
+        });
+        
+        semestersData = newData; // Update Global State
+        currentTotalCredits = grandCredits;
+
+        // Update Dashboard
+        if (grandCredits > 0) {
+            currentTotalGPA = (grandPoints / grandCredits).toFixed(2);
+            document.getElementById('total-gpa').innerText = currentTotalGPA;
+            // REMOVED THE CRASHING LINE: document.getElementById('total-credits').innerText = ...
+            updateDashboardRank(currentTotalGPA);
+        } else {
+            currentTotalGPA = 0;
+            updateDashboardRank(0);
+        }
+        
+        updateChart(chartData);
+        updateProgressChart(currentTotalCredits, targetTotalCredits);
+
+        if (save) { 
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newData)); alert("Dữ liệu đã được lưu!"); } catch(e){}
+        }
+    }
+
+    // --- OTHER FUNCTIONS ---
     function updateProgressChart(earned, total) {
         const ctx = document.getElementById('progressChart').getContext('2d');
         const isDark = document.body.classList.contains('dark-mode');
@@ -364,107 +426,23 @@
 
         if (progressChartInstance) progressChartInstance.destroy();
 
+        let color = '#3b82f6'; 
+        if(percent >= 100) color = '#10b981'; else if(percent >= 50) color = '#f59e0b'; else if(percent < 50) color = '#ef4444';
+
         progressChartInstance = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: ['Đã tích lũy', 'Còn lại'],
                 datasets: [{
                     data: [earned, remaining],
-                    backgroundColor: [
-                        '#ffffff', // Màu phần đã đạt (sẽ set đè ở dưới)
-                        isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' // Màu phần còn lại
-                    ],
-                    borderWidth: 0,
-                    hoverOffset: 4
+                    backgroundColor: [color, isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'],
+                    borderWidth: 0, hoverOffset: 4
                 }]
             },
-            options: {
-                cutout: '75%', // Độ dày vòng tròn
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false }, tooltip: { enabled: true } }
-            }
+            options: { cutout: '75%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: true } } }
         });
-        
-        // Update color dynamically based on percentage
-        let color = '#3b82f6'; // Blue default
-        if(percent >= 100) color = '#10b981'; // Green
-        else if(percent >= 50) color = '#f59e0b'; // Yellow
-        else color = '#ef4444'; // Red
-        
-        progressChartInstance.data.datasets[0].backgroundColor[0] = color;
-        progressChartInstance.update();
     }
 
-    // --- EXCEL FUNCTIONS ---
-    function exportExcel() {
-        calculateAll(false); 
-        let gradeRows = [["Học Kỳ", "Tên Môn", "Số TC", "Tỷ Lệ", "Điểm QT", "Điểm CK"]];
-        // Duyệt qua keys đã sort
-        Object.keys(semestersData).map(Number).sort((a,b)=>a-b).forEach(i => {
-            if (semestersData[i] && semestersData[i].length > 0) {
-                semestersData[i].forEach(subj => {
-                    gradeRows.push([i, subj.name, subj.credit, subj.ratio, subj.s1, subj.s2]);
-                });
-            }
-        });
-
-        let profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-        let theme = localStorage.getItem('theme') || 'light';
-        let infoRows = [["Key", "Value"], ["Name", profile.name || ""], ["ID", profile.id || ""], ["Theme", theme], ["TargetCredits", profile.targetCredits || 135]];
-
-        const wb = XLSX.utils.book_new();
-        const wsGrades = XLSX.utils.aoa_to_sheet(gradeRows);
-        const wsInfo = XLSX.utils.aoa_to_sheet(infoRows);
-        XLSX.utils.book_append_sheet(wb, wsGrades, "BangDiem");
-        XLSX.utils.book_append_sheet(wb, wsInfo, "HoSo");
-        const name = profile.name || "BangDiem";
-        XLSX.writeFile(wb, `GPA_${name}.xlsx`);
-    }
-
-    function triggerImport() { document.getElementById('file-input').click(); }
-    function importExcel(input) {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const wb = XLSX.read(data, {type: 'array'});
-                const wsGrades = wb.Sheets["BangDiem"];
-                if (wsGrades) {
-                    const jsonData = XLSX.utils.sheet_to_json(wsGrades);
-                    semestersData = {}; 
-                    jsonData.forEach(row => {
-                        const sem = row["Học Kỳ"];
-                        if (!semestersData[sem]) semestersData[sem] = [];
-                        semestersData[sem].push({
-                            name: row["Tên Môn"] || "", credit: row["Số TC"] || "",
-                            ratio: row["Tỷ Lệ"] || "40-60", s1: row["Điểm QT"], s2: row["Điểm CK"]
-                        });
-                    });
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(semestersData));
-                }
-                const wsInfo = wb.Sheets["HoSo"];
-                if (wsInfo) {
-                    const jsonInfo = XLSX.utils.sheet_to_json(wsInfo);
-                    let profile = {}; let theme = 'light';
-                    jsonInfo.forEach(row => {
-                        if (row.Key === "Name") profile.name = row.Value;
-                        if (row.Key === "ID") profile.id = row.Value;
-                        if (row.Key === "Theme") theme = row.Value;
-                        if (row.Key === "TargetCredits") profile.targetCredits = row.Value;
-                    });
-                    localStorage.setItem('userProfile', JSON.stringify(profile));
-                    localStorage.setItem('theme', theme);
-                }
-                alert('Nạp dữ liệu Excel thành công!'); location.reload();
-            } catch (err) { console.error(err); alert('File lỗi!'); }
-        };
-        reader.readAsArrayBuffer(file);
-    }
-
-    // --- STANDARD FUNCTIONS ---
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
         try { localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); } catch(e){}
@@ -477,17 +455,15 @@
     }
     function openProfileModal() { 
         document.getElementById('profileModal').style.display = 'flex'; 
-        // Load value into input
         let p = JSON.parse(localStorage.getItem('userProfile') || '{}');
         document.getElementById('profile-target-credits').value = p.targetCredits || 135;
     }
     function saveProfile() {
         const name = document.getElementById('profile-name').value;
         const id = document.getElementById('profile-id').value;
-        const targetCredits = document.getElementById('profile-target-credits').value;
-        localStorage.setItem('userProfile', JSON.stringify({ name, id, targetCredits }));
-        loadProfile(); closeModal('profileModal');
-        calculateAll(false); // Update progress chart
+        const target = document.getElementById('profile-target-credits').value;
+        localStorage.setItem('userProfile', JSON.stringify({ name, id, targetCredits: target }));
+        loadProfile(); closeModal('profileModal'); calculateAll(false);
     }
     function loadProfile() {
         let data = null; try{data=localStorage.getItem('userProfile')}catch(e){}
@@ -498,7 +474,6 @@
             document.getElementById('profile-name').value=p.name||'';
             document.getElementById('profile-id').value=p.id||'';
             targetTotalCredits = p.targetCredits || 135;
-            // Update strategy modal input too
             document.getElementById('strat-total-credits').value = targetTotalCredits;
         }
     }
@@ -508,45 +483,22 @@
         const div = document.createElement('div');
         div.className = 'subject-row';
         const name = data ? data.name : '';
-        const credit = data ? data.credit : ''; 
-        const ratio = data ? data.ratio : '40-60';
-        const s1 = data ? data.s1 : '';
-        const s2 = data ? data.s2 : '';
+        const credit = data ? data.credit : ''; const ratio = data ? data.ratio : '40-60';
+        const s1 = data ? data.s1 : ''; const s2 = data ? data.s2 : '';
         div.innerHTML = `
-            <div class="field-group" style="flex: 2; min-width: 150px;">
-                <label>Tên Môn</label>
-                <input type="text" class="inp-name" value="${name}" placeholder="Nhập tên môn...">
-            </div>
-            <div class="field-group">
-                <label>Số TC</label>
-                <input type="number" class="inp-credit" value="${credit}" min="0" placeholder="...">
-            </div>
-            <div class="field-group" style="min-width: 100px;">
-                <label>Tỷ lệ</label>
-                <select class="inp-ratio" onchange="calculateAll(false)">
-                    <option value="40-60" ${ratio === '40-60' ? 'selected' : ''}>40/60</option>
-                    <option value="50-50" ${ratio === '50-50' ? 'selected' : ''}>50/50</option>
-                    <option value="30-70" ${ratio === '30-70' ? 'selected' : ''}>30/70</option>
-                    <option value="100-0" ${ratio === '100-0' ? 'selected' : ''}>100%</option>
-                </select>
-            </div>
-            <div class="field-group">
-                <label>Điểm QT</label>
-                <input type="number" class="inp-s1" value="${s1}" step="0.1" placeholder="..." oninput="calculateAll(false)">
-            </div>
-            <div class="field-group">
-                <label>Điểm CK</label>
-                <input type="number" class="inp-s2" value="${s2}" step="0.1" placeholder="..." oninput="calculateAll(false)">
-            </div>
-            <div class="field-group" style="flex: 0.8; text-align: center;">
-                <label>Hệ 10</label><div class="preview-box preview-10">...</div>
-            </div>
-            <div class="field-group" style="flex: 1.2; text-align: center;">
-                <label>Hệ 4 - Điểm chữ</label><div class="preview-box preview-convert" style="color: #667eea;">...</div>
-            </div>
-             <div class="field-group" style="flex: 0.8; text-align: center;">
-                <label>Xếp Loại</label><div class="preview-rank">...</div>
-            </div>
+            <div class="field-group" style="flex: 2; min-width: 150px;"><label>Tên Môn</label><input type="text" class="inp-name" value="${name}" placeholder="Nhập tên môn..."></div>
+            <div class="field-group"><label>Số TC</label><input type="number" class="inp-credit" value="${credit}" min="0" placeholder="..."></div>
+            <div class="field-group" style="min-width: 100px;"><label>Tỷ lệ</label><select class="inp-ratio" onchange="calculateAll(false)">
+                <option value="40-60" ${ratio === '40-60' ? 'selected' : ''}>40/60</option>
+                <option value="50-50" ${ratio === '50-50' ? 'selected' : ''}>50/50</option>
+                <option value="30-70" ${ratio === '30-70' ? 'selected' : ''}>30/70</option>
+                <option value="100-0" ${ratio === '100-0' ? 'selected' : ''}>100%</option>
+            </select></div>
+            <div class="field-group"><label>Điểm QT</label><input type="number" class="inp-s1" value="${s1}" step="0.1" placeholder="..." oninput="calculateAll(false)"></div>
+            <div class="field-group"><label>Điểm CK</label><input type="number" class="inp-s2" value="${s2}" step="0.1" placeholder="..." oninput="calculateAll(false)"></div>
+            <div class="field-group" style="flex: 0.8; text-align: center;"><label>Hệ 10</label><div class="preview-box preview-10">...</div></div>
+            <div class="field-group" style="flex: 1.2; text-align: center;"><label>Hệ 4 - Điểm chữ</label><div class="preview-box preview-convert" style="color: #667eea;">...</div></div>
+            <div class="field-group" style="flex: 0.8; text-align: center;"><label>Xếp Loại</label><div class="preview-rank">...</div></div>
             <div style="display:flex; flex-direction:column; gap:5px; justify-content:center; margin-left: 5px;">
                 <button class="btn-icon btn-del" onclick="deleteRow(this, ${semId})" title="Xóa môn"><i class="fas fa-times"></i></button>
                 <button class="btn-icon btn-calc-target" onclick="openTargetModal(this)" title="Dự tính điểm thi"><i class="fas fa-wand-magic-sparkles"></i></button>
@@ -555,11 +507,9 @@
         listDiv.appendChild(div);
     }
     function deleteRow(btn, semId) { btn.closest('.subject-row').remove(); calculateAll(false); }
-    
     function openStrategyModal() { document.getElementById('strategyModal').style.display = 'flex'; }
     function calcStrategy() {
         const targetGPA = parseFloat(document.getElementById('strat-target-gpa').value);
-        // Use global targetTotalCredits loaded from profile
         const totalCredits = targetTotalCredits;
         const resDiv = document.getElementById('strategy-result');
         resDiv.style.display = 'block';
@@ -631,59 +581,70 @@
         });
     }
     
-    function calculateAll(save = true) {
-        let grandPoints=0, grandCredits=0, newData={}, chartData=[];
-        
-        // Loop dynamic keys sorted
+    // EXCEL FUNCTIONS
+    function exportExcel() {
+        calculateAll(false);
+        let gradeRows = [["Học Kỳ", "Tên Môn", "Số TC", "Tỷ Lệ", "Điểm QT", "Điểm CK"]];
         Object.keys(semestersData).map(Number).sort((a,b)=>a-b).forEach(i => {
-            const listDiv = document.getElementById(`list-${i}`);
-            // If listDiv exists (rendered), grab data from DOM. Else use stored data (migration safety)
-            let semPoints=0, semCredits=0, semData=[];
-            
-            if(listDiv) {
-                const rows = listDiv.querySelectorAll('.subject-row');
-                rows.forEach(row => {
-                    const name = row.querySelector('.inp-name').value;
-                    const creditVal = row.querySelector('.inp-credit').value;
-                    const credit = creditVal===''?0:parseFloat(creditVal);
-                    const ratio = row.querySelector('.inp-ratio').value;
-                    const s1 = parseFloat(row.querySelector('.inp-s1').value);
-                    const s2 = parseFloat(row.querySelector('.inp-s2').value);
-                    semData.push({name, credit: creditVal, ratio, s1: isNaN(s1)?'':s1, s2: isNaN(s2)?'':s2});
-                    
-                    const p10=row.querySelector('.preview-10'), pC=row.querySelector('.preview-convert'), pR=row.querySelector('.preview-rank');
-                    if(!isNaN(s1) && (ratio==='100-0'||!isNaN(s2))) {
-                        const r = ratio.split('-').map(x=>parseInt(x)/100);
-                        let f10 = (ratio==='100-0')?s1:(s1*r[0]+s2*r[1]); f10 = Math.round(f10*10)/10;
-                        const res = getCourseResult(f10);
-                        p10.innerText=f10; pC.innerText=`${res.g4} - ${res.char}`; pR.innerHTML=`<span class="result-badge ${res.css}">${res.text}</span>`;
-                        if(credit>0){ semPoints+=res.g4*credit; semCredits+=credit; }
-                    } else { p10.innerText='...'; pC.innerText='...'; pR.innerHTML='...'; }
+            if (semestersData[i]) {
+                semestersData[i].forEach(subj => {
+                    gradeRows.push([i, subj.name, subj.credit, subj.ratio, subj.s1, subj.s2]);
                 });
-            } else {
-                semData = semestersData[i]; // Fallback
-            }
-
-            newData[i]=semData;
-            const sumDiv = document.getElementById(`summary-${i}`);
-            if(sumDiv) {
-                if(semCredits>0) { const gpa=(semPoints/semCredits).toFixed(2); sumDiv.innerHTML=`GPA: <strong>${gpa}</strong> | ${semCredits} tín | ${getListRankBadge(gpa)}`; grandPoints+=semPoints; grandCredits+=semCredits; chartData.push(gpa); } 
-                else { sumDiv.innerHTML=`<span style="opacity:0.6; font-style:italic">Chưa có dữ liệu</span>`; chartData.push(null); }
             }
         });
-        
-        semestersData = newData; // Update global state
-        currentTotalCredits = grandCredits;
-        if (grandCredits > 0) { currentTotalGPA = (grandPoints / grandCredits).toFixed(2); document.getElementById('total-gpa').innerText = currentTotalGPA; document.getElementById('total-credits').innerText = grandCredits; updateDashboardRank(currentTotalGPA); } 
-        else { currentTotalGPA = 0; updateDashboardRank(0); }
-        
-        updateChart(chartData);
-        updateProgressChart(currentTotalCredits, targetTotalCredits);
-
-        if (save) { 
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newData)); alert("Dữ liệu đã được lưu!"); } catch(e){}
-        }
+        let profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+        let theme = localStorage.getItem('theme') || 'light';
+        let infoRows = [["Key", "Value"], ["Name", profile.name || ""], ["ID", profile.id || ""], ["Theme", theme], ["TargetCredits", profile.targetCredits || 135]];
+        const wb = XLSX.utils.book_new();
+        const wsGrades = XLSX.utils.aoa_to_sheet(gradeRows);
+        const wsInfo = XLSX.utils.aoa_to_sheet(infoRows);
+        XLSX.utils.book_append_sheet(wb, wsGrades, "BangDiem");
+        XLSX.utils.book_append_sheet(wb, wsInfo, "HoSo");
+        const name = profile.name || "BangDiem";
+        XLSX.writeFile(wb, `GPA_${name}.xlsx`);
     }
+    function triggerImport() { document.getElementById('file-input').click(); }
+    function importExcel(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const wb = XLSX.read(data, {type: 'array'});
+                const wsGrades = wb.Sheets["BangDiem"];
+                if (wsGrades) {
+                    const jsonData = XLSX.utils.sheet_to_json(wsGrades);
+                    semestersData = {}; 
+                    jsonData.forEach(row => {
+                        const sem = row["Học Kỳ"];
+                        if (!semestersData[sem]) semestersData[sem] = [];
+                        semestersData[sem].push({
+                            name: row["Tên Môn"] || "", credit: row["Số TC"] || "",
+                            ratio: row["Tỷ Lệ"] || "40-60", s1: row["Điểm QT"], s2: row["Điểm CK"]
+                        });
+                    });
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(semestersData));
+                }
+                const wsInfo = wb.Sheets["HoSo"];
+                if (wsInfo) {
+                    const jsonInfo = XLSX.utils.sheet_to_json(wsInfo);
+                    let profile = {}; let theme = 'light';
+                    jsonInfo.forEach(row => {
+                        if (row.Key === "Name") profile.name = row.Value;
+                        if (row.Key === "ID") profile.id = row.Value;
+                        if (row.Key === "Theme") theme = row.Value;
+                        if (row.Key === "TargetCredits") profile.targetCredits = row.Value;
+                    });
+                    localStorage.setItem('userProfile', JSON.stringify(profile));
+                    localStorage.setItem('theme', theme);
+                }
+                alert('Nạp dữ liệu Excel thành công!'); location.reload();
+            } catch (err) { console.error(err); alert('File lỗi!'); }
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
     init();
 </script>
 </body>
