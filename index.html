@@ -3,143 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý GPA - V13 (Excel Fixed)</title>
+    <title>Hệ Thống Quản Lý GPA - V14 (Ultimate)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
-            --text-main: #1f2937;
-            --text-light: #6b7280;
-            --border-color: #e5e7eb;
-            --input-bg: #ffffff;
-            --input-border: #d1d5db;
+            --bg-color: #f3f4f6; --card-bg: #ffffff;
+            --text-main: #1f2937; --text-light: #6b7280;
+            --border-color: #e5e7eb; --input-bg: #ffffff; --input-border: #d1d5db;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --modal-overlay: rgba(0, 0, 0, 0.5);
             --btn-strategy-bg: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             --btn-excel-bg: #107c41;
         }
-
         body.dark-mode {
             --primary-gradient: linear-gradient(135deg, #4c1d95 0%, #1e1b4b 100%);
-            --bg-color: #111827;
-            --card-bg: #1f2937;
-            --text-main: #f3f4f6;
-            --text-light: #9ca3af;
-            --border-color: #374151;
-            --input-bg: #374151;
-            --input-border: #4b5563;
+            --bg-color: #111827; --card-bg: #1f2937;
+            --text-main: #f3f4f6; --text-light: #9ca3af;
+            --border-color: #374151; --input-bg: #374151; --input-border: #4b5563;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
             --modal-overlay: rgba(255, 255, 255, 0.1);
         }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; line-height: 1.5; transition: 0.3s; }
+        .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; }
 
-        body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0; padding: 20px; line-height: 1.5;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .container { max-width: 950px; margin: 0 auto; position: relative; }
-
-        .theme-toggle {
-            position: absolute; top: 10px; right: 10px;
-            background: var(--card-bg); border: 2px solid var(--border-color);
-            color: var(--text-main); padding: 8px 15px; border-radius: 25px;
-            cursor: pointer; display: flex; align-items: center; gap: 8px;
-            font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-            transition: 0.2s; z-index: 9999; font-weight: 600;
-        }
+        /* HEADER */
+        .theme-toggle { position: absolute; top: 10px; right: 10px; background: var(--card-bg); border: 2px solid var(--border-color); color: var(--text-main); padding: 8px 15px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.2s; z-index: 9999; font-weight: 600; }
         .theme-toggle:hover { transform: scale(1.05); border-color: #8b5cf6; }
-
         .app-header { text-align: center; margin-bottom: 25px; padding-top: 20px; }
-        .app-title {
-            font-size: 1.8rem; font-weight: 800; text-transform: uppercase;
-            background: var(--primary-gradient); -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent; letter-spacing: 1px; margin: 0; line-height: 1.3;
-        }
+        .app-title { font-size: 1.8rem; font-weight: 800; text-transform: uppercase; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; margin: 0; line-height: 1.3; }
         .user-info { font-size: 1rem; color: var(--text-main); font-weight: 600; margin-top: 5px; cursor: pointer; transition: 0.2s; }
         .user-info:hover { color: #8b5cf6; }
         .app-subtitle { font-size: 0.85rem; color: var(--text-light); }
 
-        .dashboard {
-            background: var(--primary-gradient); color: white; padding: 30px;
-            border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(118, 75, 162, 0.4);
-            margin-bottom: 20px; display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 20px; position: relative; overflow: hidden;
-        }
-        .dashboard::before {
-            content: ''; position: absolute; top: -50px; left: -50px; width: 200px; height: 200px;
-            background: rgba(255,255,255,0.1); border-radius: 50%; z-index: 0;
-        }
-        .stat-item {
-            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px);
-            border-radius: 10px; border: 1px solid rgba(255,255,255,0.2);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 20px 10px; height: 100%; box-sizing: border-box; z-index: 1;
-        }
+        /* DASHBOARD - NEW PROGRESS CIRCLE */
+        .dashboard { background: var(--primary-gradient); color: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(118, 75, 162, 0.4); margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 15px; position: relative; overflow: hidden; align-items: center; }
+        .dashboard::before { content: ''; position: absolute; top: -50px; left: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; z-index: 0; }
+        
+        .stat-item { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px); border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; height: 160px; box-sizing: border-box; z-index: 1; }
         .stat-value { font-size: 2.5rem; font-weight: 800; line-height: 1; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
-        .stat-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; font-weight: 600; margin-top: auto; }
+        .stat-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; font-weight: 600; margin-top: 10px; text-align: center; }
 
-        .chart-card, .semester-card {
-            background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow);
-            border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 20px;
-        }
+        /* PROGRESS CIRCLE STYLES */
+        .progress-wrapper { position: relative; width: 120px; height: 120px; }
+        .progress-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; pointer-events: none; }
+        .progress-percent { font-size: 1.4rem; font-weight: 800; line-height: 1; display: block; }
+        .progress-detail { font-size: 0.75rem; opacity: 0.9; display: block; margin-top: 2px; }
+        .edit-target-btn { position: absolute; top: 5px; right: 5px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; transition: 0.2s; }
+        .edit-target-btn:hover { background: rgba(255,255,255,0.4); }
+
+        /* CHARTS & LISTS */
+        .chart-card, .semester-card { background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 20px; }
         .chart-card { padding: 20px; height: 300px; }
         
-        .semester-header {
-            padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-            background: var(--card-bg); transition: background 0.2s; user-select: none; color: var(--text-main);
-        }
+        /* SEMESTER HEADER */
+        .semester-header { padding: 15px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); transition: background 0.2s; user-select: none; color: var(--text-main); }
         .semester-header:hover { background-color: var(--bg-color); }
-        .sem-title { font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 12px; }
-        .sem-icon { color: #8b5cf6; background: #f3e8ff; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem; }
-        .sem-info { font-size: 0.9rem; color: var(--text-light); display: flex; align-items: center; gap: 10px; }
-        
-        .semester-content {
-            display: none; padding: 20px; background: var(--bg-color);
-            border-top: 1px solid var(--border-color); animation: slideDown 0.3s ease-out;
-        }
+        .sem-left { display: flex; align-items: center; gap: 10px; }
+        .sem-title { font-weight: 700; font-size: 1.1rem; }
+        .sem-icon { color: #8b5cf6; background: #f3e8ff; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem; }
+        .sem-info { font-size: 0.9rem; color: var(--text-light); }
+        .sem-actions { display: flex; align-items: center; gap: 10px; }
+        .btn-sem-del { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1rem; padding: 5px; opacity: 0.6; transition: 0.2s; }
+        .btn-sem-del:hover { opacity: 1; transform: scale(1.1); }
+
+        .semester-content { display: none; padding: 20px; background: var(--bg-color); border-top: 1px solid var(--border-color); animation: slideDown 0.3s ease-out; }
         .semester-content.active { display: block; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .subject-row {
-            display: flex; flex-wrap: wrap; gap: 12px; padding: 15px;
-            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px;
-            margin-bottom: 10px; align-items: flex-end; position: relative;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
+        /* INPUTS */
+        .subject-row { display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; align-items: flex-end; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .field-group { flex: 1; min-width: 80px; }
         .field-group label { display: block; font-size: 0.7rem; color: var(--text-light); margin-bottom: 5px; font-weight: 700; text-transform: uppercase; }
-        input, select {
-            width: 100%; padding: 8px; border: 1px solid var(--input-border);
-            background: var(--input-bg); color: var(--text-main);
-            border-radius: 6px; font-size: 0.9rem; outline: none; transition: 0.2s;
-        }
+        input, select { width: 100%; padding: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-main); border-radius: 6px; font-size: 0.9rem; outline: none; transition: 0.2s; }
         input:focus, select:focus { border-color: #8b5cf6; box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2); }
-        .preview-box {
-            text-align: center; font-weight: bold; padding: 8px 4px;
-            background: var(--bg-color); border: 1px solid var(--border-color);
-            border-radius: 6px; font-size: 0.9rem; color: var(--text-light);
-            min-height: 20px; display: flex; align-items: center; justify-content: center;
-        }
+        .preview-box { text-align: center; font-weight: bold; padding: 8px 4px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem; color: var(--text-light); min-height: 20px; display: flex; align-items: center; justify-content: center; }
 
+        /* CONTROLS */
         .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .controls-right { display: flex; gap: 8px; flex-wrap: wrap; }
-        
         .btn { border: none; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; box-shadow: var(--shadow); transition: 0.3s; display: flex; align-items: center; gap: 8px; color: white; font-size: 0.9rem; }
         .btn:hover { transform: translateY(-2px); opacity: 0.9; }
-        
         .btn-save { background: var(--text-main); color: var(--card-bg); }
         .btn-strategy { background: var(--btn-strategy-bg); color: white; }
         .btn-excel { background: var(--btn-excel-bg); color: white; }
-
         .btn-add { width: 100%; padding: 12px; border: 2px dashed var(--border-color); background: none; color: var(--text-light); border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn-add:hover { border-color: #8b5cf6; color: #8b5cf6; background: rgba(139, 92, 246, 0.05); }
+        .btn-add-sem { width: 100%; padding: 15px; border: 2px dashed #8b5cf6; background: rgba(139, 92, 246, 0.05); color: #8b5cf6; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 1rem; margin-top: 20px; text-transform: uppercase; }
+        .btn-add-sem:hover { background: #8b5cf6; color: white; }
 
         .btn-icon { width: 32px; height: 32px; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; margin-left: 5px; }
         .btn-del { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
@@ -147,37 +100,21 @@
         .btn-calc-target { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
         .btn-calc-target:hover { background: #3b82f6; color: white; }
 
+        /* BADGES */
         .dash-badge { padding: 8px 15px; font-size: 1.1rem; font-weight: 800; border-radius: 30px; text-transform: uppercase; box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: inline-block; min-width: 120px; text-align: center; }
         .rank-gold { background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%); color: #6a4803; border: 1px solid #ffeeba; }
         .rank-silver { background: linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%); color: #424242; border: 1px solid #f8f9fa; }
         .rank-bronze { background: linear-gradient(135deg, #d98e54 0%, #a0522d 100%); color: white; border: 1px solid #e0a884; }
         .rank-gray { background: #6c757d; color: white; }
         .rank-red { background: #dc3545; color: white; }
-
         .list-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; display: inline-block; }
-        .bg-xs { background: #16a34a; color: white; }
-        .bg-g { background: #0ea5e9; color: white; }
-        .bg-k { background: #f59e0b; color: white; }
-        .bg-tb { background: #6b7280; color: white; }
-        .bg-y { background: #dc2626; color: white; }
-
+        .bg-xs { background: #16a34a; color: white; } .bg-g { background: #0ea5e9; color: white; } .bg-k { background: #f59e0b; color: white; } .bg-tb { background: #6b7280; color: white; } .bg-y { background: #dc2626; color: white; }
         .result-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 12px; font-weight: 700; text-transform: uppercase; display: inline-block; white-space: nowrap; }
-        .bg-gioi { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-        .bg-kha { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
-        .bg-tb { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
-        .bg-tbyeu { background: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; }
-        .bg-kem { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .bg-gioi { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; } .bg-kha { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; } .bg-tb { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; } .bg-tbyeu { background: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; } .bg-kem { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 10000; display: none;
-            align-items: center; justify-content: center; backdrop-filter: blur(2px);
-        }
-        .modal {
-            background: var(--card-bg); width: 90%; max-width: 450px; padding: 25px;
-            border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center;
-            border: 1px solid var(--border-color); animation: popIn 0.3s;
-        }
+        /* MODALS */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal { background: var(--card-bg); width: 90%; max-width: 450px; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; border: 1px solid var(--border-color); animation: popIn 0.3s; }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .modal h3 { margin-top: 0; color: #8b5cf6; margin-bottom: 20px; font-size: 1.5rem; }
         .modal-result { margin: 20px 0; padding: 15px; background: rgba(139, 92, 246, 0.1); border-radius: 10px; font-weight: bold; font-size: 1.1rem; color: #8b5cf6; }
@@ -188,11 +125,16 @@
 
         @media (max-width: 768px) {
             .dashboard { grid-template-columns: 1fr; gap: 10px; }
-            .stat-item { flex-direction: row; justify-content: space-between; padding: 15px 20px; min-height: auto; align-items: center; }
+            .stat-item { height: auto; min-height: 120px; flex-direction: row; justify-content: space-between; padding: 15px 20px; }
             .stat-content-area { justify-content: flex-end; width: auto; flex: none; margin-bottom: 0; }
-            .stat-label { margin-top: 0; order: 1; }
+            .stat-label { margin-top: 0; order: 1; text-align: left; }
             .stat-content-area { order: 2; }
             .stat-value { font-size: 1.5rem; }
+            /* Mobile adjustment for Progress Circle */
+            .stat-item:nth-child(2) { flex-direction: column; align-items: center; justify-content: center; }
+            .stat-item:nth-child(2) .stat-label { order: 2; margin-top: 10px; }
+            .stat-item:nth-child(2) .stat-content-area { order: 1; }
+            
             .subject-row { flex-direction: column; align-items: stretch; gap: 8px; }
             .field-group { width: 100%; }
             .controls { flex-direction: column-reverse; gap: 15px; }
@@ -219,10 +161,21 @@
             <div class="stat-content-area"><div class="stat-value" id="total-gpa">0.00</div></div>
             <div class="stat-label">GPA Tích Lũy</div>
         </div>
-        <div class="stat-item">
-            <div class="stat-content-area"><div class="stat-value" id="total-credits">0</div></div>
-            <div class="stat-label">Tổng Tín Chỉ</div>
+        
+        <div class="stat-item" style="position: relative;">
+            <div class="stat-content-area">
+                <div class="progress-wrapper">
+                    <canvas id="progressChart"></canvas>
+                    <div class="progress-text">
+                        <span class="progress-percent" id="progress-percent">0%</span>
+                        <span class="progress-detail" id="progress-detail">0/0 TC</span>
+                    </div>
+                </div>
+            </div>
+            <button class="edit-target-btn" onclick="openProfileModal()" title="Sửa Tổng Tín Chỉ"><i class="fas fa-pen"></i></button>
+            <div class="stat-label">Tiến Độ Học Tập</div>
         </div>
+
         <div class="stat-item">
             <div class="stat-content-area" id="academic-rank-area"><span class="dash-badge rank-gray">---</span></div>
             <div class="stat-label">Xếp Loại Toàn Khóa</div>
@@ -238,20 +191,15 @@
             <i class="fas fa-chess"></i> Chiến Lược
         </button>
         <div class="controls-right">
-            <button class="btn btn-excel" onclick="exportExcel()" title="Tải file Excel về máy">
-                <i class="fas fa-file-excel"></i> Xuất Excel
-            </button>
-            <button class="btn btn-excel" onclick="triggerImport()" title="Tải file Excel lên hệ thống">
-                <i class="fas fa-file-upload"></i> Nạp Excel
-            </button>
-            <button class="btn btn-save" onclick="calculateAll(true)">
-                <i class="fas fa-save"></i> Lưu Dữ Liệu
-            </button>
+            <button class="btn btn-excel" onclick="exportExcel()" title="Tải file Excel"><i class="fas fa-file-excel"></i> Xuất Excel</button>
+            <button class="btn btn-excel" onclick="triggerImport()" title="Nạp file Excel"><i class="fas fa-file-upload"></i> Nạp Excel</button>
+            <button class="btn btn-save" onclick="calculateAll(true)"><i class="fas fa-save"></i> Lưu Dữ Liệu</button>
             <input type="file" id="file-input" style="display:none" accept=".xlsx, .xls" onchange="importExcel(this)">
         </div>
     </div>
 
     <div id="semesters-container"></div>
+    <button class="btn-add-sem" onclick="addSemester()">+ Thêm Học Kỳ Mới</button>
 </div>
 
 <div class="modal-overlay" id="targetModal">
@@ -282,8 +230,8 @@
             <input type="number" id="strat-target-gpa" placeholder="Ví dụ: 3.6" step="0.01">
         </div>
         <div class="modal-input-group">
-            <label>Tổng Tín Chỉ CTĐT:</label>
-            <input type="number" id="strat-total-credits" placeholder="Ví dụ: 135">
+            <label>Tổng Tín Chỉ CTĐT (Hệ thống sẽ tự lấy từ Profile):</label>
+            <input type="number" id="strat-total-credits" placeholder="Ví dụ: 135" disabled style="background:#eee">
         </div>
         <button class="btn-calc-modal" onclick="calcStrategy()">Phân Tích</button>
         <div class="modal-result" id="strategy-result" style="display:none; font-size: 1rem; text-align: left;"></div>
@@ -293,7 +241,7 @@
 
 <div class="modal-overlay" id="profileModal">
     <div class="modal">
-        <h3><i class="fas fa-user-edit"></i> Thông Tin Sinh Viên</h3>
+        <h3><i class="fas fa-user-edit"></i> Thông Tin & Cài Đặt</h3>
         <div class="modal-input-group">
             <label>Họ và Tên:</label>
             <input type="text" id="profile-name" placeholder="Tên của bạn">
@@ -302,19 +250,24 @@
             <label>Mã Số Sinh Viên:</label>
             <input type="text" id="profile-id" placeholder="Mã SV">
         </div>
+        <div class="modal-input-group">
+            <label>Tổng Tín Chỉ Toàn Khóa (Để tính tiến độ):</label>
+            <input type="number" id="profile-target-credits" placeholder="Ví dụ: 130">
+        </div>
         <button class="btn-calc-modal" onclick="saveProfile()">Cập Nhật</button>
         <button class="modal-close" onclick="closeModal('profileModal')">Đóng</button>
     </div>
 </div>
 
 <script>
-    const TOTAL_SEMESTERS = 8;
-    const STORAGE_KEY = 'gpaData_v13'; 
+    const STORAGE_KEY = 'gpaData_v14'; 
     let semestersData = {};
     let gpaChartInstance = null;
+    let progressChartInstance = null;
     let currentCalcData = { s1: 0, r1: 0, r2: 0 };
     let currentTotalGPA = 0;
     let currentTotalCredits = 0;
+    let targetTotalCredits = 135; // Mặc định
 
     function init() {
         try {
@@ -325,21 +278,43 @@
         loadProfile();
 
         const container = document.getElementById('semesters-container');
-        // Check for v13, then v12, v11...
+        // Logic Migration: Check v14 -> v13 -> v12...
         let savedData = localStorage.getItem(STORAGE_KEY);
+        if(!savedData) savedData = localStorage.getItem('gpaData_v13');
         if(!savedData) savedData = localStorage.getItem('gpaData_v12');
-        if(!savedData) savedData = localStorage.getItem('gpaData_v11');
 
-        if (savedData) semestersData = JSON.parse(savedData);
+        if (savedData) {
+            semestersData = JSON.parse(savedData);
+        } else {
+            // Dữ liệu mặc định 8 kỳ nếu chưa có gì
+            for(let i=1; i<=8; i++) semestersData[i] = [];
+        }
 
-        for (let i = 1; i <= TOTAL_SEMESTERS; i++) {
-            if (!semestersData[i]) semestersData[i] = [];
+        renderAllSemesters();
+        calculateAll(false);
+    }
+
+    // --- DYNAMIC SEMESTER LOGIC (V14) ---
+    function renderAllSemesters() {
+        const container = document.getElementById('semesters-container');
+        container.innerHTML = ''; // Clear old
+        // Sort keys to ensure order 1, 2, 3...
+        const keys = Object.keys(semestersData).map(Number).sort((a,b)=>a-b);
+        
+        keys.forEach(i => {
             const semDiv = document.createElement('div');
             semDiv.className = 'semester-card';
+            semDiv.id = `sem-card-${i}`;
             semDiv.innerHTML = `
                 <div class="semester-header" onclick="toggleSemester(${i})">
-                    <div class="sem-title"><div class="sem-icon"><i class="fas fa-folder-open"></i></div> Học Kỳ ${i}</div>
-                    <div class="sem-info" id="summary-${i}">Chưa có dữ liệu</div>
+                    <div class="sem-left">
+                        <div class="sem-icon"><i class="fas fa-folder-open"></i></div>
+                        <div class="sem-title">Học Kỳ ${i}</div>
+                    </div>
+                    <div class="sem-actions">
+                        <div class="sem-info" id="summary-${i}">Chưa có dữ liệu</div>
+                        <button class="btn-sem-del" onclick="removeSemester(event, ${i})" title="Xóa học kỳ này"><i class="fas fa-trash-alt"></i></button>
+                    </div>
                 </div>
                 <div class="semester-content" id="content-${i}">
                     <div id="list-${i}"></div>
@@ -347,45 +322,107 @@
                 </div>
             `;
             container.appendChild(semDiv);
-            renderSubjects(i);
-        }
+            
+            // Render subjects for this semester
+            if (semestersData[i] && semestersData[i].length > 0) {
+                semestersData[i].forEach(data => addSubjectRow(i, data));
+            } else {
+                // Không tự thêm dòng trống nữa
+            }
+        });
+    }
+
+    function addSemester() {
+        const keys = Object.keys(semestersData).map(Number);
+        const nextSem = (keys.length > 0 ? Math.max(...keys) : 0) + 1;
+        semestersData[nextSem] = [];
+        renderAllSemesters(); // Re-render toàn bộ
         calculateAll(false);
+        // Scroll to bottom
+        setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100);
+    }
+
+    function removeSemester(event, id) {
+        event.stopPropagation(); // Chặn sự kiện click vào header
+        if (semestersData[id] && semestersData[id].length > 0) {
+            if (!confirm(`Học kỳ ${id} đang có môn học. Bạn có chắc muốn xóa không?`)) return;
+        }
+        delete semestersData[id];
+        renderAllSemesters();
+        calculateAll(true); // Save immediately
+    }
+
+    // --- PROGRESS CHART (V14) ---
+    function updateProgressChart(earned, total) {
+        const ctx = document.getElementById('progressChart').getContext('2d');
+        const isDark = document.body.classList.contains('dark-mode');
+        const remaining = Math.max(0, total - earned);
+        const percent = total > 0 ? Math.round((earned / total) * 100) : 0;
+
+        document.getElementById('progress-percent').innerText = `${percent}%`;
+        document.getElementById('progress-detail').innerText = `${earned}/${total} TC`;
+
+        if (progressChartInstance) progressChartInstance.destroy();
+
+        progressChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Đã tích lũy', 'Còn lại'],
+                datasets: [{
+                    data: [earned, remaining],
+                    backgroundColor: [
+                        '#ffffff', // Màu phần đã đạt (sẽ set đè ở dưới)
+                        isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' // Màu phần còn lại
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                cutout: '75%', // Độ dày vòng tròn
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { enabled: true } }
+            }
+        });
+        
+        // Update color dynamically based on percentage
+        let color = '#3b82f6'; // Blue default
+        if(percent >= 100) color = '#10b981'; // Green
+        else if(percent >= 50) color = '#f59e0b'; // Yellow
+        else color = '#ef4444'; // Red
+        
+        progressChartInstance.data.datasets[0].backgroundColor[0] = color;
+        progressChartInstance.update();
     }
 
     // --- EXCEL FUNCTIONS ---
     function exportExcel() {
-        // QUAN TRỌNG: Cập nhật dữ liệu từ màn hình vào biến semestersData trước khi xuất
         calculateAll(false); 
-
-        // 1. Prepare Data
         let gradeRows = [["Học Kỳ", "Tên Môn", "Số TC", "Tỷ Lệ", "Điểm QT", "Điểm CK"]];
-        for (let i = 1; i <= TOTAL_SEMESTERS; i++) {
+        // Duyệt qua keys đã sort
+        Object.keys(semestersData).map(Number).sort((a,b)=>a-b).forEach(i => {
             if (semestersData[i] && semestersData[i].length > 0) {
                 semestersData[i].forEach(subj => {
                     gradeRows.push([i, subj.name, subj.credit, subj.ratio, subj.s1, subj.s2]);
                 });
             }
-        }
+        });
 
         let profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
         let theme = localStorage.getItem('theme') || 'light';
-        let infoRows = [["Key", "Value"], ["Name", profile.name || ""], ["ID", profile.id || ""], ["Theme", theme]];
+        let infoRows = [["Key", "Value"], ["Name", profile.name || ""], ["ID", profile.id || ""], ["Theme", theme], ["TargetCredits", profile.targetCredits || 135]];
 
-        // 2. Create Workbook
         const wb = XLSX.utils.book_new();
         const wsGrades = XLSX.utils.aoa_to_sheet(gradeRows);
         const wsInfo = XLSX.utils.aoa_to_sheet(infoRows);
-
         XLSX.utils.book_append_sheet(wb, wsGrades, "BangDiem");
         XLSX.utils.book_append_sheet(wb, wsInfo, "HoSo");
-
-        // 3. Download
         const name = profile.name || "BangDiem";
         XLSX.writeFile(wb, `GPA_${name}.xlsx`);
     }
 
     function triggerImport() { document.getElementById('file-input').click(); }
-
     function importExcel(input) {
         const file = input.files[0];
         if (!file) return;
@@ -416,6 +453,7 @@
                         if (row.Key === "Name") profile.name = row.Value;
                         if (row.Key === "ID") profile.id = row.Value;
                         if (row.Key === "Theme") theme = row.Value;
+                        if (row.Key === "TargetCredits") profile.targetCredits = row.Value;
                     });
                     localStorage.setItem('userProfile', JSON.stringify(profile));
                     localStorage.setItem('theme', theme);
@@ -437,12 +475,19 @@
         const isDark = document.body.classList.contains('dark-mode');
         btn.innerHTML = isDark ? '<i class="fas fa-sun"></i> <span>Light Mode</span>' : '<i class="fas fa-moon"></i> <span>Dark Mode</span>';
     }
-    function openProfileModal() { document.getElementById('profileModal').style.display = 'flex'; }
+    function openProfileModal() { 
+        document.getElementById('profileModal').style.display = 'flex'; 
+        // Load value into input
+        let p = JSON.parse(localStorage.getItem('userProfile') || '{}');
+        document.getElementById('profile-target-credits').value = p.targetCredits || 135;
+    }
     function saveProfile() {
         const name = document.getElementById('profile-name').value;
         const id = document.getElementById('profile-id').value;
-        localStorage.setItem('userProfile', JSON.stringify({ name, id }));
+        const targetCredits = document.getElementById('profile-target-credits').value;
+        localStorage.setItem('userProfile', JSON.stringify({ name, id, targetCredits }));
         loadProfile(); closeModal('profileModal');
+        calculateAll(false); // Update progress chart
     }
     function loadProfile() {
         let data = null; try{data=localStorage.getItem('userProfile')}catch(e){}
@@ -452,6 +497,9 @@
             if(p.id) document.getElementById('display-id').innerText=`MSSV: ${p.id}`;
             document.getElementById('profile-name').value=p.name||'';
             document.getElementById('profile-id').value=p.id||'';
+            targetTotalCredits = p.targetCredits || 135;
+            // Update strategy modal input too
+            document.getElementById('strat-total-credits').value = targetTotalCredits;
         }
     }
     function toggleSemester(id) { document.getElementById(`content-${id}`).classList.toggle('active'); }
@@ -507,17 +555,15 @@
         listDiv.appendChild(div);
     }
     function deleteRow(btn, semId) { btn.closest('.subject-row').remove(); calculateAll(false); }
-    function renderSubjects(semId) {
-        const list = semestersData[semId];
-        if (list && list.length > 0) list.forEach(data => addSubjectRow(semId, data));
-    }
+    
     function openStrategyModal() { document.getElementById('strategyModal').style.display = 'flex'; }
     function calcStrategy() {
         const targetGPA = parseFloat(document.getElementById('strat-target-gpa').value);
-        const totalCredits = parseInt(document.getElementById('strat-total-credits').value);
+        // Use global targetTotalCredits loaded from profile
+        const totalCredits = targetTotalCredits;
         const resDiv = document.getElementById('strategy-result');
         resDiv.style.display = 'block';
-        if (!targetGPA || !totalCredits) { resDiv.innerHTML = '<span style="color:#ef4444">Nhập đủ thông tin đi!</span>'; return; }
+        if (!targetGPA) { resDiv.innerHTML = '<span style="color:#ef4444">Nhập GPA mục tiêu!</span>'; return; }
         const earnedCredits = currentTotalCredits;
         const currentPoints = currentTotalGPA * earnedCredits;
         const remainingCredits = totalCredits - earnedCredits;
@@ -550,8 +596,6 @@
         if (req > 10) resDiv.innerHTML = `Không thể! (${req.toFixed(2)})`; else if (req < 0) resDiv.innerHTML = `Đã đạt!`; else resDiv.innerHTML = `Cần thi cuối kỳ: <span style="font-size:1.5rem; color:#d97706">${req.toFixed(2)}</span>`;
     }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    
-    // --- GRADE LOGIC ---
     function getCourseResult(score10) {
         if (score10 >= 8.5) return { g4: 4.0, char: 'A', text: 'Giỏi', css: 'bg-gioi' };
         if (score10 >= 8.0) return { g4: 3.5, char: 'B+', text: 'Khá', css: 'bg-kha' };
@@ -582,48 +626,60 @@
         grad.addColorStop(0, isDark?'rgba(139,92,246,0.5)':'rgba(118,75,162,0.5)');
         grad.addColorStop(1, isDark?'rgba(139,92,246,0)':'rgba(118,75,162,0)');
         gpaChartInstance = new Chart(ctx, {
-            type: 'line', data: { labels: Array.from({length: TOTAL_SEMESTERS}, (_,i)=>`Kỳ ${i+1}`), datasets: [{ label: 'GPA', data: data, borderColor: isDark?'#a78bfa':'#764ba2', backgroundColor: grad, fill: true, tension: 0.4 }] },
+            type: 'line', data: { labels: Object.keys(semestersData).map(k=>`Kỳ ${k}`), datasets: [{ label: 'GPA', data: data, borderColor: isDark?'#a78bfa':'#764ba2', backgroundColor: grad, fill: true, tension: 0.4 }] },
             options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 4.0, grid: { color: isDark?'#374151':'#e5e7eb' }, ticks: { color: isDark?'#9ca3af':'#666' } }, x: { grid: { display: false }, ticks: { color: isDark?'#9ca3af':'#666' } } }, plugins: { legend: { display: false } } }
         });
     }
     
-    // --- MAIN LOGIC (FIXED) ---
     function calculateAll(save = true) {
         let grandPoints=0, grandCredits=0, newData={}, chartData=[];
-        for (let i = 1; i <= TOTAL_SEMESTERS; i++) {
+        
+        // Loop dynamic keys sorted
+        Object.keys(semestersData).map(Number).sort((a,b)=>a-b).forEach(i => {
             const listDiv = document.getElementById(`list-${i}`);
-            const rows = listDiv.querySelectorAll('.subject-row');
+            // If listDiv exists (rendered), grab data from DOM. Else use stored data (migration safety)
             let semPoints=0, semCredits=0, semData=[];
-            rows.forEach(row => {
-                const name = row.querySelector('.inp-name').value;
-                const creditVal = row.querySelector('.inp-credit').value;
-                const credit = creditVal===''?0:parseFloat(creditVal);
-                const ratio = row.querySelector('.inp-ratio').value;
-                const s1 = parseFloat(row.querySelector('.inp-s1').value);
-                const s2 = parseFloat(row.querySelector('.inp-s2').value);
-                semData.push({name, credit: creditVal, ratio, s1: isNaN(s1)?'':s1, s2: isNaN(s2)?'':s2});
-                const p10=row.querySelector('.preview-10'), pC=row.querySelector('.preview-convert'), pR=row.querySelector('.preview-rank');
-                if(!isNaN(s1) && (ratio==='100-0'||!isNaN(s2))) {
-                    const r = ratio.split('-').map(x=>parseInt(x)/100);
-                    let f10 = (ratio==='100-0')?s1:(s1*r[0]+s2*r[1]); f10 = Math.round(f10*10)/10;
-                    const res = getCourseResult(f10);
-                    p10.innerText=f10; pC.innerText=`${res.g4} - ${res.char}`; pR.innerHTML=`<span class="result-badge ${res.css}">${res.text}</span>`;
-                    if(credit>0){ semPoints+=res.g4*credit; semCredits+=credit; }
-                } else { p10.innerText='...'; pC.innerText='...'; pR.innerHTML='...'; }
-            });
+            
+            if(listDiv) {
+                const rows = listDiv.querySelectorAll('.subject-row');
+                rows.forEach(row => {
+                    const name = row.querySelector('.inp-name').value;
+                    const creditVal = row.querySelector('.inp-credit').value;
+                    const credit = creditVal===''?0:parseFloat(creditVal);
+                    const ratio = row.querySelector('.inp-ratio').value;
+                    const s1 = parseFloat(row.querySelector('.inp-s1').value);
+                    const s2 = parseFloat(row.querySelector('.inp-s2').value);
+                    semData.push({name, credit: creditVal, ratio, s1: isNaN(s1)?'':s1, s2: isNaN(s2)?'':s2});
+                    
+                    const p10=row.querySelector('.preview-10'), pC=row.querySelector('.preview-convert'), pR=row.querySelector('.preview-rank');
+                    if(!isNaN(s1) && (ratio==='100-0'||!isNaN(s2))) {
+                        const r = ratio.split('-').map(x=>parseInt(x)/100);
+                        let f10 = (ratio==='100-0')?s1:(s1*r[0]+s2*r[1]); f10 = Math.round(f10*10)/10;
+                        const res = getCourseResult(f10);
+                        p10.innerText=f10; pC.innerText=`${res.g4} - ${res.char}`; pR.innerHTML=`<span class="result-badge ${res.css}">${res.text}</span>`;
+                        if(credit>0){ semPoints+=res.g4*credit; semCredits+=credit; }
+                    } else { p10.innerText='...'; pC.innerText='...'; pR.innerHTML='...'; }
+                });
+            } else {
+                semData = semestersData[i]; // Fallback
+            }
+
             newData[i]=semData;
             const sumDiv = document.getElementById(`summary-${i}`);
-            if(semCredits>0) { const gpa=(semPoints/semCredits).toFixed(2); sumDiv.innerHTML=`GPA: <strong>${gpa}</strong> | ${semCredits} tín | ${getListRankBadge(gpa)}`; grandPoints+=semPoints; grandCredits+=semCredits; chartData.push(gpa); } 
-            else { sumDiv.innerHTML=`<span style="opacity:0.6; font-style:italic">Chưa có dữ liệu</span>`; chartData.push(null); }
-        }
+            if(sumDiv) {
+                if(semCredits>0) { const gpa=(semPoints/semCredits).toFixed(2); sumDiv.innerHTML=`GPA: <strong>${gpa}</strong> | ${semCredits} tín | ${getListRankBadge(gpa)}`; grandPoints+=semPoints; grandCredits+=semCredits; chartData.push(gpa); } 
+                else { sumDiv.innerHTML=`<span style="opacity:0.6; font-style:italic">Chưa có dữ liệu</span>`; chartData.push(null); }
+            }
+        });
         
-        // CẬP NHẬT BIẾN TOÀN CỤC NGAY LẬP TỨC (Fix Lỗi Excel)
-        semestersData = newData;
-
+        semestersData = newData; // Update global state
         currentTotalCredits = grandCredits;
         if (grandCredits > 0) { currentTotalGPA = (grandPoints / grandCredits).toFixed(2); document.getElementById('total-gpa').innerText = currentTotalGPA; document.getElementById('total-credits').innerText = grandCredits; updateDashboardRank(currentTotalGPA); } 
         else { currentTotalGPA = 0; updateDashboardRank(0); }
+        
         updateChart(chartData);
+        updateProgressChart(currentTotalCredits, targetTotalCredits);
+
         if (save) { 
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newData)); alert("Dữ liệu đã được lưu!"); } catch(e){}
         }
