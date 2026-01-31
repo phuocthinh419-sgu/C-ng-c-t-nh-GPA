@@ -2,8 +2,15 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý GPA - V17 (Aurora)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GPA Manager - Private Fortress</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#4c1d95">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/color/96/000000/student-male--v1.png">
+    <link rel="manifest" href='data:application/manifest+json;base64,ewogICJuYW1lIjogIkhlIFRob25nIEdQQSIsCiAgInNob3J0X25hbWUiOiAiR1BBIE1hbmFnZXIiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzFhMWEyZSIsCiAgInRoZW1lX2NvbG9yIjogIiM0YzFkOTUiLAogICJpY29ucyI6IFt7CiAgICAic3JjIjogImh0dHBzOi8vaW1nLmljb25zOC5jb20vY29sb3IvMTkyLzAwMDAwMC9zdHVkZW50LW1hbGUtLXYxLnBuZyIsCiAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgfV0KfQ=='>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
@@ -11,9 +18,8 @@
     
     <style>
         :root {
-            /* Light Aurora: Bình minh rực rỡ */
             --aurora-bg: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            --card-bg: rgba(255, 255, 255, 0.85); /* Kính mờ sáng */
+            --card-bg: rgba(255, 255, 255, 0.85);
             --text-main: #1f2937; --text-light: #6b7280;
             --border-color: rgba(255,255,255,0.6);
             --input-bg: rgba(255, 255, 255, 0.9); --input-border: #d1d5db;
@@ -22,9 +28,8 @@
             --btn-excel-bg: #107c41;
         }
         body.dark-mode {
-            /* Dark Aurora: Cực quang đêm đen huyền bí */
             --aurora-bg: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e, #0f2027, #203a43, #2c5364);
-            --card-bg: rgba(30, 41, 59, 0.75); /* Kính mờ tối */
+            --card-bg: rgba(30, 41, 59, 0.75);
             --text-main: #f1f5f9; --text-light: #94a3b8;
             --border-color: rgba(255,255,255,0.1);
             --input-bg: rgba(51, 65, 85, 0.9); --input-border: #475569;
@@ -34,10 +39,10 @@
         body { 
             font-family: 'Segoe UI', Roboto, sans-serif; 
             background: var(--aurora-bg); 
-            background-size: 400% 400%; /* Kích thước lớn để tạo hiệu ứng trôi */
-            animation: auroraAnimation 15s ease infinite; /* Hiệu ứng chuyển động */
-            color: var(--text-main); margin: 0; padding: 20px; line-height: 1.5; transition: 0.3s; 
-            min-height: 100vh;
+            background-size: 400% 400%; 
+            animation: auroraAnimation 15s ease infinite; 
+            color: var(--text-main); margin: 0; padding: 20px; 
+            min-height: 100vh; overflow-x: hidden;
         }
 
         @keyframes auroraAnimation {
@@ -46,121 +51,113 @@
             100% { background-position: 0% 50%; }
         }
 
-        .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; }
-
-        /* THEME TOGGLE */
-        .theme-toggle { 
-            position: absolute; top: 10px; right: 10px; 
-            background: var(--card-bg); border: 1px solid var(--border-color); 
-            color: var(--text-main); padding: 8px 15px; border-radius: 25px; 
-            cursor: pointer; display: flex; align-items: center; gap: 8px; 
-            font-size: 0.9rem; box-shadow: var(--shadow); 
-            transition: 0.2s; z-index: 9999; font-weight: 600; backdrop-filter: blur(4px);
+        /* --- SECURITY GATE (LOCK SCREEN) --- */
+        #security-gate {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px);
+            z-index: 10000; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            color: white; transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
         }
-        .theme-toggle:hover { transform: scale(1.05); }
-
-        /* HEADER */
-        .app-header { text-align: center; margin-bottom: 25px; padding-top: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .app-title { 
-            font-size: 2rem; font-weight: 800; text-transform: uppercase; 
-            color: var(--text-main); letter-spacing: 1px; margin: 0; line-height: 1.3;
+        #security-gate.unlocked { transform: translateY(-100%); }
+        
+        .gate-content { text-align: center; max-width: 300px; }
+        .gate-icon { font-size: 4rem; color: #f59e0b; margin-bottom: 20px; animation: pulse 2s infinite; }
+        .gate-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
+        .gate-msg { font-size: 0.9rem; color: #94a3b8; margin-bottom: 30px; }
+        
+        .pin-display { 
+            display: flex; gap: 15px; justify-content: center; margin-bottom: 30px; 
         }
-        .user-info { font-size: 1.1rem; color: var(--text-main); font-weight: 600; margin-top: 5px; cursor: pointer; transition: 0.2s; display: inline-block; padding: 5px 15px; border-radius: 15px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); }
-        .user-info:hover { background: rgba(255,255,255,0.3); }
+        .pin-dot { 
+            width: 15px; height: 15px; border-radius: 50%; 
+            border: 2px solid rgba(255,255,255,0.3); transition: 0.2s; 
+        }
+        .pin-dot.filled { background: #8b5cf6; border-color: #8b5cf6; box-shadow: 0 0 10px #8b5cf6; }
+        
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .num-btn { 
+            width: 60px; height: 60px; border-radius: 50%; 
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1);
+            color: white; font-size: 1.2rem; font-weight: 600; cursor: pointer;
+            transition: 0.2s; display: flex; align-items: center; justify-content: center;
+        }
+        .num-btn:hover { background: rgba(255,255,255,0.2); }
+        .num-btn:active { transform: scale(0.9); }
+        
+        .shake-anim { animation: shake 0.4s ease-in-out; }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
+        @keyframes pulse { 0% {transform: scale(1); opacity: 1;} 50% {transform: scale(1.1); opacity: 0.8;} 100% {transform: scale(1); opacity: 1;} }
+
+        /* --- MAIN APP --- */
+        .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; filter: blur(0); transition: filter 0.5s; }
+        
+        /* HEADER & CONTROLS */
+        .theme-toggle { position: absolute; top: 10px; right: 10px; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 15px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; box-shadow: var(--shadow); z-index: 99; font-weight: 600; backdrop-filter: blur(4px); }
+        .app-header { text-align: center; margin-bottom: 25px; padding-top: 20px; }
+        .app-title { font-size: 2rem; font-weight: 800; text-transform: uppercase; color: var(--text-main); letter-spacing: 1px; margin: 0; }
+        .user-info { font-size: 1.1rem; color: var(--text-main); font-weight: 600; margin-top: 5px; cursor: pointer; display: inline-block; padding: 5px 15px; border-radius: 15px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); }
         .app-subtitle { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; color: var(--text-main); }
 
-        /* DASHBOARD (GLASSMORPHISM CAO CẤP) */
-        .dashboard { 
-            background: rgba(255, 255, 255, 0.1); 
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white; padding: 25px; 
-            border-radius: 20px; box-shadow: var(--shadow); 
-            margin-bottom: 25px; display: grid; grid-template-columns: 1fr 1.2fr 1fr; 
-            gap: 20px; align-items: center; position: relative;
-        }
-        
-        .stat-item { 
-            background: rgba(255, 255, 255, 0.05); 
-            border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            padding: 15px; height: 160px; box-sizing: border-box; 
-            transition: transform 0.3s ease, background 0.3s;
-        }
+        /* DASHBOARD GLASS */
+        .dashboard { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); margin-bottom: 25px; display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 20px; align-items: center; }
+        .stat-item { background: rgba(255, 255, 255, 0.05); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; height: 160px; transition: transform 0.3s ease; position: relative; }
         .stat-item:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.15); }
-        
-        /* Chữ trong dashboard luôn trắng để nổi trên nền aurora */
-        .dashboard .stat-value { font-size: 2.5rem; font-weight: 800; color: #fff; text-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .dashboard .stat-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.9); font-weight: 600; margin-top: 10px; }
+        .stat-value { font-size: 2.5rem; font-weight: 800; color: #fff; text-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .stat-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.9); font-weight: 600; margin-top: 10px; }
 
-        /* PROGRESS CIRCLE */
         .progress-wrapper { position: relative; width: 120px; height: 120px; }
         .progress-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; pointer-events: none; }
         .progress-percent { font-size: 1.4rem; font-weight: 800; color: #fff; }
         .progress-detail { font-size: 0.75rem; color: rgba(255,255,255,0.9); }
-        .edit-target-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; transition: 0.2s; }
-        .edit-target-btn:hover { background: rgba(255,255,255,0.4); transform: rotate(15deg); }
+        .edit-target-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .edit-target-btn:hover { background: rgba(255,255,255,0.4); }
 
-        /* CARDS (SEMESTERS & CHART) */
-        .chart-card, .semester-card { 
-            background: var(--card-bg); 
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border-radius: 16px; box-shadow: var(--shadow); 
-            border: 1px solid var(--border-color); 
-            overflow: hidden; margin-bottom: 20px; 
-            transition: transform 0.2s;
-        }
-        .semester-card:hover { transform: translateY(-2px); }
-
+        /* CARDS */
+        .chart-card, .semester-card { background: var(--card-bg); backdrop-filter: blur(10px); border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 20px; }
         .chart-card { padding: 20px; height: 300px; }
-        .semester-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: transparent; transition: background 0.2s; user-select: none; color: var(--text-main); }
+        .semester-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: transparent; transition: background 0.2s; color: var(--text-main); }
         .semester-header:hover { background: rgba(139, 92, 246, 0.05); }
-        
         .sem-left { display: flex; align-items: center; gap: 12px; }
         .sem-title { font-weight: 700; font-size: 1.1rem; }
-        .sem-icon { color: #8b5cf6; background: rgba(139, 92, 246, 0.1); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem; }
+        .sem-icon { color: #8b5cf6; background: rgba(139, 92, 246, 0.1); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
         .sem-info { font-size: 0.9rem; color: var(--text-light); }
-        .sem-actions { display: flex; align-items: center; gap: 10px; }
-        
-        .semester-content { display: none; padding: 20px; background: rgba(0,0,0,0.02); border-top: 1px solid var(--border-color); animation: slideDown 0.3s ease-out; }
+        .semester-content { display: none; padding: 20px; border-top: 1px solid var(--border-color); animation: slideDown 0.3s ease-out; }
         .semester-content.active { display: block; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* INPUTS */
+        /* INPUTS & BUTTONS */
         .subject-row { display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 10px; align-items: flex-end; }
         .field-group { flex: 1; min-width: 80px; }
         .field-group label { display: block; font-size: 0.7rem; color: var(--text-light); margin-bottom: 5px; font-weight: 700; text-transform: uppercase; }
         input, select { width: 100%; padding: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-main); border-radius: 8px; font-size: 0.9rem; outline: none; transition: 0.2s; }
-        input:focus, select:focus { border-color: #8b5cf6; box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3); }
+        input:focus { border-color: #8b5cf6; box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3); }
         .preview-box { text-align: center; font-weight: bold; padding: 8px 4px; background: rgba(0,0,0,0.05); border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.9rem; color: var(--text-light); min-height: 20px; display: flex; align-items: center; justify-content: center; }
 
-        /* BUTTONS */
         .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .controls-right { display: flex; gap: 8px; flex-wrap: wrap; }
         .btn { border: none; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: 0.3s; display: flex; align-items: center; gap: 8px; color: white; font-size: 0.9rem; backdrop-filter: blur(4px); }
-        .btn:hover { transform: translateY(-3px); opacity: 0.95; box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
-        .btn-save { background: #1f2937; } /* Dark button for contrast */
+        .btn:hover { transform: translateY(-3px); opacity: 0.95; }
+        .btn-save { background: #1f2937; } 
         .btn-strategy { background: var(--btn-strategy-bg); }
         .btn-excel { background: var(--btn-excel-bg); }
         .btn-add { width: 100%; padding: 12px; border: 2px dashed var(--border-color); background: rgba(255,255,255,0.1); color: var(--text-main); border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn-add:hover { border-color: #8b5cf6; color: #8b5cf6; background: rgba(139, 92, 246, 0.1); }
-        .btn-add-sem { width: 100%; padding: 15px; border: 2px dashed rgba(255,255,255,0.5); background: rgba(255,255,255,0.1); color: var(--text-main); border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 1rem; margin-top: 20px; text-transform: uppercase; backdrop-filter: blur(5px); }
-        .btn-add-sem:hover { background: rgba(255,255,255,0.2); border-color: #fff; transform: scale(1.02); }
-        .btn-icon { width: 32px; height: 32px; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; margin-left: 5px; }
+        .btn-add-sem { width: 100%; padding: 15px; border: 2px dashed rgba(255,255,255,0.5); background: rgba(255,255,255,0.1); color: var(--text-main); border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px; text-transform: uppercase; }
+        .btn-add-sem:hover { background: rgba(255,255,255,0.2); border-color: #fff; }
+        .btn-icon { width: 32px; height: 32px; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-left: 5px; }
         .btn-del { background: rgba(239, 68, 68, 0.1); color: #ef4444; } .btn-del:hover { background: #ef4444; color: white; }
+        .btn-sem-del { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1rem; padding: 5px; opacity: 0.6; } .btn-sem-del:hover { opacity: 1; transform: scale(1.2); }
         .btn-calc-target { background: rgba(59, 130, 246, 0.1); color: #3b82f6; } .btn-calc-target:hover { background: #3b82f6; color: white; }
-        .btn-sem-del { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1rem; padding: 5px; opacity: 0.6; transition: 0.2s; } .btn-sem-del:hover { opacity: 1; transform: scale(1.2); }
 
-        /* BADGES & RANKS */
         .dash-badge { padding: 8px 20px; font-size: 1.2rem; font-weight: 800; border-radius: 30px; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: inline-block; min-width: 120px; text-align: center; border: 2px solid rgba(255,255,255,0.2); }
         .rank-gold { background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%); color: #6a4803; }
         .rank-silver { background: linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%); color: #424242; }
         .rank-bronze { background: linear-gradient(135deg, #d98e54 0%, #a0522d 100%); color: white; }
         .rank-gray { background: rgba(255,255,255,0.2); color: white; }
-        .rank-red { background: #dc3545; color: white; }
-
+        
         .list-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; display: inline-block; }
-        .bg-xs { background: #16a34a; color: white; } .bg-g { background: #0ea5e9; color: white; } .bg-k { background: #f59e0b; color: white; } .bg-tb { background: #6b7280; color: white; } .bg-y { background: #dc2626; color: white; }
+        .bg-xs { background: #16a34a; color: white; } .bg-g { background: #0ea5e9; color: white; } .bg-k { background: #f59e0b; color: white; } .bg-tb { background: #6b7280; color: white; }
         .result-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 12px; font-weight: 700; text-transform: uppercase; display: inline-block; white-space: nowrap; }
         .bg-gioi { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; } .bg-kha { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; } .bg-tb { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; } .bg-tbyeu { background: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; } .bg-kem { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
@@ -193,10 +190,35 @@
 </head>
 <body>
 
-<div class="container">
-    <button class="theme-toggle" onclick="toggleTheme()" title="Chuyển chế độ Sáng/Tối">
-        <i class="fas fa-moon"></i> <span>Dark Mode</span>
-    </button>
+<div id="security-gate">
+    <div class="gate-content">
+        <div class="gate-icon"><i class="fas fa-fingerprint"></i></div>
+        <div class="gate-title">Khu Vực Riêng Tư</div>
+        <div class="gate-msg" id="gate-msg">Nhập PIN để mở khóa</div>
+        
+        <div class="pin-display" id="pin-display">
+            <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+        </div>
+        
+        <div class="numpad">
+            <div class="num-btn" onclick="enterDigit(1)">1</div>
+            <div class="num-btn" onclick="enterDigit(2)">2</div>
+            <div class="num-btn" onclick="enterDigit(3)">3</div>
+            <div class="num-btn" onclick="enterDigit(4)">4</div>
+            <div class="num-btn" onclick="enterDigit(5)">5</div>
+            <div class="num-btn" onclick="enterDigit(6)">6</div>
+            <div class="num-btn" onclick="enterDigit(7)">7</div>
+            <div class="num-btn" onclick="enterDigit(8)">8</div>
+            <div class="num-btn" onclick="enterDigit(9)">9</div>
+            <div class="num-btn" style="opacity:0"></div>
+            <div class="num-btn" onclick="enterDigit(0)">0</div>
+            <div class="num-btn" onclick="clearPin()"><i class="fas fa-backspace"></i></div>
+        </div>
+    </div>
+</div>
+
+<div class="container" id="main-app">
+    <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i> <span>Dark Mode</span></button>
 
     <div class="app-header">
         <h1 class="app-title"><i class="fas fa-university"></i> Hệ thống quản lý điểm GPA</h1>
@@ -235,12 +257,10 @@
     </div>
 
     <div class="controls">
-        <button class="btn btn-strategy" onclick="openStrategyModal()">
-            <i class="fas fa-chess"></i> Chiến Lược
-        </button>
+        <button class="btn btn-strategy" onclick="openStrategyModal()"><i class="fas fa-chess"></i> Chiến Lược</button>
         <div class="controls-right">
-            <button class="btn btn-excel" onclick="exportExcel()" title="Tải file Excel"><i class="fas fa-file-excel"></i> Xuất Excel</button>
-            <button class="btn btn-excel" onclick="triggerImport()" title="Nạp file Excel"><i class="fas fa-file-upload"></i> Nạp Excel</button>
+            <button class="btn btn-excel" onclick="exportExcel()"><i class="fas fa-file-excel"></i> Xuất Excel</button>
+            <button class="btn btn-excel" onclick="triggerImport()"><i class="fas fa-file-upload"></i> Nạp Excel</button>
             <button class="btn btn-save" onclick="calculateAll(true)"><i class="fas fa-save"></i> Lưu Dữ Liệu</button>
             <input type="file" id="file-input" style="display:none" accept=".xlsx, .xls" onchange="importExcel(this)">
         </div>
@@ -255,13 +275,13 @@
         <h3><i class="fas fa-magic"></i> Dự Tính Điểm Thi</h3>
         <p id="modal-subject-name" style="color: var(--text-light); margin-bottom: 15px;">Môn học</p>
         <div style="text-align: left; margin-bottom: 15px;">
-            <label>Mục tiêu môn này:</label>
+            <label>Mục tiêu:</label>
             <select id="target-grade" style="width: 100%; margin-top: 5px;" onchange="calcTarget()">
                 <option value="8.5">Điểm A (Giỏi - 8.5+)</option>
                 <option value="8.0">Điểm B+ (Khá - 8.0+)</option>
                 <option value="7.0">Điểm B (Khá - 7.0+)</option>
-                <option value="6.5">Điểm C+ (Trung bình - 6.5+)</option>
-                <option value="5.5">Điểm C (Trung bình - 5.5+)</option>
+                <option value="6.5">Điểm C+ (TB - 6.5+)</option>
+                <option value="5.5">Điểm C (TB - 5.5+)</option>
                 <option value="5.0">Điểm D+ (TB Yếu - 5.0+)</option>
             </select>
         </div>
@@ -272,9 +292,9 @@
 
 <div class="modal-overlay" id="strategyModal">
     <div class="modal">
-        <h3><i class="fas fa-chess-king"></i> Chiến Lược Toàn Khóa</h3>
+        <h3><i class="fas fa-chess-king"></i> Chiến Lược</h3>
         <div class="modal-input-group"><label>GPA Mục Tiêu:</label><input type="number" id="strat-target-gpa" placeholder="Ví dụ: 3.6" step="0.01"></div>
-        <div class="modal-input-group"><label>Tổng Tín Chỉ CTĐT:</label><input type="number" id="strat-total-credits" placeholder="Ví dụ: 135" disabled style="background:#eee; opacity: 0.7"></div>
+        <div class="modal-input-group"><label>Tổng Tín Chỉ:</label><input type="number" id="strat-total-credits" placeholder="135" disabled style="background:#eee"></div>
         <button class="btn-calc-modal" onclick="calcStrategy()">Phân Tích</button>
         <div class="modal-result" id="strategy-result" style="display:none; font-size: 1rem; text-align: left;"></div>
         <button class="modal-close" onclick="closeModal('strategyModal')">Đóng</button>
@@ -283,18 +303,28 @@
 
 <div class="modal-overlay" id="profileModal">
     <div class="modal">
-        <h3><i class="fas fa-user-edit"></i> Thông Tin & Cài Đặt</h3>
+        <h3><i class="fas fa-user-edit"></i> Thông Tin</h3>
         <div class="modal-input-group"><label>Họ và Tên:</label><input type="text" id="profile-name" placeholder="Tên của bạn"></div>
-        <div class="modal-input-group"><label>Mã Số Sinh Viên:</label><input type="text" id="profile-id" placeholder="Mã SV"></div>
+        <div class="modal-input-group"><label>MSSV:</label><input type="text" id="profile-id" placeholder="Mã SV"></div>
         <div class="modal-input-group"><label>Tổng Tín Chỉ Toàn Khóa:</label><input type="number" id="profile-target-credits" placeholder="Ví dụ: 135"></div>
-        <button class="btn-calc-modal" onclick="saveProfile()">Cập Nhật</button>
+        
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
+        <div style="text-align:left; margin-bottom:10px; font-weight:bold; color:var(--text-light)">Bảo Mật</div>
+        <button class="btn-calc-modal" style="background: #ef4444;" onclick="resetPin()">Đặt Lại Mã PIN</button>
+        
+        <button class="btn-calc-modal" style="margin-top:20px" onclick="saveProfile()">Lưu Cài Đặt</button>
         <button class="modal-close" onclick="closeModal('profileModal')">Đóng</button>
     </div>
 </div>
 
 <script>
-    const STORAGE_KEY = 'gpaData_v17'; 
+    const STORAGE_KEY = 'gpaData_v18';
     let semestersData = {};
+    let currentInputPin = "";
+    let savedPin = localStorage.getItem('appPIN');
+    let isSetupMode = !savedPin;
+    
+    // VARIABLES
     let gpaChartInstance = null;
     let progressChartInstance = null;
     let currentCalcData = { s1: 0, r1: 0, r2: 0 };
@@ -302,7 +332,78 @@
     let currentTotalCredits = 0;
     let targetTotalCredits = 135;
 
-    function init() {
+    // --- SECURITY LOGIC ---
+    function initSecurity() {
+        const msg = document.getElementById('gate-msg');
+        if(isSetupMode) {
+            msg.innerText = "Thiết lập mã PIN mới (4 số)";
+            msg.style.color = "#3b82f6";
+        } else {
+            msg.innerText = "Nhập PIN để mở khóa";
+            msg.style.color = "#94a3b8";
+        }
+    }
+
+    function enterDigit(num) {
+        if(currentInputPin.length < 4) {
+            currentInputPin += num;
+            updatePinDisplay();
+            if(currentInputPin.length === 4) {
+                setTimeout(checkPin, 200);
+            }
+        }
+    }
+
+    function clearPin() {
+        currentInputPin = "";
+        updatePinDisplay();
+    }
+
+    function updatePinDisplay() {
+        const dots = document.querySelectorAll('.pin-dot');
+        dots.forEach((dot, idx) => {
+            if(idx < currentInputPin.length) dot.classList.add('filled');
+            else dot.classList.remove('filled');
+        });
+    }
+
+    function checkPin() {
+        const gate = document.getElementById('security-gate');
+        const msg = document.getElementById('gate-msg');
+        
+        if(isSetupMode) {
+            // Setup Mode
+            localStorage.setItem('appPIN', currentInputPin);
+            savedPin = currentInputPin;
+            isSetupMode = false;
+            alert("Đã thiết lập mã PIN thành công! Hãy ghi nhớ nó.");
+            gate.classList.add('unlocked');
+            initApp();
+        } else {
+            // Verify Mode
+            if(currentInputPin === savedPin) {
+                gate.classList.add('unlocked');
+                initApp();
+            } else {
+                msg.innerText = "Sai mã PIN! Thử lại.";
+                msg.style.color = "#ef4444";
+                document.querySelector('.gate-icon').classList.add('shake-anim');
+                setTimeout(() => document.querySelector('.gate-icon').classList.remove('shake-anim'), 500);
+                currentInputPin = "";
+                updatePinDisplay();
+            }
+        }
+    }
+
+    function resetPin() {
+        if(confirm("Bạn có chắc muốn xóa mã PIN cũ và đặt lại?")) {
+            localStorage.removeItem('appPIN');
+            location.reload();
+        }
+    }
+
+    // --- MAIN APP LOGIC ---
+    function initApp() {
         try {
             const theme = localStorage.getItem('theme');
             if (theme === 'dark') document.body.classList.add('dark-mode');
@@ -311,11 +412,8 @@
         loadProfile();
 
         let savedData = localStorage.getItem(STORAGE_KEY);
-        // Migration logic
+        if(!savedData) savedData = localStorage.getItem('gpaData_v17');
         if(!savedData) savedData = localStorage.getItem('gpaData_v16');
-        if(!savedData) savedData = localStorage.getItem('gpaData_v15');
-        if(!savedData) savedData = localStorage.getItem('gpaData_v14');
-        if(!savedData) savedData = localStorage.getItem('gpaData_v13');
 
         if (savedData) {
             semestersData = JSON.parse(savedData);
@@ -327,31 +425,21 @@
         calculateAll(false);
     }
 
+    // ... (Keep existing logic from V17 for calculations, charts, excel) ...
+    // Copying core functions for compactness:
     function animateValue(obj, start, end, duration) {
         let startTimestamp = null;
         const step = (timestamp) => {
             if (!startTimestamp) startTimestamp = timestamp;
             const progress = Math.min((timestamp - startTimestamp) / duration, 1);
             obj.innerHTML = (progress * (end - start) + start).toFixed(2);
-            if (progress < 1) {
-                window.requestAnimationFrame(step);
-            }
+            if (progress < 1) window.requestAnimationFrame(step);
         };
         window.requestAnimationFrame(step);
     }
 
     function runConfetti() {
-        var duration = 3 * 1000;
-        var animationEnd = Date.now() + duration;
-        var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
-        function randomInRange(min, max) { return Math.random() * (max - min) + min; }
-        var interval = setInterval(function() {
-            var timeLeft = animationEnd - Date.now();
-            if (timeLeft <= 0) { return clearInterval(interval); }
-            var particleCount = 50 * (timeLeft / duration);
-            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
-        }, 250);
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     }
 
     function renderAllSemesters() {
@@ -364,12 +452,12 @@
             semDiv.innerHTML = `
                 <div class="semester-header" onclick="toggleSemester(${i})">
                     <div class="sem-left"><div class="sem-icon"><i class="fas fa-folder-open"></i></div><div class="sem-title">Học Kỳ ${i}</div></div>
-                    <div class="sem-actions"><div class="sem-info" id="summary-${i}">Chưa có dữ liệu</div><button class="btn-sem-del" onclick="removeSemester(event, ${i})" title="Xóa học kỳ"><i class="fas fa-trash-alt"></i></button></div>
+                    <div class="sem-actions"><div class="sem-info" id="summary-${i}">Chưa có dữ liệu</div><button class="btn-sem-del" onclick="removeSemester(event, ${i})"><i class="fas fa-trash-alt"></i></button></div>
                 </div>
                 <div class="semester-content" id="content-${i}"><div id="list-${i}"></div><button class="btn-add" onclick="addSubjectRow(${i})"><i class="fas fa-plus"></i> Thêm môn học</button></div>
             `;
             container.appendChild(semDiv);
-            if (semestersData[i] && semestersData[i].length > 0) semestersData[i].forEach(data => addSubjectRow(i, data));
+            if (semestersData[i]) semestersData[i].forEach(data => addSubjectRow(i, data));
         });
     }
 
@@ -383,19 +471,15 @@
 
     function removeSemester(event, id) {
         event.stopPropagation();
-        if (semestersData[id] && semestersData[id].length > 0) {
-            if (!confirm(`Học kỳ ${id} đang có môn học. Bạn có chắc muốn xóa không?`)) return;
-        }
+        if (semestersData[id] && semestersData[id].length > 0 && !confirm(`Xóa học kỳ ${id}?`)) return;
         delete semestersData[id]; renderAllSemesters(); calculateAll(true);
     }
 
     function calculateAll(save = true) {
         let grandPoints = 0, grandCredits = 0, newData = {}, chartData = [];
-        
         Object.keys(semestersData).map(Number).sort((a,b)=>a-b).forEach(i => {
             const listDiv = document.getElementById(`list-${i}`);
             let semPoints = 0, semCredits = 0, semData = [];
-            
             if(listDiv) {
                 const rows = listDiv.querySelectorAll('.subject-row');
                 rows.forEach(row => {
@@ -464,31 +548,25 @@
         updateProgressChart(currentTotalCredits, targetTotalCredits);
 
         if (save) { 
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newData)); alert("Đã lưu thành công!"); } catch(e){}
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newData)); alert("Dữ liệu đã được lưu!"); } catch(e){}
         }
     }
 
     function updateProgressChart(earned, total) {
         const ctx = document.getElementById('progressChart').getContext('2d');
+        const isDark = document.body.classList.contains('dark-mode');
         const remaining = Math.max(0, total - earned);
         const percent = total > 0 ? Math.round((earned / total) * 100) : 0;
-
         document.getElementById('progress-percent').innerText = `${percent}%`;
         document.getElementById('progress-detail').innerText = `${earned}/${total} TC`;
-
         if (progressChartInstance) progressChartInstance.destroy();
         let color = '#3b82f6';
         if(percent >= 100) color = '#10b981'; else if(percent >= 50) color = '#f59e0b'; else if(percent < 50) color = '#ef4444';
-
         progressChartInstance = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: ['Đã tích lũy', 'Còn lại'],
-                datasets: [{
-                    data: [earned, remaining],
-                    backgroundColor: [color, 'rgba(255,255,255,0.2)'],
-                    borderWidth: 0, hoverOffset: 4
-                }]
+                datasets: [{ data: [earned, remaining], backgroundColor: [color, 'rgba(255,255,255,0.2)'], borderWidth: 0, hoverOffset: 4 }]
             },
             options: { cutout: '80%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: true } } }
         });
@@ -537,7 +615,7 @@
         const credit = data ? data.credit : ''; const ratio = data ? data.ratio : '40-60';
         const s1 = data ? data.s1 : ''; const s2 = data ? data.s2 : '';
         div.innerHTML = `
-            <div class="field-group" style="flex: 2; min-width: 150px;"><label>Tên Môn</label><input type="text" class="inp-name" value="${name}" placeholder="Nhập tên môn..."></div>
+            <div class="field-group" style="flex: 2; min-width: 150px;"><label>Tên Môn</label><input type="text" class="inp-name" value="${name}" placeholder="..."></div>
             <div class="field-group"><label>Số TC</label><input type="number" class="inp-credit" value="${credit}" min="0" placeholder="..."></div>
             <div class="field-group" style="min-width: 100px;"><label>Tỷ lệ</label><select class="inp-ratio" onchange="calculateAll(false)">
                 <option value="40-60" ${ratio === '40-60' ? 'selected' : ''}>40/60</option>
@@ -548,11 +626,11 @@
             <div class="field-group"><label>Điểm QT</label><input type="number" class="inp-s1" value="${s1}" step="0.1" placeholder="..." oninput="calculateAll(false)"></div>
             <div class="field-group"><label>Điểm CK</label><input type="number" class="inp-s2" value="${s2}" step="0.1" placeholder="..." oninput="calculateAll(false)"></div>
             <div class="field-group" style="flex: 0.8; text-align: center;"><label>Hệ 10</label><div class="preview-box preview-10">...</div></div>
-            <div class="field-group" style="flex: 1.2; text-align: center;"><label>Hệ 4 - Điểm chữ</label><div class="preview-box preview-convert" style="color: #fff;">...</div></div>
+            <div class="field-group" style="flex: 1.2; text-align: center;"><label>Hệ 4</label><div class="preview-box preview-convert" style="color:#fff;">...</div></div>
             <div class="field-group" style="flex: 0.8; text-align: center;"><label>Xếp Loại</label><div class="preview-rank">...</div></div>
             <div style="display:flex; flex-direction:column; gap:5px; justify-content:center; margin-left: 5px;">
-                <button class="btn-icon btn-del" onclick="deleteRow(this, ${semId})" title="Xóa môn"><i class="fas fa-times"></i></button>
-                <button class="btn-icon btn-calc-target" onclick="openTargetModal(this)" title="Dự tính điểm thi"><i class="fas fa-wand-magic-sparkles"></i></button>
+                <button class="btn-icon btn-del" onclick="deleteRow(this, ${semId})"><i class="fas fa-times"></i></button>
+                <button class="btn-icon btn-calc-target" onclick="openTargetModal(this)"><i class="fas fa-wand-magic-sparkles"></i></button>
             </div>
         `;
         listDiv.appendChild(div);
@@ -571,8 +649,8 @@
         if (remainingCredits <= 0) { resDiv.innerHTML = '<span style="color:#f59e0b">Đã học hết tín chỉ!</span>'; return; }
         const requiredGPA = ((targetGPA * totalCredits) - currentPoints) / remainingCredits;
         let msg = `<div>Hiện tại: <b>${currentTotalGPA}</b> (${earnedCredits} tín) | Còn lại: <b>${remainingCredits}</b> tín</div><hr style="margin:10px 0; opacity:0.2">`;
-        if (requiredGPA > 4.0) msg += `<div style="color:#ef4444; font-weight:bold;"><i class="fas fa-exclamation-triangle"></i> KHÔNG KHẢ THI (Cần > 4.0: ${requiredGPA.toFixed(2)})</div>`;
-        else if (requiredGPA < 0) msg += `<div style="color:#10b981; font-weight:bold;"><i class="fas fa-check-circle"></i> ĐÃ ĐẠT MỤC TIÊU!</div>`;
+        if (requiredGPA > 4.0) msg += `<div style="color:#ef4444; font-weight:bold;">KHÔNG KHẢ THI (Cần > 4.0: ${requiredGPA.toFixed(2)})</div>`;
+        else if (requiredGPA < 0) msg += `<div style="color:#10b981; font-weight:bold;">ĐÃ ĐẠT MỤC TIÊU!</div>`;
         else msg += `<div style="color:#8b5cf6; font-weight:bold; font-size:1.1rem">Mỗi kỳ tới cần đạt: <span style="font-size:1.4rem; color:#d97706">${requiredGPA.toFixed(2)}</span></div>`;
         resDiv.innerHTML = msg;
     }
@@ -631,7 +709,6 @@
             options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 4.0, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'rgba(255,255,255,0.7)' } }, x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.7)' } } }, plugins: { legend: { display: false } } }
         });
     }
-    
     function exportExcel() {
         calculateAll(false);
         let gradeRows = [["Học Kỳ", "Tên Môn", "Số TC", "Tỷ Lệ", "Điểm QT", "Điểm CK"]];
@@ -695,7 +772,7 @@
         reader.readAsArrayBuffer(file);
     }
 
-    init();
+    initSecurity(); // START AT LOCK SCREEN
 </script>
 </body>
 </html>
