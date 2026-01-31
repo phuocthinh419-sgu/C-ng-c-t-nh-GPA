@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý GPA - V16 (Royal Beauty)</title>
+    <title>Hệ Thống Quản Lý GPA - V17 (Aurora)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
@@ -11,120 +11,153 @@
     
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --bg-color: #f3f4f6; --card-bg: #ffffff;
+            /* Light Aurora: Bình minh rực rỡ */
+            --aurora-bg: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            --card-bg: rgba(255, 255, 255, 0.85); /* Kính mờ sáng */
             --text-main: #1f2937; --text-light: #6b7280;
-            --border-color: #e5e7eb; --input-bg: #ffffff; --input-border: #d1d5db;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --border-color: rgba(255,255,255,0.6);
+            --input-bg: rgba(255, 255, 255, 0.9); --input-border: #d1d5db;
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
             --btn-strategy-bg: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             --btn-excel-bg: #107c41;
         }
         body.dark-mode {
-            --primary-gradient: linear-gradient(135deg, #4c1d95 0%, #1e1b4b 100%);
-            --bg-color: #0f172a; --card-bg: #1e293b;
+            /* Dark Aurora: Cực quang đêm đen huyền bí */
+            --aurora-bg: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e, #0f2027, #203a43, #2c5364);
+            --card-bg: rgba(30, 41, 59, 0.75); /* Kính mờ tối */
             --text-main: #f1f5f9; --text-light: #94a3b8;
-            --border-color: #334155; --input-bg: #334155; --input-border: #475569;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --border-color: rgba(255,255,255,0.1);
+            --input-bg: rgba(51, 65, 85, 0.9); --input-border: #475569;
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; line-height: 1.5; transition: 0.3s; }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            background: var(--aurora-bg); 
+            background-size: 400% 400%; /* Kích thước lớn để tạo hiệu ứng trôi */
+            animation: auroraAnimation 15s ease infinite; /* Hiệu ứng chuyển động */
+            color: var(--text-main); margin: 0; padding: 20px; line-height: 1.5; transition: 0.3s; 
+            min-height: 100vh;
+        }
+
+        @keyframes auroraAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; }
 
         /* THEME TOGGLE */
-        .theme-toggle { position: absolute; top: 10px; right: 10px; background: var(--card-bg); border: 2px solid var(--border-color); color: var(--text-main); padding: 8px 15px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.2s; z-index: 9999; font-weight: 600; }
-        .theme-toggle:hover { transform: scale(1.05); border-color: #8b5cf6; }
+        .theme-toggle { 
+            position: absolute; top: 10px; right: 10px; 
+            background: var(--card-bg); border: 1px solid var(--border-color); 
+            color: var(--text-main); padding: 8px 15px; border-radius: 25px; 
+            cursor: pointer; display: flex; align-items: center; gap: 8px; 
+            font-size: 0.9rem; box-shadow: var(--shadow); 
+            transition: 0.2s; z-index: 9999; font-weight: 600; backdrop-filter: blur(4px);
+        }
+        .theme-toggle:hover { transform: scale(1.05); }
 
         /* HEADER */
-        .app-header { text-align: center; margin-bottom: 25px; padding-top: 20px; }
-        .app-title { font-size: 1.8rem; font-weight: 800; text-transform: uppercase; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; margin: 0; line-height: 1.3; }
-        .user-info { font-size: 1rem; color: var(--text-main); font-weight: 600; margin-top: 5px; cursor: pointer; transition: 0.2s; }
-        .user-info:hover { color: #8b5cf6; }
-        .app-subtitle { font-size: 0.85rem; color: var(--text-light); }
+        .app-header { text-align: center; margin-bottom: 25px; padding-top: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .app-title { 
+            font-size: 2rem; font-weight: 800; text-transform: uppercase; 
+            color: var(--text-main); letter-spacing: 1px; margin: 0; line-height: 1.3;
+        }
+        .user-info { font-size: 1.1rem; color: var(--text-main); font-weight: 600; margin-top: 5px; cursor: pointer; transition: 0.2s; display: inline-block; padding: 5px 15px; border-radius: 15px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); }
+        .user-info:hover { background: rgba(255,255,255,0.3); }
+        .app-subtitle { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; color: var(--text-main); }
 
-        /* DASHBOARD (GLASSMORPHISM) */
+        /* DASHBOARD (GLASSMORPHISM CAO CẤP) */
         .dashboard { 
-            background: var(--primary-gradient); color: white; padding: 20px; 
-            border-radius: 16px; box-shadow: 0 10px 30px -5px rgba(118, 75, 162, 0.5); 
-            margin-bottom: 25px; display: grid; grid-template-columns: 1fr 1.2fr 1fr; 
-            gap: 15px; position: relative; overflow: hidden; align-items: center; 
-        }
-        /* Hiệu ứng nền dashboard lung linh hơn */
-        .dashboard::before { content: ''; position: absolute; top: -50%; left: -20%; width: 300px; height: 300px; background: rgba(255,255,255,0.1); border-radius: 50%; filter: blur(40px); z-index: 0; }
-        .dashboard::after { content: ''; position: absolute; bottom: -50%; right: -20%; width: 250px; height: 250px; background: rgba(255,255,255,0.15); border-radius: 50%; filter: blur(40px); z-index: 0; }
-
-        /* Các ô Stat Item trong suốt (Glassmorphism) */
-        .stat-item { 
             background: rgba(255, 255, 255, 0.1); 
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; padding: 15px; 
-            height: 160px; box-sizing: border-box; z-index: 1; position: relative;
-            transition: transform 0.3s ease;
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white; padding: 25px; 
+            border-radius: 20px; box-shadow: var(--shadow); 
+            margin-bottom: 25px; display: grid; grid-template-columns: 1fr 1.2fr 1fr; 
+            gap: 20px; align-items: center; position: relative;
         }
-        .stat-item:hover { transform: translateY(-3px); background: rgba(255, 255, 255, 0.15); }
-
-        .stat-value { font-size: 2.5rem; font-weight: 800; line-height: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .stat-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; font-weight: 600; margin-top: 10px; text-align: center; }
+        
+        .stat-item { 
+            background: rgba(255, 255, 255, 0.05); 
+            border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            padding: 15px; height: 160px; box-sizing: border-box; 
+            transition: transform 0.3s ease, background 0.3s;
+        }
+        .stat-item:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.15); }
+        
+        /* Chữ trong dashboard luôn trắng để nổi trên nền aurora */
+        .dashboard .stat-value { font-size: 2.5rem; font-weight: 800; color: #fff; text-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .dashboard .stat-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.9); font-weight: 600; margin-top: 10px; }
 
         /* PROGRESS CIRCLE */
         .progress-wrapper { position: relative; width: 120px; height: 120px; }
         .progress-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; pointer-events: none; }
-        .progress-percent { font-size: 1.4rem; font-weight: 800; line-height: 1; display: block; }
-        .progress-detail { font-size: 0.75rem; opacity: 0.9; display: block; margin-top: 2px; }
+        .progress-percent { font-size: 1.4rem; font-weight: 800; color: #fff; }
+        .progress-detail { font-size: 0.75rem; color: rgba(255,255,255,0.9); }
         .edit-target-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; transition: 0.2s; }
         .edit-target-btn:hover { background: rgba(255,255,255,0.4); transform: rotate(15deg); }
 
-        /* CARDS & INPUTS */
-        .chart-card, .semester-card { background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 20px; }
+        /* CARDS (SEMESTERS & CHART) */
+        .chart-card, .semester-card { 
+            background: var(--card-bg); 
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px; box-shadow: var(--shadow); 
+            border: 1px solid var(--border-color); 
+            overflow: hidden; margin-bottom: 20px; 
+            transition: transform 0.2s;
+        }
+        .semester-card:hover { transform: translateY(-2px); }
+
         .chart-card { padding: 20px; height: 300px; }
+        .semester-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: transparent; transition: background 0.2s; user-select: none; color: var(--text-main); }
+        .semester-header:hover { background: rgba(139, 92, 246, 0.05); }
         
-        .semester-header { padding: 15px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); transition: background 0.2s; user-select: none; color: var(--text-main); }
-        .semester-header:hover { background-color: var(--bg-color); }
-        .sem-left { display: flex; align-items: center; gap: 10px; }
+        .sem-left { display: flex; align-items: center; gap: 12px; }
         .sem-title { font-weight: 700; font-size: 1.1rem; }
-        .sem-icon { color: #8b5cf6; background: #f3e8ff; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem; }
+        .sem-icon { color: #8b5cf6; background: rgba(139, 92, 246, 0.1); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem; }
         .sem-info { font-size: 0.9rem; color: var(--text-light); }
         .sem-actions { display: flex; align-items: center; gap: 10px; }
-        .btn-sem-del { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1rem; padding: 5px; opacity: 0.6; transition: 0.2s; }
-        .btn-sem-del:hover { opacity: 1; transform: scale(1.1); }
-
-        .semester-content { display: none; padding: 20px; background: var(--bg-color); border-top: 1px solid var(--border-color); animation: slideDown 0.3s ease-out; }
+        
+        .semester-content { display: none; padding: 20px; background: rgba(0,0,0,0.02); border-top: 1px solid var(--border-color); animation: slideDown 0.3s ease-out; }
         .semester-content.active { display: block; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .subject-row { display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; align-items: flex-end; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        /* INPUTS */
+        .subject-row { display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 10px; align-items: flex-end; }
         .field-group { flex: 1; min-width: 80px; }
         .field-group label { display: block; font-size: 0.7rem; color: var(--text-light); margin-bottom: 5px; font-weight: 700; text-transform: uppercase; }
-        input, select { width: 100%; padding: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-main); border-radius: 6px; font-size: 0.9rem; outline: none; transition: 0.2s; }
-        input:focus, select:focus { border-color: #8b5cf6; box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2); }
-        .preview-box { text-align: center; font-weight: bold; padding: 8px 4px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem; color: var(--text-light); min-height: 20px; display: flex; align-items: center; justify-content: center; }
+        input, select { width: 100%; padding: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-main); border-radius: 8px; font-size: 0.9rem; outline: none; transition: 0.2s; }
+        input:focus, select:focus { border-color: #8b5cf6; box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3); }
+        .preview-box { text-align: center; font-weight: bold; padding: 8px 4px; background: rgba(0,0,0,0.05); border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.9rem; color: var(--text-light); min-height: 20px; display: flex; align-items: center; justify-content: center; }
 
         /* BUTTONS */
         .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .controls-right { display: flex; gap: 8px; flex-wrap: wrap; }
-        .btn { border: none; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; box-shadow: var(--shadow); transition: 0.3s; display: flex; align-items: center; gap: 8px; color: white; font-size: 0.9rem; }
-        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
-        .btn-save { background: var(--text-main); color: var(--card-bg); }
-        .btn-strategy { background: var(--btn-strategy-bg); color: white; }
-        .btn-excel { background: var(--btn-excel-bg); color: white; }
-        .btn-add { width: 100%; padding: 12px; border: 2px dashed var(--border-color); background: none; color: var(--text-light); border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        .btn-add:hover { border-color: #8b5cf6; color: #8b5cf6; background: rgba(139, 92, 246, 0.05); }
-        .btn-add-sem { width: 100%; padding: 15px; border: 2px dashed #8b5cf6; background: rgba(139, 92, 246, 0.05); color: #8b5cf6; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 1rem; margin-top: 20px; text-transform: uppercase; }
-        .btn-add-sem:hover { background: #8b5cf6; color: white; }
+        .btn { border: none; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: 0.3s; display: flex; align-items: center; gap: 8px; color: white; font-size: 0.9rem; backdrop-filter: blur(4px); }
+        .btn:hover { transform: translateY(-3px); opacity: 0.95; box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        .btn-save { background: #1f2937; } /* Dark button for contrast */
+        .btn-strategy { background: var(--btn-strategy-bg); }
+        .btn-excel { background: var(--btn-excel-bg); }
+        .btn-add { width: 100%; padding: 12px; border: 2px dashed var(--border-color); background: rgba(255,255,255,0.1); color: var(--text-main); border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-add:hover { border-color: #8b5cf6; color: #8b5cf6; background: rgba(139, 92, 246, 0.1); }
+        .btn-add-sem { width: 100%; padding: 15px; border: 2px dashed rgba(255,255,255,0.5); background: rgba(255,255,255,0.1); color: var(--text-main); border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 1rem; margin-top: 20px; text-transform: uppercase; backdrop-filter: blur(5px); }
+        .btn-add-sem:hover { background: rgba(255,255,255,0.2); border-color: #fff; transform: scale(1.02); }
         .btn-icon { width: 32px; height: 32px; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; margin-left: 5px; }
-        .btn-del { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
-        .btn-del:hover { background: #ef4444; color: white; }
-        .btn-calc-target { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-        .btn-calc-target:hover { background: #3b82f6; color: white; }
+        .btn-del { background: rgba(239, 68, 68, 0.1); color: #ef4444; } .btn-del:hover { background: #ef4444; color: white; }
+        .btn-calc-target { background: rgba(59, 130, 246, 0.1); color: #3b82f6; } .btn-calc-target:hover { background: #3b82f6; color: white; }
+        .btn-sem-del { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1rem; padding: 5px; opacity: 0.6; transition: 0.2s; } .btn-sem-del:hover { opacity: 1; transform: scale(1.2); }
 
-        /* BADGES */
-        .dash-badge { padding: 8px 15px; font-size: 1.1rem; font-weight: 800; border-radius: 30px; text-transform: uppercase; box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: inline-block; min-width: 120px; text-align: center; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); backdrop-filter: blur(5px); }
-        /* Override rank colors for Dashboard to match Glassmorphism */
-        .rank-gold { color: #fde047; text-shadow: 0 0 10px rgba(253, 224, 71, 0.5); border-color: #fde047; }
-        .rank-silver { color: #e2e8f0; border-color: #e2e8f0; }
-        .rank-bronze { color: #fdba74; border-color: #fdba74; }
-        .rank-gray { color: #cbd5e1; border-color: #cbd5e1; }
-        .rank-red { color: #fca5a5; border-color: #fca5a5; }
+        /* BADGES & RANKS */
+        .dash-badge { padding: 8px 20px; font-size: 1.2rem; font-weight: 800; border-radius: 30px; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: inline-block; min-width: 120px; text-align: center; border: 2px solid rgba(255,255,255,0.2); }
+        .rank-gold { background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%); color: #6a4803; }
+        .rank-silver { background: linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%); color: #424242; }
+        .rank-bronze { background: linear-gradient(135deg, #d98e54 0%, #a0522d 100%); color: white; }
+        .rank-gray { background: rgba(255,255,255,0.2); color: white; }
+        .rank-red { background: #dc3545; color: white; }
 
         .list-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; display: inline-block; }
         .bg-xs { background: #16a34a; color: white; } .bg-g { background: #0ea5e9; color: white; } .bg-k { background: #f59e0b; color: white; } .bg-tb { background: #6b7280; color: white; } .bg-y { background: #dc2626; color: white; }
@@ -132,10 +165,10 @@
         .bg-gioi { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; } .bg-kha { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; } .bg-tb { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; } .bg-tbyeu { background: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; } .bg-kem { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
         /* MODALS */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .modal { background: var(--card-bg); width: 90%; max-width: 450px; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; border: 1px solid var(--border-color); animation: popIn 0.3s; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal { background: var(--card-bg); width: 90%; max-width: 450px; padding: 25px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; border: 1px solid var(--border-color); animation: popIn 0.3s; backdrop-filter: blur(20px); }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .modal h3 { margin-top: 0; color: #8b5cf6; margin-bottom: 20px; font-size: 1.5rem; }
+        .modal h3 { margin-top: 0; color: #8b5cf6; margin-bottom: 20px; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
         .modal-result { margin: 20px 0; padding: 15px; background: rgba(139, 92, 246, 0.1); border-radius: 10px; font-weight: bold; font-size: 1.1rem; color: #8b5cf6; }
         .modal-input-group { margin-bottom: 15px; text-align: left; }
         .modal-input-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; color: var(--text-light); }
@@ -241,7 +274,7 @@
     <div class="modal">
         <h3><i class="fas fa-chess-king"></i> Chiến Lược Toàn Khóa</h3>
         <div class="modal-input-group"><label>GPA Mục Tiêu:</label><input type="number" id="strat-target-gpa" placeholder="Ví dụ: 3.6" step="0.01"></div>
-        <div class="modal-input-group"><label>Tổng Tín Chỉ CTĐT:</label><input type="number" id="strat-total-credits" placeholder="Ví dụ: 135" disabled style="background:#eee"></div>
+        <div class="modal-input-group"><label>Tổng Tín Chỉ CTĐT:</label><input type="number" id="strat-total-credits" placeholder="Ví dụ: 135" disabled style="background:#eee; opacity: 0.7"></div>
         <button class="btn-calc-modal" onclick="calcStrategy()">Phân Tích</button>
         <div class="modal-result" id="strategy-result" style="display:none; font-size: 1rem; text-align: left;"></div>
         <button class="modal-close" onclick="closeModal('strategyModal')">Đóng</button>
@@ -260,7 +293,7 @@
 </div>
 
 <script>
-    const STORAGE_KEY = 'gpaData_v16'; // V16 Final
+    const STORAGE_KEY = 'gpaData_v17'; 
     let semestersData = {};
     let gpaChartInstance = null;
     let progressChartInstance = null;
@@ -279,6 +312,7 @@
 
         let savedData = localStorage.getItem(STORAGE_KEY);
         // Migration logic
+        if(!savedData) savedData = localStorage.getItem('gpaData_v16');
         if(!savedData) savedData = localStorage.getItem('gpaData_v15');
         if(!savedData) savedData = localStorage.getItem('gpaData_v14');
         if(!savedData) savedData = localStorage.getItem('gpaData_v13');
@@ -293,7 +327,6 @@
         calculateAll(false);
     }
 
-    // --- ANIMATION EFFECTS (V16) ---
     function animateValue(obj, start, end, duration) {
         let startTimestamp = null;
         const step = (timestamp) => {
@@ -311,9 +344,7 @@
         var duration = 3 * 1000;
         var animationEnd = Date.now() + duration;
         var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
-
         function randomInRange(min, max) { return Math.random() * (max - min) + min; }
-
         var interval = setInterval(function() {
             var timeLeft = animationEnd - Date.now();
             if (timeLeft <= 0) { return clearInterval(interval); }
@@ -323,7 +354,6 @@
         }, 250);
     }
 
-    // --- STANDARD LOGIC ---
     function renderAllSemesters() {
         const container = document.getElementById('semesters-container');
         container.innerHTML = '';
@@ -422,19 +452,14 @@
             const oldGPA = currentTotalGPA;
             const newGPA = (grandPoints / grandCredits).toFixed(2);
             currentTotalGPA = newGPA;
-            
-            // ANIMATION CALL
             animateValue(document.getElementById('total-gpa'), parseFloat(oldGPA), parseFloat(newGPA), 1000);
             updateDashboardRank(newGPA);
-            
-            // CONFETTI TRIGGER (Only on save & High GPA)
             if(save && parseFloat(newGPA) >= 3.2) { runConfetti(); }
         } else {
             currentTotalGPA = 0;
             document.getElementById('total-gpa').innerText = "0.00";
             updateDashboardRank(0);
         }
-        
         updateChart(chartData);
         updateProgressChart(currentTotalCredits, targetTotalCredits);
 
@@ -445,7 +470,6 @@
 
     function updateProgressChart(earned, total) {
         const ctx = document.getElementById('progressChart').getContext('2d');
-        const isDark = document.body.classList.contains('dark-mode');
         const remaining = Math.max(0, total - earned);
         const percent = total > 0 ? Math.round((earned / total) * 100) : 0;
 
@@ -453,11 +477,8 @@
         document.getElementById('progress-detail').innerText = `${earned}/${total} TC`;
 
         if (progressChartInstance) progressChartInstance.destroy();
-
-        let color = '#3b82f6'; // Default Blue
-        if(percent >= 100) color = '#10b981'; // Green
-        else if(percent >= 50) color = '#f59e0b'; // Yellow
-        else if(percent < 50) color = '#ef4444'; // Red
+        let color = '#3b82f6';
+        if(percent >= 100) color = '#10b981'; else if(percent >= 50) color = '#f59e0b'; else if(percent < 50) color = '#ef4444';
 
         progressChartInstance = new Chart(ctx, {
             type: 'doughnut',
@@ -465,7 +486,7 @@
                 labels: ['Đã tích lũy', 'Còn lại'],
                 datasets: [{
                     data: [earned, remaining],
-                    backgroundColor: [color, isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.3)'],
+                    backgroundColor: [color, 'rgba(255,255,255,0.2)'],
                     borderWidth: 0, hoverOffset: 4
                 }]
             },
@@ -527,7 +548,7 @@
             <div class="field-group"><label>Điểm QT</label><input type="number" class="inp-s1" value="${s1}" step="0.1" placeholder="..." oninput="calculateAll(false)"></div>
             <div class="field-group"><label>Điểm CK</label><input type="number" class="inp-s2" value="${s2}" step="0.1" placeholder="..." oninput="calculateAll(false)"></div>
             <div class="field-group" style="flex: 0.8; text-align: center;"><label>Hệ 10</label><div class="preview-box preview-10">...</div></div>
-            <div class="field-group" style="flex: 1.2; text-align: center;"><label>Hệ 4 - Điểm chữ</label><div class="preview-box preview-convert" style="color: #667eea;">...</div></div>
+            <div class="field-group" style="flex: 1.2; text-align: center;"><label>Hệ 4 - Điểm chữ</label><div class="preview-box preview-convert" style="color: #fff;">...</div></div>
             <div class="field-group" style="flex: 0.8; text-align: center;"><label>Xếp Loại</label><div class="preview-rank">...</div></div>
             <div style="display:flex; flex-direction:column; gap:5px; justify-content:center; margin-left: 5px;">
                 <button class="btn-icon btn-del" onclick="deleteRow(this, ${semId})" title="Xóa môn"><i class="fas fa-times"></i></button>
@@ -607,11 +628,10 @@
         grad.addColorStop(1, isDark?'rgba(139,92,246,0)':'rgba(118,75,162,0)');
         gpaChartInstance = new Chart(ctx, {
             type: 'line', data: { labels: Object.keys(semestersData).map(k=>`Kỳ ${k}`), datasets: [{ label: 'GPA', data: data, borderColor: isDark?'#a78bfa':'#764ba2', backgroundColor: grad, fill: true, tension: 0.4 }] },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 4.0, grid: { color: isDark?'#374151':'#e5e7eb' }, ticks: { color: isDark?'#9ca3af':'#666' } }, x: { grid: { display: false }, ticks: { color: isDark?'#9ca3af':'#666' } } }, plugins: { legend: { display: false } } }
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 4.0, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'rgba(255,255,255,0.7)' } }, x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.7)' } } }, plugins: { legend: { display: false } } }
         });
     }
     
-    // EXCEL FUNCTIONS
     function exportExcel() {
         calculateAll(false);
         let gradeRows = [["Học Kỳ", "Tên Môn", "Số TC", "Tỷ Lệ", "Điểm QT", "Điểm CK"]];
