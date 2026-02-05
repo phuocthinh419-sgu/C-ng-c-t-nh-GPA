@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GPA Manager - V24 (Perfect UX)</title>
+    <title>GPA Manager - V25 (Share Card)</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#4c1d95">
     <link rel="apple-touch-icon" href="https://img.icons8.com/color/96/000000/student-male--v1.png">
-    <link rel="manifest" href='data:application/manifest+json;base64,ewogICJuYW1lIjogIkhlIFRob25nIFF1YW4gTHkgR1BBIiwKICAic2hvcnRfbmFtZSI6ICJHUEEgTWFuYWdlciIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMWExYTJlIiwKICAidGhlbWVfY29sb3IiOiAiIzRjMWQ5NSIsCiAgImljb25zIjogW3sKICAgICJzcmMiOiAiaHR0cHM6Ly9pbWcuaWNvbnM4LmNvbS9jb2xvci8xOTIvMDAwMDAwL3N0dWRlbnQtbWFsZS0tdjEucG5nIiwKICAgICJzaXplcyI6ICIxOTJ4MTkyIiwKICAgICJ0eXBlIjogImltYWdlL3BuZyIKICB9XQp9'>
+    <link rel="manifest" href='data:application/manifest+json;base64,ewogICJuYW1lIjogIkhlIFRob25nIFF1YW4gTHkgR1BBIiwKICAic2hvcnRfbmFtZSI6ICJHUEEgTWFuYWdlciIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMWExYTJlIiwKICAidGhlbWVfY29sb3IiOiAiIzFhMWEyZSIsCiAgImljb25zIjogW3sKICAgICJzcmMiOiAiaHR0cHM6Ly9pbWcuaWNvbnM4LmNvbS9jb2xvci8xOTIvMDAwMDAwL3N0dWRlbnQtbWFsZS0tdjEucG5nIiwKICAgICJzaXplcyI6ICIxOTJ4MTkyIiwKICAgICJ0eXBlIjogImltYWdlL3BuZyIKICB9XQp9'>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.10.0/dist/index.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     
     <style>
-        /* GIỮ NGUYÊN CSS V23 */
+        /* CSS GỐC (GIỮ NGUYÊN) */
         :root { --aurora-bg: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); --card-bg: rgba(255, 255, 255, 0.85); --text-main: #1f2937; --text-light: #6b7280; --border-color: rgba(255,255,255,0.6); --input-bg: rgba(255, 255, 255, 0.9); --input-border: #d1d5db; --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15); --btn-strategy-bg: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); --btn-excel-bg: #107c41; }
         body.dark-mode { --aurora-bg: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e, #0f2027, #203a43, #2c5364); --card-bg: rgba(30, 41, 59, 0.75); --text-main: #f1f5f9; --text-light: #94a3b8; --border-color: rgba(255,255,255,0.1); --input-bg: rgba(51, 65, 85, 0.9); --input-border: #475569; --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); }
         body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--aurora-bg); background-size: 400% 400%; animation: auroraAnimation 15s ease infinite; color: var(--text-main); margin: 0; padding: 20px; min-height: 100vh; overflow-x: hidden; }
@@ -31,16 +33,15 @@
         .mascot-display { font-size: 4.5rem; line-height: 1; margin-bottom: 10px; display: inline-block; cursor: pointer; animation: mascot-idle 4s ease-in-out infinite, mascot-glow 3s infinite; transition: all 0.3s; user-select: none; }
         .mascot-display:hover { animation-play-state: paused; transform: scale(1.2) rotate(-5deg); filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.8)); }
         .mascot-display.joyful { animation: mascot-spin 0.8s ease-in-out; }
-        
         .mascot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
         .mascot-option { font-size: 2rem; padding: 10px; border-radius: 12px; cursor: pointer; background: rgba(255,255,255,0.1); border: 2px solid transparent; transition: 0.2s; text-align: center; }
         .mascot-option:hover { background: rgba(255,255,255,0.2); transform: scale(1.2); }
         .mascot-option.selected { border-color: #8b5cf6; background: rgba(139, 92, 246, 0.2); box-shadow: 0 0 10px rgba(139, 92, 246, 0.5); animation: mascot-idle 2s infinite; }
 
-        /* SECURITY GATE */
+        /* SECURITY & COMMON */
         #security-gate { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(20px); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
         #security-gate.unlocked { transform: translateY(-100%); }
-        .gate-content { text-align: center; max-width: 300px; outline: none; } /* Added outline none for focus */
+        .gate-content { text-align: center; max-width: 300px; outline: none; }
         .gate-icon { font-size: 4rem; color: #f59e0b; margin-bottom: 20px; animation: pulse 2s infinite; }
         .gate-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
         .gate-msg { font-size: 0.9rem; color: #94a3b8; margin-bottom: 30px; }
@@ -50,12 +51,11 @@
         .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
         .num-btn { width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: white; font-size: 1.2rem; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .num-btn:hover { background: rgba(255,255,255,0.2); }
-        .num-btn:active { transform: scale(0.9); }
         .shake-anim { animation: shake 0.4s ease-in-out; }
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
         @keyframes pulse { 0% {transform: scale(1); opacity: 1;} 50% {transform: scale(1.1); opacity: 0.8;} 100% {transform: scale(1); opacity: 1;} }
 
-        /* APP LAYOUT & COMPONENTS */
+        /* APP LAYOUT */
         .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; filter: blur(0); transition: filter 0.5s; z-index: 1; }
         .top-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; z-index: 99; }
         .theme-toggle, .install-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 15px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; box-shadow: var(--shadow); font-weight: 600; backdrop-filter: blur(4px); transition: 0.2s; }
@@ -106,6 +106,7 @@
         .btn-save { background: #1f2937; } 
         .btn-strategy { background: var(--btn-strategy-bg); }
         .btn-excel { background: var(--btn-excel-bg); }
+        .btn-share { background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); color: white; } /* V25 NEW */
         .btn-add { width: 100%; padding: 12px; border: 2px dashed var(--border-color); background: rgba(255,255,255,0.1); color: var(--text-main); border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn-add:hover { border-color: #8b5cf6; color: #8b5cf6; background: rgba(139, 92, 246, 0.1); }
         .btn-add-sem { width: 100%; padding: 15px; border: 2px dashed rgba(255,255,255,0.5); background: rgba(255,255,255,0.1); color: var(--text-main); border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px; text-transform: uppercase; }
@@ -120,7 +121,6 @@
         .rank-silver { background: linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%); color: #424242; }
         .rank-bronze { background: linear-gradient(135deg, #d98e54 0%, #a0522d 100%); color: white; }
         .rank-gray { background: rgba(255,255,255,0.2); color: white; }
-        
         .list-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; display: inline-block; }
         .bg-xs { background: #16a34a; color: white; } .bg-g { background: #0ea5e9; color: white; } .bg-k { background: #f59e0b; color: white; } .bg-tb { background: #6b7280; color: white; }
         .result-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 12px; font-weight: 700; text-transform: uppercase; display: inline-block; white-space: nowrap; }
@@ -136,6 +136,25 @@
         .modal-input-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; color: var(--text-light); }
         .modal-close { background: var(--text-light); color: white; border: none; padding: 8px 25px; border-radius: 20px; cursor: pointer; margin-top: 10px; font-weight: 600; }
         .btn-calc-modal { width: 100%; background: var(--btn-strategy-bg); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 10px; }
+
+        /* V25: SHARE CARD STYLES */
+        .share-card-container {
+            width: 320px; margin: 0 auto;
+            background: linear-gradient(135deg, #1f1c2c, #928dab);
+            border-radius: 15px; overflow: hidden; position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center; color: white;
+            font-family: 'Segoe UI', sans-serif;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+        .sc-header { padding: 30px 20px 10px; background: rgba(255,255,255,0.05); }
+        .sc-mascot { font-size: 5rem; line-height: 1; filter: drop-shadow(0 0 15px rgba(255,215,0,0.5)); margin-bottom: 10px; }
+        .sc-name { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sc-id { font-size: 0.8rem; opacity: 0.7; }
+        .sc-body { padding: 20px; }
+        .sc-gpa-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.8; margin-bottom: 5px; }
+        .sc-gpa { font-size: 4.5rem; font-weight: 800; line-height: 1; margin-bottom: 15px; background: -webkit-linear-gradient(#fff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); }
+        .sc-footer { padding: 15px; font-size: 0.7rem; opacity: 0.5; border-top: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); }
 
         @media (max-width: 768px) {
             .dashboard { grid-template-columns: 1fr; gap: 10px; }
@@ -162,24 +181,14 @@
         <div class="gate-icon"><i class="fas fa-fingerprint"></i></div>
         <div class="gate-title">Khu Vực Riêng Tư</div>
         <div class="gate-msg" id="gate-msg">Nhập PIN để mở khóa</div>
-        
         <div class="pin-display" id="pin-display">
             <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
         </div>
-        
         <div class="numpad">
-            <div class="num-btn" onclick="enterDigit(1)">1</div>
-            <div class="num-btn" onclick="enterDigit(2)">2</div>
-            <div class="num-btn" onclick="enterDigit(3)">3</div>
-            <div class="num-btn" onclick="enterDigit(4)">4</div>
-            <div class="num-btn" onclick="enterDigit(5)">5</div>
-            <div class="num-btn" onclick="enterDigit(6)">6</div>
-            <div class="num-btn" onclick="enterDigit(7)">7</div>
-            <div class="num-btn" onclick="enterDigit(8)">8</div>
-            <div class="num-btn" onclick="enterDigit(9)">9</div>
-            <div class="num-btn" style="opacity:0"></div>
-            <div class="num-btn" onclick="enterDigit(0)">0</div>
-            <div class="num-btn" onclick="clearPin()"><i class="fas fa-backspace"></i></div>
+            <div class="num-btn" onclick="enterDigit(1)">1</div><div class="num-btn" onclick="enterDigit(2)">2</div><div class="num-btn" onclick="enterDigit(3)">3</div>
+            <div class="num-btn" onclick="enterDigit(4)">4</div><div class="num-btn" onclick="enterDigit(5)">5</div><div class="num-btn" onclick="enterDigit(6)">6</div>
+            <div class="num-btn" onclick="enterDigit(7)">7</div><div class="num-btn" onclick="enterDigit(8)">8</div><div class="num-btn" onclick="enterDigit(9)">9</div>
+            <div class="num-btn" style="opacity:0"></div><div class="num-btn" onclick="enterDigit(0)">0</div><div class="num-btn" onclick="clearPin()"><i class="fas fa-backspace"></i></div>
         </div>
         <div style="margin-top:20px; font-size:0.8rem; opacity:0.6"><i class="fas fa-keyboard"></i> Hỗ trợ bàn phím PC</div>
     </div>
@@ -203,34 +212,25 @@
             <div class="stat-content-area"><div class="stat-value" id="total-gpa">0.00</div></div>
             <div class="stat-label">GPA Tích Lũy</div>
         </div>
-        
         <div class="stat-item">
             <div class="stat-content-area">
-                <div class="progress-wrapper">
-                    <canvas id="progressChart"></canvas>
-                    <div class="progress-text">
-                        <span class="progress-percent" id="progress-percent">0%</span>
-                        <span class="progress-detail" id="progress-detail">0/0 TC</span>
-                    </div>
-                </div>
+                <div class="progress-wrapper"><canvas id="progressChart"></canvas><div class="progress-text"><span class="progress-percent" id="progress-percent">0%</span><span class="progress-detail" id="progress-detail">0/0 TC</span></div></div>
             </div>
             <button class="edit-target-btn" onclick="openProfileModal()" title="Sửa Tổng Tín Chỉ"><i class="fas fa-pen"></i></button>
             <div class="stat-label" style="order:3; margin-top:5px;">Tiến Độ Học Tập</div>
         </div>
-
         <div class="stat-item">
             <div class="stat-content-area" id="academic-rank-area"><span class="dash-badge rank-gray">---</span></div>
             <div class="stat-label">Xếp Loại Toàn Khóa</div>
         </div>
     </div>
 
-    <div class="chart-card">
-        <canvas id="gpaChart"></canvas>
-    </div>
+    <div class="chart-card"><canvas id="gpaChart"></canvas></div>
 
     <div class="controls">
         <button class="btn btn-strategy" onclick="openStrategyModal()"><i class="fas fa-chess"></i> Chiến Lược</button>
         <div class="controls-right">
+            <button class="btn btn-share" onclick="openShareModal()"><i class="fas fa-camera"></i> Khoe Điểm</button>
             <button class="btn btn-excel" onclick="exportExcel()"><i class="fas fa-file-excel"></i> Xuất Excel</button>
             <button class="btn btn-excel" onclick="triggerImport()"><i class="fas fa-file-upload"></i> Nạp Excel</button>
             <button class="btn btn-save" onclick="calculateAll(true)"><i class="fas fa-save"></i> Lưu Dữ Liệu</button>
@@ -242,16 +242,40 @@
     <button class="btn-add-sem" onclick="addSemester()">+ Thêm Học Kỳ Mới</button>
 </div>
 
-<div class="modal-overlay" id="installModal">
-    <div class="modal">
-        <h3><i class="fas fa-mobile-alt"></i> Hướng Dẫn Cài App</h3>
-        <div id="install-instructions" style="text-align:left; color:var(--text-main); font-size:0.95rem; margin-bottom:20px;">
-            Đang xác định thiết bị...
+<div class="modal-overlay" id="shareModal" style="backdrop-filter: blur(10px); background: rgba(0,0,0,0.8);">
+    <div class="modal" style="background: transparent; box-shadow: none; border: none; max-width: 400px;">
+        <h3 style="color:white; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Thẻ Bài Hoàng Gia</h3>
+        
+        <div id="capture-area" class="share-card-container">
+            <div class="sc-header">
+                <div class="sc-mascot" id="sc-mascot">👑</div>
+                <div class="sc-name" id="sc-name">Nguyễn Văn A</div>
+                <div class="sc-id" id="sc-id">MSSV: 12345678</div>
+            </div>
+            <div class="sc-body">
+                <div class="sc-gpa-label">GPA Tích Lũy</div>
+                <div class="sc-gpa" id="sc-gpa">3.80</div>
+                <div id="sc-rank-badge"></div>
+            </div>
+            <div class="sc-footer">
+                Verified by GPA Manager System
+            </div>
         </div>
-        <button class="modal-close" onclick="closeModal('installModal')">Đã Hiểu</button>
+
+        <button class="btn-calc-modal" style="margin-top:20px; background: white; color: #4c1d95;" onclick="downloadShareCard()">
+            <i class="fas fa-download"></i> Tải Ảnh Về
+        </button>
+        <button class="modal-close" onclick="closeModal('shareModal')" style="background: rgba(255,255,255,0.2);">Đóng</button>
     </div>
 </div>
 
+<div class="modal-overlay" id="installModal">
+    <div class="modal">
+        <h3><i class="fas fa-mobile-alt"></i> Hướng Dẫn Cài App</h3>
+        <div id="install-instructions" style="text-align:left; color:var(--text-main); font-size:0.95rem; margin-bottom:20px;">Đang xác định...</div>
+        <button class="modal-close" onclick="closeModal('installModal')">Đã Hiểu</button>
+    </div>
+</div>
 <div class="modal-overlay" id="targetModal">
     <div class="modal">
         <h3><i class="fas fa-magic"></i> Dự Tính Điểm Thi</h3>
@@ -259,69 +283,48 @@
         <div style="text-align: left; margin-bottom: 15px;">
             <label>Mục tiêu:</label>
             <select id="target-grade" style="width: 100%; margin-top: 5px;" onchange="calcTarget()">
-                <option value="8.5">Điểm A (Giỏi - 8.5+)</option>
-                <option value="8.0">Điểm B+ (Khá - 8.0+)</option>
-                <option value="7.0">Điểm B (Khá - 7.0+)</option>
-                <option value="6.5">Điểm C+ (TB - 6.5+)</option>
-                <option value="5.5">Điểm C (TB - 5.5+)</option>
-                <option value="5.0">Điểm D+ (TB Yếu - 5.0+)</option>
+                <option value="8.5">Điểm A (Giỏi - 8.5+)</option><option value="8.0">Điểm B+ (Khá - 8.0+)</option><option value="7.0">Điểm B (Khá - 7.0+)</option><option value="6.5">Điểm C+ (TB - 6.5+)</option><option value="5.5">Điểm C (TB - 5.5+)</option><option value="5.0">Điểm D+ (TB Yếu - 5.0+)</option>
             </select>
         </div>
         <div class="modal-result" id="target-result">...</div>
         <button class="modal-close" onclick="closeModal('targetModal')">Đóng</button>
     </div>
 </div>
-
 <div class="modal-overlay" id="strategyModal">
     <div class="modal">
         <h3><i class="fas fa-chess-king"></i> Chiến Lược</h3>
-        <div class="modal-input-group"><label>GPA Mục Tiêu:</label><input type="number" id="strat-target-gpa" placeholder="Ví dụ: 3.6" step="0.01"></div>
+        <div class="modal-input-group"><label>GPA Mục Tiêu:</label><input type="number" id="strat-target-gpa" placeholder="3.6" step="0.01"></div>
         <div class="modal-input-group"><label>Tổng Tín Chỉ:</label><input type="number" id="strat-total-credits" placeholder="135" disabled style="background:#eee"></div>
         <button class="btn-calc-modal" onclick="calcStrategy()">Phân Tích</button>
         <div class="modal-result" id="strategy-result" style="display:none; font-size: 1rem; text-align: left;"></div>
         <button class="modal-close" onclick="closeModal('strategyModal')">Đóng</button>
     </div>
 </div>
-
 <div class="modal-overlay" id="profileModal">
     <div class="modal">
         <h3><i class="fas fa-user-edit"></i> Thông Tin & Linh Vật</h3>
         <div class="modal-input-group"><label>Họ và Tên:</label><input type="text" id="profile-name" placeholder="Tên của bạn"></div>
         <div class="modal-input-group"><label>MSSV:</label><input type="text" id="profile-id" placeholder="Mã SV"></div>
-        <div class="modal-input-group"><label>Tổng Tín Chỉ Toàn Khóa:</label><input type="number" id="profile-target-credits" placeholder="Ví dụ: 135"></div>
-        
-        <div style="text-align:left; margin-top:15px; margin-bottom:5px; font-weight:600; font-size:0.9rem; color:var(--text-light)">Chọn Linh Vật Hộ Mệnh:</div>
+        <div class="modal-input-group"><label>Tổng Tín Chỉ:</label><input type="number" id="profile-target-credits" placeholder="135"></div>
+        <div style="text-align:left; margin-top:15px; margin-bottom:5px; font-weight:600; font-size:0.9rem; color:var(--text-light)">Chọn Linh Vật:</div>
         <div class="mascot-grid" id="mascot-grid">
-            <div class="mascot-option" onclick="selectMascot('🦁')">🦁</div>
-            <div class="mascot-option" onclick="selectMascot('👑')">👑</div>
-            <div class="mascot-option" onclick="selectMascot('🐉')">🐉</div>
-            <div class="mascot-option" onclick="selectMascot('🦄')">🦄</div>
-            <div class="mascot-option" onclick="selectMascot('🦅')">🦅</div>
-            <div class="mascot-option" onclick="selectMascot('🦊')">🦊</div>
-            <div class="mascot-option" onclick="selectMascot('🐼')">🐼</div>
-            <div class="mascot-option" onclick="selectMascot('🐯')">🐯</div>
-            <div class="mascot-option" onclick="selectMascot('👻')">👻</div>
-            <div class="mascot-option" onclick="selectMascot('⚽')">⚽</div>
-            <div class="mascot-option" onclick="selectMascot('🎓')">🎓</div>
-            <div class="mascot-option" onclick="selectMascot('🐱')">🐱</div>
+            <div class="mascot-option" onclick="selectMascot('🦁')">🦁</div><div class="mascot-option" onclick="selectMascot('👑')">👑</div><div class="mascot-option" onclick="selectMascot('🐉')">🐉</div><div class="mascot-option" onclick="selectMascot('🦄')">🦄</div>
+            <div class="mascot-option" onclick="selectMascot('🦅')">🦅</div><div class="mascot-option" onclick="selectMascot('🦊')">🦊</div><div class="mascot-option" onclick="selectMascot('🐼')">🐼</div><div class="mascot-option" onclick="selectMascot('🐯')">🐯</div>
+            <div class="mascot-option" onclick="selectMascot('👻')">👻</div><div class="mascot-option" onclick="selectMascot('⚽')">⚽</div><div class="mascot-option" onclick="selectMascot('🎓')">🎓</div><div class="mascot-option" onclick="selectMascot('🐱')">🐱</div>
         </div>
-
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
-        <div style="text-align:left; margin-bottom:10px; font-weight:bold; color:var(--text-light)">Bảo Mật</div>
         <button class="btn-calc-modal" style="background: #ef4444;" onclick="resetPin()">Đặt Lại Mã PIN</button>
-        
         <button class="btn-calc-modal" style="margin-top:20px" onclick="saveProfile()">Lưu Cài Đặt</button>
         <button class="modal-close" onclick="closeModal('profileModal')">Đóng</button>
     </div>
 </div>
 
 <script>
-    const STORAGE_KEY = 'gpaData_v24'; // UPDATE KEY
+    const STORAGE_KEY = 'gpaData_v25';
     let semestersData = {};
     let currentInputPin = "";
     let savedPin = localStorage.getItem('appPIN');
     let isSetupMode = !savedPin;
-    
     let gpaChartInstance = null;
     let progressChartInstance = null;
     let currentCalcData = { s1: 0, r1: 0, r2: 0 };
@@ -329,174 +332,131 @@
     let currentTotalCredits = 0;
     let targetTotalCredits = 135;
     let selectedMascot = '👑'; 
-    let deferredPrompt; // PWA PROMPT
+    let deferredPrompt;
 
-    // --- PWA LOGIC ENHANCED (V24) ---
-    window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevent Chrome 67 and earlier from automatically showing the prompt
-        e.preventDefault();
-        // Stash the event so it can be triggered later.
-        deferredPrompt = e;
-        // Update UI to notify the user they can add to home screen
-        document.getElementById('btn-install-app').style.display = 'flex';
-    });
-
-    function triggerInstallApp() {
-        if (deferredPrompt) {
-            // Show the native prompt
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('User accepted the A2HS prompt');
-                }
-                deferredPrompt = null;
-            });
-        } else {
-            // If native prompt is not available (iOS, or already installed), show manual guide
-            showInstallGuide();
-        }
-    }
-
-    function showInstallGuide() {
-        const modal = document.getElementById('installModal');
-        const content = document.getElementById('install-instructions');
-        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-        let instructions = "";
+    // --- SHARE CARD LOGIC (V25) ---
+    function openShareModal() {
+        // Populate Data
+        let profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+        document.getElementById('sc-mascot').innerText = selectedMascot;
+        document.getElementById('sc-name').innerText = profile.name || "Chưa cập nhật tên";
+        document.getElementById('sc-id').innerText = profile.id ? `MSSV: ${profile.id}` : "";
+        document.getElementById('sc-gpa').innerText = currentTotalGPA;
         
-        // CHECK IF RUNNING FROM FILE://
-        if (window.location.protocol === 'file:') {
-            content.innerHTML = `
-                <div style="color:#ef4444; margin-bottom:15px; font-weight:bold;">⚠️ Lưu ý quan trọng</div>
-                <p>Tính năng "Cài App" không hoạt động khi mở trực tiếp file từ máy tính.</p>
-                <p>Bệ hạ cần đưa file này lên mạng (ví dụ: GitHub Pages) hoặc chạy qua Local Server để cài đặt.</p>
-            `;
-            modal.style.display = 'flex';
-            return;
+        // Clone Rank Badge style
+        const rankArea = document.getElementById('academic-rank-area');
+        const badge = rankArea.querySelector('.dash-badge');
+        const rankContainer = document.getElementById('sc-rank-badge');
+        rankContainer.innerHTML = '';
+        if(badge) {
+            const clone = badge.cloneNode(true);
+            clone.style.boxShadow = 'none'; // Simplify for image
+            rankContainer.appendChild(clone);
         }
 
-        if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-            instructions = `
-                <div style="text-align:center; margin-bottom:15px"><i class="fab fa-apple" style="font-size:3rem; color:#8b5cf6"></i></div>
-                <p>Để cài đặt trên <b>iPhone/iPad</b>:</p>
-                <ol style="margin-left:20px; line-height:1.6">
-                    <li>Nhấn nút <b>Chia sẻ</b> <img src="https://img.icons8.com/ios-glyphs/24/000000/share-rounded.png" style="vertical-align:middle; width:20px"> trên thanh công cụ Safari.</li>
-                    <li>Chọn <b>"Thêm vào MH chính"</b>.</li>
-                    <li>Nhấn <b>Thêm</b>.</li>
-                </ol>`;
-        } else {
-            // Default Fallback
-            instructions = `
-                <div style="text-align:center; margin-bottom:15px"><i class="fas fa-download" style="font-size:3rem; color:#10b981"></i></div>
-                <p>Nếu không thấy nút cài tự động:</p>
-                <p>Hãy tìm trong Menu trình duyệt > <b>"Cài đặt ứng dụng"</b> hoặc <b>"Thêm vào màn hình chính"</b>.</p>`;
-        }
-        content.innerHTML = instructions;
-        modal.style.display = 'flex';
+        document.getElementById('shareModal').style.display = 'flex';
     }
 
-    // --- SECURITY & KEYBOARD (V24 NEW) ---
-    function initSecurity() {
-        const msg = document.getElementById('gate-msg');
-        if(isSetupMode) {
-            msg.innerText = "Thiết lập mã PIN mới (4 số)";
-            msg.style.color = "#3b82f6";
-        } else {
-            msg.innerText = "Nhập PIN để mở khóa";
-            msg.style.color = "#94a3b8";
-        }
+    function downloadShareCard() {
+        const captureArea = document.getElementById('capture-area');
         
-        // V24: KEYBOARD LISTENER
-        document.addEventListener('keydown', handleKeyboardPin);
-    }
-
-    function handleKeyboardPin(e) {
-        const gate = document.getElementById('security-gate');
-        // Only listen if gate is not unlocked
-        if (gate.classList.contains('unlocked')) return;
-
-        if (e.key >= '0' && e.key <= '9') {
-            enterDigit(parseInt(e.key));
-        } else if (e.key === 'Backspace' || e.key === 'Delete') {
-            clearPin();
-        }
-    }
-
-    function enterDigit(num) {
-        if(currentInputPin.length < 4) {
-            currentInputPin += num;
-            updatePinDisplay();
-            if(currentInputPin.length === 4) setTimeout(checkPin, 200);
-        }
-    }
-
-    function clearPin() { currentInputPin = ""; updatePinDisplay(); }
-
-    function updatePinDisplay() {
-        const dots = document.querySelectorAll('.pin-dot');
-        dots.forEach((dot, idx) => {
-            if(idx < currentInputPin.length) dot.classList.add('filled');
-            else dot.classList.remove('filled');
+        // Use html2canvas
+        html2canvas(captureArea, {
+            scale: 3, // High resolution
+            backgroundColor: null, // Transparent bg inside container
+            useCORS: true
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `GPA_Share_${Date.now()}.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
         });
     }
 
+    // --- PWA LOGIC ---
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('btn-install-app').style.display = 'flex';
+    });
+    function triggerInstallApp() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; });
+        } else { showInstallGuide(); }
+    }
+    function showInstallGuide() {
+        const modal = document.getElementById('installModal');
+        const content = document.getElementById('install-instructions');
+        if (window.location.protocol === 'file:') {
+            content.innerHTML = `<div style="color:#ef4444;margin-bottom:15px;font-weight:bold;">⚠️ Lưu ý</div><p>Cần đưa file lên Hosting (GitHub Pages) để cài App.</p>`;
+            modal.style.display = 'flex'; return;
+        }
+        content.innerHTML = `<div style="text-align:center;margin-bottom:15px"><i class="fas fa-download" style="font-size:3rem;color:#10b981"></i></div><p>Tìm trong Menu trình duyệt > <b>"Thêm vào màn hình chính"</b>.</p>`;
+        modal.style.display = 'flex';
+    }
+
+    // --- SECURITY ---
+    function initSecurity() {
+        const msg = document.getElementById('gate-msg');
+        if(isSetupMode) { msg.innerText = "Thiết lập mã PIN mới (4 số)"; msg.style.color = "#3b82f6"; }
+        else { msg.innerText = "Nhập PIN để mở khóa"; msg.style.color = "#94a3b8"; }
+        document.addEventListener('keydown', handleKeyboardPin);
+    }
+    function handleKeyboardPin(e) {
+        if (document.getElementById('security-gate').classList.contains('unlocked')) return;
+        if (e.key >= '0' && e.key <= '9') enterDigit(parseInt(e.key));
+        else if (e.key === 'Backspace' || e.key === 'Delete') clearPin();
+    }
+    function enterDigit(num) {
+        if(currentInputPin.length < 4) {
+            currentInputPin += num; updatePinDisplay();
+            if(currentInputPin.length === 4) setTimeout(checkPin, 200);
+        }
+    }
+    function clearPin() { currentInputPin = ""; updatePinDisplay(); }
+    function updatePinDisplay() {
+        document.querySelectorAll('.pin-dot').forEach((dot, idx) => {
+            if(idx < currentInputPin.length) dot.classList.add('filled'); else dot.classList.remove('filled');
+        });
+    }
     function checkPin() {
         const gate = document.getElementById('security-gate');
-        const msg = document.getElementById('gate-msg');
-        
         if(isSetupMode) {
-            localStorage.setItem('appPIN', currentInputPin);
-            savedPin = currentInputPin; isSetupMode = false;
-            alert("Đã thiết lập mã PIN!");
-            gate.classList.add('unlocked'); initApp();
+            localStorage.setItem('appPIN', currentInputPin); savedPin = currentInputPin; isSetupMode = false;
+            alert("Đã thiết lập mã PIN!"); gate.classList.add('unlocked'); initApp();
         } else {
-            if(currentInputPin === savedPin) {
-                gate.classList.add('unlocked'); initApp();
-            } else {
-                msg.innerText = "Sai mã PIN!"; msg.style.color = "#ef4444";
+            if(currentInputPin === savedPin) { gate.classList.add('unlocked'); initApp(); }
+            else { 
+                document.getElementById('gate-msg').innerText = "Sai mã PIN!"; 
                 document.querySelector('.gate-icon').classList.add('shake-anim');
                 setTimeout(() => document.querySelector('.gate-icon').classList.remove('shake-anim'), 500);
                 currentInputPin = ""; updatePinDisplay();
             }
         }
     }
+    function resetPin() { if(confirm("Xóa mã PIN cũ?")) { localStorage.removeItem('appPIN'); location.reload(); } }
 
-    function resetPin() {
-        if(confirm("Xóa mã PIN cũ và đặt lại?")) {
-            localStorage.removeItem('appPIN'); location.reload();
-        }
-    }
-
-    // --- MAIN APP (Standard Logic) ---
+    // --- APP LOGIC ---
     function initApp() {
-        // Remove keyboard listener for PIN to avoid conflict
         document.removeEventListener('keydown', handleKeyboardPin);
-        
         try { const theme = localStorage.getItem('theme'); if (theme === 'dark') document.body.classList.add('dark-mode'); } catch(e) {}
         loadProfile();
         let savedData = localStorage.getItem(STORAGE_KEY);
-        // Migration V23 -> V24
+        if(!savedData) savedData = localStorage.getItem('gpaData_v24');
         if(!savedData) savedData = localStorage.getItem('gpaData_v23');
         if(!savedData) savedData = localStorage.getItem('gpaData_v22');
-        if(!savedData) savedData = localStorage.getItem('gpaData_v21');
-        
         if (savedData) semestersData = JSON.parse(savedData);
         else for(let i=1; i<=8; i++) semestersData[i] = [];
         renderAllSemesters(); calculateAll(false);
         if (window.matchMedia('(display-mode: standalone)').matches) document.querySelector('.install-btn').style.display = 'none';
-        
         initFireworks();
     }
 
-    // --- MASCOT & FIREWORKS ---
-    function mascotJoy() {
-        const m = document.getElementById('mascot-display');
-        m.classList.remove('joyful'); void m.offsetWidth; m.classList.add('joyful');
-    }
-    
+    function mascotJoy() { const m = document.getElementById('mascot-display'); m.classList.remove('joyful'); void m.offsetWidth; m.classList.add('joyful'); }
     let fireworks;
     function initFireworks() {
-        const container = document.getElementById('fireworks-container');
-        fireworks = new Fireworks.default(container, {
+        fireworks = new Fireworks.default(document.getElementById('fireworks-container'), {
             autoresize: true, opacity: 0.5, acceleration: 1.05, friction: 0.97, gravity: 1.5,
             particles: 150, traceLength: 3, traceSpeed: 10, explosion: 5, intensity: 30, flickering: 50,
             lineStyle: 'round', hue: { min: 0, max: 360 }, delay: { min: 15, max: 30 },
@@ -504,20 +464,14 @@
             brightness: { min: 50, max: 80 }, decay: { min: 0.015, max: 0.03 }, mouse: { click: false, move: false, max: 1 }
         });
     }
-    function runBigFireworks() {
-        if (!fireworks) initFireworks();
-        fireworks.start();
-        setTimeout(() => { fireworks.stop(); }, 8000);
-    }
+    function runBigFireworks() { if (!fireworks) initFireworks(); fireworks.start(); setTimeout(() => { fireworks.stop(); }, 8000); }
 
-    // --- CORE LOGIC (Calculating, Charts, Excel) ---
     function selectMascot(char) {
         selectedMascot = char;
-        const options = document.querySelectorAll('.mascot-option');
-        options.forEach(opt => {
-            if(opt.innerText === char) opt.classList.add('selected');
-            else opt.classList.remove('selected');
+        document.querySelectorAll('.mascot-option').forEach(opt => {
+            if(opt.innerText === char) opt.classList.add('selected'); else opt.classList.remove('selected');
         });
+        updateMascotDisplay();
     }
     function updateMascotDisplay() { document.getElementById('mascot-display').innerText = selectedMascot; }
     
@@ -612,10 +566,7 @@
                     const gpa = (semPoints/semCredits).toFixed(2);
                     sumDiv.innerHTML = `GPA: <strong>${gpa}</strong> | ${semCredits} tín | ${getListRankBadge(gpa)}`;
                     grandPoints += semPoints; grandCredits += semCredits; chartData.push(gpa);
-                } else {
-                    sumDiv.innerHTML = `<span style="opacity:0.6; font-style:italic">...</span>`;
-                    chartData.push(null);
-                }
+                } else { sumDiv.innerHTML = `<span style="opacity:0.6; font-style:italic">...</span>`; chartData.push(null); }
             }
         });
         
@@ -637,9 +588,7 @@
         updateChart(chartData);
         updateProgressChart(currentTotalCredits, targetTotalCredits);
 
-        if (save) { 
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newData)); alert("Đã lưu dữ liệu!"); } catch(e){}
-        }
+        if (save) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newData)); alert("Đã lưu dữ liệu!"); } catch(e){} }
     }
 
     function updateProgressChart(earned, total) {
@@ -654,10 +603,7 @@
         if(percent >= 100) color = '#10b981'; else if(percent >= 50) color = '#f59e0b'; else if(percent < 50) color = '#ef4444';
         progressChartInstance = new Chart(ctx, {
             type: 'doughnut',
-            data: {
-                labels: ['Đã tích lũy', 'Còn lại'],
-                datasets: [{ data: [earned, remaining], backgroundColor: [color, 'rgba(255,255,255,0.2)'], borderWidth: 0, hoverOffset: 4 }]
-            },
+            data: { labels: ['Đã tích lũy', 'Còn lại'], datasets: [{ data: [earned, remaining], backgroundColor: [color, 'rgba(255,255,255,0.2)'], borderWidth: 0, hoverOffset: 4 }] },
             options: { cutout: '80%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: true } } }
         });
     }
@@ -690,10 +636,7 @@
             document.getElementById('profile-id').value=p.id||'';
             targetTotalCredits = p.targetCredits || 135;
             document.getElementById('strat-total-credits').value = targetTotalCredits;
-            if(p.mascot) {
-                selectedMascot = p.mascot;
-                updateMascotDisplay();
-            }
+            if(p.mascot) { selectedMascot = p.mascot; updateMascotDisplay(); }
         }
     }
     function toggleSemester(id) { document.getElementById(`content-${id}`).classList.toggle('active'); }
@@ -708,10 +651,8 @@
             <div class="field-group" style="flex: 2; min-width: 150px;"><label>Tên Môn</label><input type="text" class="inp-name" value="${name}" placeholder="..."></div>
             <div class="field-group"><label>Số TC</label><input type="number" class="inp-credit" value="${credit}" min="0" placeholder="..."></div>
             <div class="field-group" style="min-width: 100px;"><label>Tỷ lệ</label><select class="inp-ratio" onchange="calculateAll(false)">
-                <option value="40-60" ${ratio === '40-60' ? 'selected' : ''}>40/60</option>
-                <option value="50-50" ${ratio === '50-50' ? 'selected' : ''}>50/50</option>
-                <option value="30-70" ${ratio === '30-70' ? 'selected' : ''}>30/70</option>
-                <option value="100-0" ${ratio === '100-0' ? 'selected' : ''}>100%</option>
+                <option value="40-60" ${ratio === '40-60' ? 'selected' : ''}>40/60</option><option value="50-50" ${ratio === '50-50' ? 'selected' : ''}>50/50</option>
+                <option value="30-70" ${ratio === '30-70' ? 'selected' : ''}>30/70</option><option value="100-0" ${ratio === '100-0' ? 'selected' : ''}>100%</option>
             </select></div>
             <div class="field-group"><label>Điểm QT</label><input type="number" class="inp-s1" value="${s1}" step="0.1" placeholder="..." oninput="calculateAll(false)"></div>
             <div class="field-group"><label>Điểm CK</label><input type="number" class="inp-s2" value="${s2}" step="0.1" placeholder="..." oninput="calculateAll(false)"></div>
@@ -803,11 +744,7 @@
         calculateAll(false);
         let gradeRows = [["Học Kỳ", "Tên Môn", "Số TC", "Tỷ Lệ", "Điểm QT", "Điểm CK"]];
         Object.keys(semestersData).map(Number).sort((a,b)=>a-b).forEach(i => {
-            if (semestersData[i]) {
-                semestersData[i].forEach(subj => {
-                    gradeRows.push([i, subj.name, subj.credit, subj.ratio, subj.s1, subj.s2]);
-                });
-            }
+            if (semestersData[i]) { semestersData[i].forEach(subj => { gradeRows.push([i, subj.name, subj.credit, subj.ratio, subj.s1, subj.s2]); }); }
         });
         let profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
         let theme = localStorage.getItem('theme') || 'light';
@@ -815,8 +752,7 @@
         const wb = XLSX.utils.book_new();
         const wsGrades = XLSX.utils.aoa_to_sheet(gradeRows);
         const wsInfo = XLSX.utils.aoa_to_sheet(infoRows);
-        XLSX.utils.book_append_sheet(wb, wsGrades, "BangDiem");
-        XLSX.utils.book_append_sheet(wb, wsInfo, "HoSo");
+        XLSX.utils.book_append_sheet(wb, wsGrades, "BangDiem"); XLSX.utils.book_append_sheet(wb, wsInfo, "HoSo");
         const name = profile.name || "BangDiem";
         XLSX.writeFile(wb, `GPA_${name}.xlsx`);
     }
@@ -836,10 +772,7 @@
                     jsonData.forEach(row => {
                         const sem = row["Học Kỳ"];
                         if (!semestersData[sem]) semestersData[sem] = [];
-                        semestersData[sem].push({
-                            name: row["Tên Môn"] || "", credit: row["Số TC"] || "",
-                            ratio: row["Tỷ Lệ"] || "40-60", s1: row["Điểm QT"], s2: row["Điểm CK"]
-                        });
+                        semestersData[sem].push({ name: row["Tên Môn"] || "", credit: row["Số TC"] || "", ratio: row["Tỷ Lệ"] || "40-60", s1: row["Điểm QT"], s2: row["Điểm CK"] });
                     });
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(semestersData));
                 }
@@ -848,13 +781,10 @@
                     const jsonInfo = XLSX.utils.sheet_to_json(wsInfo);
                     let profile = {}; let theme = 'light';
                     jsonInfo.forEach(row => {
-                        if (row.Key === "Name") profile.name = row.Value;
-                        if (row.Key === "ID") profile.id = row.Value;
-                        if (row.Key === "Theme") theme = row.Value;
-                        if (row.Key === "TargetCredits") profile.targetCredits = row.Value;
+                        if (row.Key === "Name") profile.name = row.Value; if (row.Key === "ID") profile.id = row.Value;
+                        if (row.Key === "Theme") theme = row.Value; if (row.Key === "TargetCredits") profile.targetCredits = row.Value;
                     });
-                    localStorage.setItem('userProfile', JSON.stringify(profile));
-                    localStorage.setItem('theme', theme);
+                    localStorage.setItem('userProfile', JSON.stringify(profile)); localStorage.setItem('theme', theme);
                 }
                 alert('Nạp dữ liệu Excel thành công!'); location.reload();
             } catch (err) { console.error(err); alert('File lỗi!'); }
