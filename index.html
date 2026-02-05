@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GPA Manager - V23 (Alive Mascot)</title>
+    <title>GPA Manager - V24 (Perfect UX)</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#4c1d95">
     <link rel="apple-touch-icon" href="https://img.icons8.com/color/96/000000/student-male--v1.png">
-    
+    <link rel="manifest" href='data:application/manifest+json;base64,ewogICJuYW1lIjogIkhlIFRob25nIFF1YW4gTHkgR1BBIiwKICAic2hvcnRfbmFtZSI6ICJHUEEgTWFuYWdlciIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMWExYTJlIiwKICAidGhlbWVfY29sb3IiOiAiIzRjMWQ5NSIsCiAgImljb25zIjogW3sKICAgICJzcmMiOiAiaHR0cHM6Ly9pbWcuaWNvbnM4LmNvbS9jb2xvci8xOTIvMDAwMDAwL3N0dWRlbnQtbWFsZS0tdjEucG5nIiwKICAgICJzaXplcyI6ICIxOTJ4MTkyIiwKICAgICJ0eXBlIjogImltYWdlL3BuZyIKICB9XQp9'>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
@@ -17,110 +18,29 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
-        /* BASE STYLES */
-        :root {
-            --aurora-bg: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --text-main: #1f2937; --text-light: #6b7280;
-            --border-color: rgba(255,255,255,0.6);
-            --input-bg: rgba(255, 255, 255, 0.9); --input-border: #d1d5db;
-            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-            --btn-strategy-bg: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            --btn-excel-bg: #107c41;
-        }
-        body.dark-mode {
-            --aurora-bg: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e, #0f2027, #203a43, #2c5364);
-            --card-bg: rgba(30, 41, 59, 0.75);
-            --text-main: #f1f5f9; --text-light: #94a3b8;
-            --border-color: rgba(255,255,255,0.1);
-            --input-bg: rgba(51, 65, 85, 0.9); --input-border: #475569;
-            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        }
+        /* GIỮ NGUYÊN CSS V23 */
+        :root { --aurora-bg: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); --card-bg: rgba(255, 255, 255, 0.85); --text-main: #1f2937; --text-light: #6b7280; --border-color: rgba(255,255,255,0.6); --input-bg: rgba(255, 255, 255, 0.9); --input-border: #d1d5db; --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15); --btn-strategy-bg: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); --btn-excel-bg: #107c41; }
+        body.dark-mode { --aurora-bg: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e, #0f2027, #203a43, #2c5364); --card-bg: rgba(30, 41, 59, 0.75); --text-main: #f1f5f9; --text-light: #94a3b8; --border-color: rgba(255,255,255,0.1); --input-bg: rgba(51, 65, 85, 0.9); --input-border: #475569; --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--aurora-bg); background-size: 400% 400%; animation: auroraAnimation 15s ease infinite; color: var(--text-main); margin: 0; padding: 20px; min-height: 100vh; overflow-x: hidden; }
+        @keyframes auroraAnimation { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        body { 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            background: var(--aurora-bg); background-size: 400% 400%; 
-            animation: auroraAnimation 15s ease infinite; 
-            color: var(--text-main); margin: 0; padding: 20px; 
-            min-height: 100vh; overflow-x: hidden;
-        }
-        @keyframes auroraAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* --- V23: ALIVE MASCOT ANIMATIONS --- */
-        /* 1. Trạng thái sống (Lơ lửng + Thở) */
-        @keyframes mascot-idle {
-            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-            50% { transform: translateY(-8px) rotate(2deg) scale(1.02); }
-        }
+        /* MASCOT */
+        @keyframes mascot-idle { 0%, 100% { transform: translateY(0) rotate(0deg) scale(1); } 50% { transform: translateY(-8px) rotate(2deg) scale(1.02); } }
+        @keyframes mascot-glow { 0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4)); } 50% { filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8)); } }
+        @keyframes mascot-spin { 0% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.3) rotate(180deg); } 100% { transform: scale(1) rotate(360deg); } }
+        .mascot-display { font-size: 4.5rem; line-height: 1; margin-bottom: 10px; display: inline-block; cursor: pointer; animation: mascot-idle 4s ease-in-out infinite, mascot-glow 3s infinite; transition: all 0.3s; user-select: none; }
+        .mascot-display:hover { animation-play-state: paused; transform: scale(1.2) rotate(-5deg); filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.8)); }
+        .mascot-display.joyful { animation: mascot-spin 0.8s ease-in-out; }
         
-        /* 2. Hào quang (Glow) */
-        @keyframes mascot-glow {
-            0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4)); }
-            50% { filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8)); }
-        }
-
-        /* 3. Xoay vòng chiến thắng (Khi click) */
-        @keyframes mascot-spin {
-            0% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.3) rotate(180deg); }
-            100% { transform: scale(1) rotate(360deg); }
-        }
-
-        .mascot-display { 
-            font-size: 4.5rem; 
-            line-height: 1; 
-            margin-bottom: 10px; 
-            display: inline-block;
-            cursor: pointer;
-            /* Kết hợp 2 animation: chuyển động vật lý + ánh sáng */
-            animation: mascot-idle 4s ease-in-out infinite, mascot-glow 3s infinite;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            user-select: none;
-        }
-
-        /* Khi di chuột vào: Phấn khích */
-        .mascot-display:hover {
-            animation-play-state: paused; /* Tạm dừng idle */
-            transform: scale(1.2) rotate(-5deg); /* Nghiêng đầu chào */
-            filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.8));
-        }
-
-        /* Class kích hoạt khi click */
-        .mascot-display.joyful {
-            animation: mascot-spin 0.8s ease-in-out;
-        }
-        
-        /* Modal Mascot Selection Grid */
         .mascot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
-        .mascot-option { 
-            font-size: 2rem; padding: 10px; border-radius: 12px; cursor: pointer; 
-            background: rgba(255,255,255,0.1); border: 2px solid transparent; 
-            transition: 0.2s; text-align: center;
-        }
-        .mascot-option:hover { 
-            background: rgba(255,255,255,0.2); 
-            transform: scale(1.2); /* Phóng to khi chọn */
-        }
-        .mascot-option.selected { 
-            border-color: #8b5cf6; background: rgba(139, 92, 246, 0.2); 
-            box-shadow: 0 0 10px rgba(139, 92, 246, 0.5); 
-            animation: mascot-idle 2s infinite; /* Con được chọn sẽ nhảy nhót trong modal */
-        }
+        .mascot-option { font-size: 2rem; padding: 10px; border-radius: 12px; cursor: pointer; background: rgba(255,255,255,0.1); border: 2px solid transparent; transition: 0.2s; text-align: center; }
+        .mascot-option:hover { background: rgba(255,255,255,0.2); transform: scale(1.2); }
+        .mascot-option.selected { border-color: #8b5cf6; background: rgba(139, 92, 246, 0.2); box-shadow: 0 0 10px rgba(139, 92, 246, 0.5); animation: mascot-idle 2s infinite; }
 
         /* SECURITY GATE */
-        #security-gate {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(20px);
-            z-index: 10000; display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            color: white; transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-        }
+        #security-gate { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(20px); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
         #security-gate.unlocked { transform: translateY(-100%); }
-        .gate-content { text-align: center; max-width: 300px; }
+        .gate-content { text-align: center; max-width: 300px; outline: none; } /* Added outline none for focus */
         .gate-icon { font-size: 4rem; color: #f59e0b; margin-bottom: 20px; animation: pulse 2s infinite; }
         .gate-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
         .gate-msg { font-size: 0.9rem; color: #94a3b8; margin-bottom: 30px; }
@@ -135,7 +55,7 @@
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
         @keyframes pulse { 0% {transform: scale(1); opacity: 1;} 50% {transform: scale(1.1); opacity: 0.8;} 100% {transform: scale(1); opacity: 1;} }
 
-        /* APP LAYOUT */
+        /* APP LAYOUT & COMPONENTS */
         .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; filter: blur(0); transition: filter 0.5s; z-index: 1; }
         .top-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; z-index: 99; }
         .theme-toggle, .install-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 15px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; box-shadow: var(--shadow); font-weight: 600; backdrop-filter: blur(4px); transition: 0.2s; }
@@ -238,7 +158,7 @@
 <div id="fireworks-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999;"></div>
 
 <div id="security-gate">
-    <div class="gate-content">
+    <div class="gate-content" tabindex="0">
         <div class="gate-icon"><i class="fas fa-fingerprint"></i></div>
         <div class="gate-title">Khu Vực Riêng Tư</div>
         <div class="gate-msg" id="gate-msg">Nhập PIN để mở khóa</div>
@@ -261,12 +181,13 @@
             <div class="num-btn" onclick="enterDigit(0)">0</div>
             <div class="num-btn" onclick="clearPin()"><i class="fas fa-backspace"></i></div>
         </div>
+        <div style="margin-top:20px; font-size:0.8rem; opacity:0.6"><i class="fas fa-keyboard"></i> Hỗ trợ bàn phím PC</div>
     </div>
 </div>
 
 <div class="container" id="main-app">
     <div class="top-controls">
-        <button class="install-btn" onclick="showInstallGuide()"><i class="fas fa-download"></i> Cài App</button>
+        <button class="install-btn" id="btn-install-app" onclick="triggerInstallApp()"><i class="fas fa-download"></i> Cài App</button>
         <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
     </div>
 
@@ -395,7 +316,7 @@
 </div>
 
 <script>
-    const STORAGE_KEY = 'gpaData_v23'; // V23 Key
+    const STORAGE_KEY = 'gpaData_v24'; // UPDATE KEY
     let semestersData = {};
     let currentInputPin = "";
     let savedPin = localStorage.getItem('appPIN');
@@ -408,79 +329,72 @@
     let currentTotalCredits = 0;
     let targetTotalCredits = 135;
     let selectedMascot = '👑'; 
+    let deferredPrompt; // PWA PROMPT
 
-    // --- MASCOT INTERACTION (V23) ---
-    function mascotJoy() {
-        const m = document.getElementById('mascot-display');
-        m.classList.remove('joyful'); // Reset
-        void m.offsetWidth; // Trigger reflow
-        m.classList.add('joyful'); // Add class to start animation
+    // --- PWA LOGIC ENHANCED (V24) ---
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent Chrome 67 and earlier from automatically showing the prompt
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        deferredPrompt = e;
+        // Update UI to notify the user they can add to home screen
+        document.getElementById('btn-install-app').style.display = 'flex';
+    });
+
+    function triggerInstallApp() {
+        if (deferredPrompt) {
+            // Show the native prompt
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the A2HS prompt');
+                }
+                deferredPrompt = null;
+            });
+        } else {
+            // If native prompt is not available (iOS, or already installed), show manual guide
+            showInstallGuide();
+        }
     }
 
-    // --- FIREWORKS (V21) ---
-    let fireworks;
-    function initFireworks() {
-        const container = document.getElementById('fireworks-container');
-        fireworks = new Fireworks.default(container, {
-            autoresize: true, opacity: 0.5, acceleration: 1.05, friction: 0.97, gravity: 1.5,
-            particles: 150, traceLength: 3, traceSpeed: 10, explosion: 5, intensity: 30, flickering: 50,
-            lineStyle: 'round', hue: { min: 0, max: 360 }, delay: { min: 15, max: 30 },
-            rocketsPoint: { min: 0, max: 100 }, lineWidth: { explosion: { min: 1, max: 3 }, trace: { min: 1, max: 2 } },
-            brightness: { min: 50, max: 80 }, decay: { min: 0.015, max: 0.03 }, mouse: { click: false, move: false, max: 1 }
-        });
-    }
-    function runBigFireworks() {
-        if (!fireworks) initFireworks();
-        fireworks.start();
-        setTimeout(() => { fireworks.stop(); }, 8000);
-    }
-
-    // --- MASCOT SELECTION ---
-    function selectMascot(char) {
-        selectedMascot = char;
-        const options = document.querySelectorAll('.mascot-option');
-        options.forEach(opt => {
-            if(opt.innerText === char) opt.classList.add('selected');
-            else opt.classList.remove('selected');
-        });
-    }
-
-    function updateMascotDisplay() {
-        document.getElementById('mascot-display').innerText = selectedMascot;
-    }
-
-    // --- INSTALL GUIDE ---
     function showInstallGuide() {
         const modal = document.getElementById('installModal');
         const content = document.getElementById('install-instructions');
         const userAgent = navigator.userAgent || navigator.vendor || window.opera;
         let instructions = "";
         
+        // CHECK IF RUNNING FROM FILE://
+        if (window.location.protocol === 'file:') {
+            content.innerHTML = `
+                <div style="color:#ef4444; margin-bottom:15px; font-weight:bold;">⚠️ Lưu ý quan trọng</div>
+                <p>Tính năng "Cài App" không hoạt động khi mở trực tiếp file từ máy tính.</p>
+                <p>Bệ hạ cần đưa file này lên mạng (ví dụ: GitHub Pages) hoặc chạy qua Local Server để cài đặt.</p>
+            `;
+            modal.style.display = 'flex';
+            return;
+        }
+
         if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
             instructions = `
                 <div style="text-align:center; margin-bottom:15px"><i class="fab fa-apple" style="font-size:3rem; color:#8b5cf6"></i></div>
                 <p>Để cài đặt trên <b>iPhone/iPad</b>:</p>
                 <ol style="margin-left:20px; line-height:1.6">
-                    <li>Nhấn nút <b>Chia sẻ</b> <img src="https://img.icons8.com/ios-glyphs/24/000000/share-rounded.png" style="vertical-align:middle; width:20px"> trên thanh công cụ.</li>
+                    <li>Nhấn nút <b>Chia sẻ</b> <img src="https://img.icons8.com/ios-glyphs/24/000000/share-rounded.png" style="vertical-align:middle; width:20px"> trên thanh công cụ Safari.</li>
                     <li>Chọn <b>"Thêm vào MH chính"</b>.</li>
                     <li>Nhấn <b>Thêm</b>.</li>
                 </ol>`;
-        } else if (/android/i.test(userAgent)) {
-            instructions = `
-                <div style="text-align:center; margin-bottom:15px"><i class="fab fa-android" style="font-size:3rem; color:#10b981"></i></div>
-                <p>Để cài đặt trên <b>Android</b>:</p>
-                <ol style="margin-left:20px; line-height:1.6">
-                    <li>Nhấn dấu <b>3 chấm</b> <i class="fas fa-ellipsis-v"></i> góc trên phải.</li>
-                    <li>Chọn <b>"Cài đặt ứng dụng"</b>.</li>
-                </ol>`;
         } else {
-            instructions = `<div style="text-align:center"><i class="fas fa-desktop" style="font-size:3rem; color:#3b82f6"></i><br>Lưu trang này vào Bookmark (Ctrl+D)</div>`;
+            // Default Fallback
+            instructions = `
+                <div style="text-align:center; margin-bottom:15px"><i class="fas fa-download" style="font-size:3rem; color:#10b981"></i></div>
+                <p>Nếu không thấy nút cài tự động:</p>
+                <p>Hãy tìm trong Menu trình duyệt > <b>"Cài đặt ứng dụng"</b> hoặc <b>"Thêm vào màn hình chính"</b>.</p>`;
         }
         content.innerHTML = instructions;
         modal.style.display = 'flex';
     }
 
-    // --- SECURITY ---
+    // --- SECURITY & KEYBOARD (V24 NEW) ---
     function initSecurity() {
         const msg = document.getElementById('gate-msg');
         if(isSetupMode) {
@@ -489,6 +403,21 @@
         } else {
             msg.innerText = "Nhập PIN để mở khóa";
             msg.style.color = "#94a3b8";
+        }
+        
+        // V24: KEYBOARD LISTENER
+        document.addEventListener('keydown', handleKeyboardPin);
+    }
+
+    function handleKeyboardPin(e) {
+        const gate = document.getElementById('security-gate');
+        // Only listen if gate is not unlocked
+        if (gate.classList.contains('unlocked')) return;
+
+        if (e.key >= '0' && e.key <= '9') {
+            enterDigit(parseInt(e.key));
+        } else if (e.key === 'Backspace' || e.key === 'Delete') {
+            clearPin();
         }
     }
 
@@ -537,22 +466,61 @@
         }
     }
 
-    // --- APP LOGIC ---
+    // --- MAIN APP (Standard Logic) ---
     function initApp() {
+        // Remove keyboard listener for PIN to avoid conflict
+        document.removeEventListener('keydown', handleKeyboardPin);
+        
         try { const theme = localStorage.getItem('theme'); if (theme === 'dark') document.body.classList.add('dark-mode'); } catch(e) {}
         loadProfile();
         let savedData = localStorage.getItem(STORAGE_KEY);
-        // Migration V22 -> V23
+        // Migration V23 -> V24
+        if(!savedData) savedData = localStorage.getItem('gpaData_v23');
         if(!savedData) savedData = localStorage.getItem('gpaData_v22');
         if(!savedData) savedData = localStorage.getItem('gpaData_v21');
-        if(!savedData) savedData = localStorage.getItem('gpaData_v20');
+        
         if (savedData) semestersData = JSON.parse(savedData);
         else for(let i=1; i<=8; i++) semestersData[i] = [];
         renderAllSemesters(); calculateAll(false);
         if (window.matchMedia('(display-mode: standalone)').matches) document.querySelector('.install-btn').style.display = 'none';
+        
         initFireworks();
     }
 
+    // --- MASCOT & FIREWORKS ---
+    function mascotJoy() {
+        const m = document.getElementById('mascot-display');
+        m.classList.remove('joyful'); void m.offsetWidth; m.classList.add('joyful');
+    }
+    
+    let fireworks;
+    function initFireworks() {
+        const container = document.getElementById('fireworks-container');
+        fireworks = new Fireworks.default(container, {
+            autoresize: true, opacity: 0.5, acceleration: 1.05, friction: 0.97, gravity: 1.5,
+            particles: 150, traceLength: 3, traceSpeed: 10, explosion: 5, intensity: 30, flickering: 50,
+            lineStyle: 'round', hue: { min: 0, max: 360 }, delay: { min: 15, max: 30 },
+            rocketsPoint: { min: 0, max: 100 }, lineWidth: { explosion: { min: 1, max: 3 }, trace: { min: 1, max: 2 } },
+            brightness: { min: 50, max: 80 }, decay: { min: 0.015, max: 0.03 }, mouse: { click: false, move: false, max: 1 }
+        });
+    }
+    function runBigFireworks() {
+        if (!fireworks) initFireworks();
+        fireworks.start();
+        setTimeout(() => { fireworks.stop(); }, 8000);
+    }
+
+    // --- CORE LOGIC (Calculating, Charts, Excel) ---
+    function selectMascot(char) {
+        selectedMascot = char;
+        const options = document.querySelectorAll('.mascot-option');
+        options.forEach(opt => {
+            if(opt.innerText === char) opt.classList.add('selected');
+            else opt.classList.remove('selected');
+        });
+    }
+    function updateMascotDisplay() { document.getElementById('mascot-display').innerText = selectedMascot; }
+    
     function animateValue(obj, start, end, duration) {
         let startTimestamp = null;
         const step = (timestamp) => {
