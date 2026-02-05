@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GPA Manager - V21 (Imperial Fireworks)</title>
+    <title>GPA Manager - V22 (Mascot)</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,11 +13,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.10.0/dist/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
-        /* CSS GIỮ NGUYÊN NHƯ V20 */
+        /* CSS CỐT LÕI (GIỮ NGUYÊN) */
         :root {
             --aurora-bg: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
             --card-bg: rgba(255, 255, 255, 0.85);
@@ -39,18 +39,29 @@
 
         body { 
             font-family: 'Segoe UI', Roboto, sans-serif; 
-            background: var(--aurora-bg); 
-            background-size: 400% 400%; 
+            background: var(--aurora-bg); background-size: 400% 400%; 
             animation: auroraAnimation 15s ease infinite; 
             color: var(--text-main); margin: 0; padding: 20px; 
             min-height: 100vh; overflow-x: hidden;
         }
-
         @keyframes auroraAnimation {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+
+        /* MASCOT STYLES (NEW V22) */
+        .mascot-display { font-size: 3.5rem; line-height: 1; margin-bottom: 5px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2)); animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0% {transform: translateY(0px);} 50% {transform: translateY(-5px);} 100% {transform: translateY(0px);} }
+        
+        .mascot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+        .mascot-option { 
+            font-size: 2rem; padding: 10px; border-radius: 12px; cursor: pointer; 
+            background: rgba(255,255,255,0.1); border: 2px solid transparent; 
+            transition: 0.2s; text-align: center;
+        }
+        .mascot-option:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
+        .mascot-option.selected { border-color: #8b5cf6; background: rgba(139, 92, 246, 0.2); box-shadow: 0 0 10px rgba(139, 92, 246, 0.5); }
 
         /* SECURITY GATE */
         #security-gate {
@@ -61,16 +72,13 @@
             color: white; transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
         }
         #security-gate.unlocked { transform: translateY(-100%); }
-        
         .gate-content { text-align: center; max-width: 300px; }
         .gate-icon { font-size: 4rem; color: #f59e0b; margin-bottom: 20px; animation: pulse 2s infinite; }
         .gate-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
         .gate-msg { font-size: 0.9rem; color: #94a3b8; margin-bottom: 30px; }
-        
         .pin-display { display: flex; gap: 15px; justify-content: center; margin-bottom: 30px; }
         .pin-dot { width: 15px; height: 15px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); transition: 0.2s; }
         .pin-dot.filled { background: #8b5cf6; border-color: #8b5cf6; box-shadow: 0 0 10px #8b5cf6; }
-        
         .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
         .num-btn { width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: white; font-size: 1.2rem; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .num-btn:hover { background: rgba(255,255,255,0.2); }
@@ -79,16 +87,16 @@
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
         @keyframes pulse { 0% {transform: scale(1); opacity: 1;} 50% {transform: scale(1.1); opacity: 0.8;} 100% {transform: scale(1); opacity: 1;} }
 
-        /* MAIN APP */
-        .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; filter: blur(0); transition: filter 0.5s; z-index: 1; /* Ensure app is below fireworks */ }
-        
+        /* MAIN APP STRUCTURE */
+        .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; filter: blur(0); transition: filter 0.5s; z-index: 1; }
         .top-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; z-index: 99; }
         .theme-toggle, .install-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 15px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; box-shadow: var(--shadow); font-weight: 600; backdrop-filter: blur(4px); transition: 0.2s; }
         .theme-toggle:hover, .install-btn:hover { transform: scale(1.05); }
         .install-btn { background: #8b5cf6; color: white; border: none; }
 
-        .app-header { text-align: center; margin-bottom: 25px; padding-top: 20px; }
-        .app-title { font-size: 2rem; font-weight: 800; text-transform: uppercase; color: var(--text-main); letter-spacing: 1px; margin: 0; }
+        .app-header { text-align: center; margin-bottom: 25px; padding-top: 10px; }
+        /* Header customized for Mascot */
+        .app-title { font-size: 1.8rem; font-weight: 800; text-transform: uppercase; color: var(--text-main); letter-spacing: 1px; margin: 0; margin-top: 5px; }
         .user-info { font-size: 1.1rem; color: var(--text-main); font-weight: 600; margin-top: 5px; cursor: pointer; display: inline-block; padding: 5px 15px; border-radius: 15px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); }
         .app-subtitle { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; color: var(--text-main); }
 
@@ -216,7 +224,8 @@
     </div>
 
     <div class="app-header">
-        <h1 class="app-title"><i class="fas fa-university"></i> Hệ thống quản lý điểm GPA</h1>
+        <div class="mascot-display" id="mascot-display">👑</div>
+        <h1 class="app-title">Hệ thống quản lý điểm GPA</h1>
         <div class="user-info" onclick="openProfileModal()" id="display-name">Sinh viên: Chưa cập nhật tên</div>
         <div class="app-subtitle" id="display-id">MSSV: ---</div>
     </div>
@@ -308,11 +317,27 @@
 
 <div class="modal-overlay" id="profileModal">
     <div class="modal">
-        <h3><i class="fas fa-user-edit"></i> Thông Tin</h3>
+        <h3><i class="fas fa-user-edit"></i> Thông Tin & Linh Vật</h3>
         <div class="modal-input-group"><label>Họ và Tên:</label><input type="text" id="profile-name" placeholder="Tên của bạn"></div>
         <div class="modal-input-group"><label>MSSV:</label><input type="text" id="profile-id" placeholder="Mã SV"></div>
         <div class="modal-input-group"><label>Tổng Tín Chỉ Toàn Khóa:</label><input type="number" id="profile-target-credits" placeholder="Ví dụ: 135"></div>
         
+        <div style="text-align:left; margin-top:15px; margin-bottom:5px; font-weight:600; font-size:0.9rem; color:var(--text-light)">Chọn Linh Vật Hộ Mệnh:</div>
+        <div class="mascot-grid" id="mascot-grid">
+            <div class="mascot-option" onclick="selectMascot('🦁')">🦁</div>
+            <div class="mascot-option" onclick="selectMascot('👑')">👑</div>
+            <div class="mascot-option" onclick="selectMascot('🐉')">🐉</div>
+            <div class="mascot-option" onclick="selectMascot('🦄')">🦄</div>
+            <div class="mascot-option" onclick="selectMascot('🦅')">🦅</div>
+            <div class="mascot-option" onclick="selectMascot('🦊')">🦊</div>
+            <div class="mascot-option" onclick="selectMascot('🐼')">🐼</div>
+            <div class="mascot-option" onclick="selectMascot('🐯')">🐯</div>
+            <div class="mascot-option" onclick="selectMascot('👻')">👻</div>
+            <div class="mascot-option" onclick="selectMascot('⚽')">⚽</div>
+            <div class="mascot-option" onclick="selectMascot('🎓')">🎓</div>
+            <div class="mascot-option" onclick="selectMascot('🐱')">🐱</div>
+        </div>
+
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
         <div style="text-align:left; margin-bottom:10px; font-weight:bold; color:var(--text-light)">Bảo Mật</div>
         <button class="btn-calc-modal" style="background: #ef4444;" onclick="resetPin()">Đặt Lại Mã PIN</button>
@@ -323,7 +348,7 @@
 </div>
 
 <script>
-    const STORAGE_KEY = 'gpaData_v21'; // V21 Key
+    const STORAGE_KEY = 'gpaData_v22'; // V22 Mascot
     let semestersData = {};
     let currentInputPin = "";
     let savedPin = localStorage.getItem('appPIN');
@@ -335,41 +360,39 @@
     let currentTotalGPA = 0;
     let currentTotalCredits = 0;
     let targetTotalCredits = 135;
+    let selectedMascot = '👑'; // Default
 
-    // --- NEW: FIREWORKS LOGIC (V21) ---
+    // --- FIREWORKS (V21) ---
     let fireworks;
     function initFireworks() {
         const container = document.getElementById('fireworks-container');
         fireworks = new Fireworks.default(container, {
-            autoresize: true,
-            opacity: 0.5,
-            acceleration: 1.05,
-            friction: 0.97,
-            gravity: 1.5,
-            particles: 150, // Tăng số lượng hạt pháo
-            traceLength: 3,
-            traceSpeed: 10,
-            explosion: 5,
-            intensity: 30,
-            flickering: 50,
-            lineStyle: 'round',
-            hue: { min: 0, max: 360 },
-            delay: { min: 15, max: 30 },
-            rocketsPoint: { min: 0, max: 100 }, // Bắn từ toàn bộ chiều ngang phía dưới
-            lineWidth: { explosion: { min: 1, max: 3 }, trace: { min: 1, max: 2 } },
-            brightness: { min: 50, max: 80 },
-            decay: { min: 0.015, max: 0.03 },
-            mouse: { click: false, move: false, max: 1 }
+            autoresize: true, opacity: 0.5, acceleration: 1.05, friction: 0.97, gravity: 1.5,
+            particles: 150, traceLength: 3, traceSpeed: 10, explosion: 5, intensity: 30, flickering: 50,
+            lineStyle: 'round', hue: { min: 0, max: 360 }, delay: { min: 15, max: 30 },
+            rocketsPoint: { min: 0, max: 100 }, lineWidth: { explosion: { min: 1, max: 3 }, trace: { min: 1, max: 2 } },
+            brightness: { min: 50, max: 80 }, decay: { min: 0.015, max: 0.03 }, mouse: { click: false, move: false, max: 1 }
         });
     }
-
     function runBigFireworks() {
         if (!fireworks) initFireworks();
         fireworks.start();
-        // Dừng sau 8 giây
-        setTimeout(() => {
-            fireworks.stop();
-        }, 8000);
+        setTimeout(() => { fireworks.stop(); }, 8000);
+    }
+
+    // --- MASCOT LOGIC (V22) ---
+    function selectMascot(char) {
+        selectedMascot = char;
+        // Visual feedback
+        const options = document.querySelectorAll('.mascot-option');
+        options.forEach(opt => {
+            if(opt.innerText === char) opt.classList.add('selected');
+            else opt.classList.remove('selected');
+        });
+    }
+
+    function updateMascotDisplay() {
+        document.getElementById('mascot-display').innerText = selectedMascot;
     }
 
     // --- INSTALL GUIDE ---
@@ -465,16 +488,13 @@
         try { const theme = localStorage.getItem('theme'); if (theme === 'dark') document.body.classList.add('dark-mode'); } catch(e) {}
         loadProfile();
         let savedData = localStorage.getItem(STORAGE_KEY);
+        if(!savedData) savedData = localStorage.getItem('gpaData_v21');
         if(!savedData) savedData = localStorage.getItem('gpaData_v20');
         if(!savedData) savedData = localStorage.getItem('gpaData_v19');
-        if(!savedData) savedData = localStorage.getItem('gpaData_v18');
-        if(!savedData) savedData = localStorage.getItem('gpaData_v17');
         if (savedData) semestersData = JSON.parse(savedData);
         else for(let i=1; i<=8; i++) semestersData[i] = [];
         renderAllSemesters(); calculateAll(false);
         if (window.matchMedia('(display-mode: standalone)').matches) document.querySelector('.install-btn').style.display = 'none';
-        
-        // Init fireworks engine
         initFireworks();
     }
 
@@ -585,7 +605,6 @@
             currentTotalGPA = newGPA;
             animateValue(document.getElementById('total-gpa'), parseFloat(oldGPA), parseFloat(newGPA), 1000);
             updateDashboardRank(newGPA);
-            // FIREWORKS TRIGGER (V21)
             if(save && parseFloat(newGPA) >= 3.2) { runBigFireworks(); }
         } else {
             currentTotalGPA = 0;
@@ -629,12 +648,14 @@
         document.getElementById('profileModal').style.display = 'flex'; 
         let p = JSON.parse(localStorage.getItem('userProfile') || '{}');
         document.getElementById('profile-target-credits').value = p.targetCredits || 135;
+        // Init selection state
+        selectMascot(p.mascot || '👑');
     }
     function saveProfile() {
         const name = document.getElementById('profile-name').value;
         const id = document.getElementById('profile-id').value;
         const target = document.getElementById('profile-target-credits').value;
-        localStorage.setItem('userProfile', JSON.stringify({ name, id, targetCredits: target }));
+        localStorage.setItem('userProfile', JSON.stringify({ name, id, targetCredits: target, mascot: selectedMascot }));
         loadProfile(); closeModal('profileModal'); calculateAll(false);
     }
     function loadProfile() {
@@ -647,6 +668,10 @@
             document.getElementById('profile-id').value=p.id||'';
             targetTotalCredits = p.targetCredits || 135;
             document.getElementById('strat-total-credits').value = targetTotalCredits;
+            if(p.mascot) {
+                selectedMascot = p.mascot;
+                updateMascotDisplay();
+            }
         }
     }
     function toggleSemester(id) { document.getElementById(`content-${id}`).classList.toggle('active'); }
