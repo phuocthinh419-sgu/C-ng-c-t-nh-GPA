@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GPA Manager - V20 (Grand Victory)</title>
+    <title>GPA Manager - V21 (Imperial Fireworks)</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,10 +13,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.10.0/dist/index.umd.js"></script>
     
     <style>
-        /* CSS GIỮ NGUYÊN NHƯ V19 */
+        /* CSS GIỮ NGUYÊN NHƯ V20 */
         :root {
             --aurora-bg: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
             --card-bg: rgba(255, 255, 255, 0.85);
@@ -79,7 +80,7 @@
         @keyframes pulse { 0% {transform: scale(1); opacity: 1;} 50% {transform: scale(1.1); opacity: 0.8;} 100% {transform: scale(1); opacity: 1;} }
 
         /* MAIN APP */
-        .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; filter: blur(0); transition: filter 0.5s; }
+        .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; filter: blur(0); transition: filter 0.5s; z-index: 1; /* Ensure app is below fireworks */ }
         
         .top-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; z-index: 99; }
         .theme-toggle, .install-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 15px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; box-shadow: var(--shadow); font-weight: 600; backdrop-filter: blur(4px); transition: 0.2s; }
@@ -178,6 +179,8 @@
     </style>
 </head>
 <body>
+
+<div id="fireworks-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999;"></div>
 
 <div id="security-gate">
     <div class="gate-content">
@@ -320,7 +323,7 @@
 </div>
 
 <script>
-    const STORAGE_KEY = 'gpaData_v20'; // V20 Key
+    const STORAGE_KEY = 'gpaData_v21'; // V21 Key
     let semestersData = {};
     let currentInputPin = "";
     let savedPin = localStorage.getItem('appPIN');
@@ -333,37 +336,40 @@
     let currentTotalCredits = 0;
     let targetTotalCredits = 135;
 
-    // --- GRAND VICTORY FIREWORKS (V20) ---
-    function runConfetti() {
-        var duration = 5 * 1000; // 5 seconds
-        var animationEnd = Date.now() + duration;
-        var defaults = { startVelocity: 45, spread: 360, ticks: 100, zIndex: 9999 };
+    // --- NEW: FIREWORKS LOGIC (V21) ---
+    let fireworks;
+    function initFireworks() {
+        const container = document.getElementById('fireworks-container');
+        fireworks = new Fireworks.default(container, {
+            autoresize: true,
+            opacity: 0.5,
+            acceleration: 1.05,
+            friction: 0.97,
+            gravity: 1.5,
+            particles: 150, // Tăng số lượng hạt pháo
+            traceLength: 3,
+            traceSpeed: 10,
+            explosion: 5,
+            intensity: 30,
+            flickering: 50,
+            lineStyle: 'round',
+            hue: { min: 0, max: 360 },
+            delay: { min: 15, max: 30 },
+            rocketsPoint: { min: 0, max: 100 }, // Bắn từ toàn bộ chiều ngang phía dưới
+            lineWidth: { explosion: { min: 1, max: 3 }, trace: { min: 1, max: 2 } },
+            brightness: { min: 50, max: 80 },
+            decay: { min: 0.015, max: 0.03 },
+            mouse: { click: false, move: false, max: 1 }
+        });
+    }
 
-        function randomInRange(min, max) { return Math.random() * (max - min) + min; }
-
-        var interval = setInterval(function() {
-            var timeLeft = animationEnd - Date.now();
-
-            if (timeLeft <= 0) {
-                return clearInterval(interval);
-            }
-
-            var particleCount = 70 * (timeLeft / duration);
-            
-            // Shoot from bottom left corner
-            confetti(Object.assign({}, defaults, { 
-                particleCount, 
-                origin: { x: 0, y: 1 }, 
-                angle: 60
-            }));
-            
-            // Shoot from bottom right corner
-            confetti(Object.assign({}, defaults, { 
-                particleCount, 
-                origin: { x: 1, y: 1 }, 
-                angle: 120 
-            }));
-        }, 250);
+    function runBigFireworks() {
+        if (!fireworks) initFireworks();
+        fireworks.start();
+        // Dừng sau 8 giây
+        setTimeout(() => {
+            fireworks.stop();
+        }, 8000);
     }
 
     // --- INSTALL GUIDE ---
@@ -459,6 +465,7 @@
         try { const theme = localStorage.getItem('theme'); if (theme === 'dark') document.body.classList.add('dark-mode'); } catch(e) {}
         loadProfile();
         let savedData = localStorage.getItem(STORAGE_KEY);
+        if(!savedData) savedData = localStorage.getItem('gpaData_v20');
         if(!savedData) savedData = localStorage.getItem('gpaData_v19');
         if(!savedData) savedData = localStorage.getItem('gpaData_v18');
         if(!savedData) savedData = localStorage.getItem('gpaData_v17');
@@ -466,6 +473,9 @@
         else for(let i=1; i<=8; i++) semestersData[i] = [];
         renderAllSemesters(); calculateAll(false);
         if (window.matchMedia('(display-mode: standalone)').matches) document.querySelector('.install-btn').style.display = 'none';
+        
+        // Init fireworks engine
+        initFireworks();
     }
 
     function animateValue(obj, start, end, duration) {
@@ -575,8 +585,8 @@
             currentTotalGPA = newGPA;
             animateValue(document.getElementById('total-gpa'), parseFloat(oldGPA), parseFloat(newGPA), 1000);
             updateDashboardRank(newGPA);
-            // VICTORY CHECK (V20)
-            if(save && parseFloat(newGPA) >= 3.2) { runConfetti(); }
+            // FIREWORKS TRIGGER (V21)
+            if(save && parseFloat(newGPA) >= 3.2) { runBigFireworks(); }
         } else {
             currentTotalGPA = 0;
             document.getElementById('total-gpa').innerText = "0.00";
