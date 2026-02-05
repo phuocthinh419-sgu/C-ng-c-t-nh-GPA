@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GPA Manager - V22 (Mascot)</title>
+    <title>GPA Manager - V23 (Alive Mascot)</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,7 +17,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
-        /* CSS CỐT LÕI (GIỮ NGUYÊN) */
+        /* BASE STYLES */
         :root {
             --aurora-bg: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
             --card-bg: rgba(255, 255, 255, 0.85);
@@ -50,18 +50,66 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* MASCOT STYLES (NEW V22) */
-        .mascot-display { font-size: 3.5rem; line-height: 1; margin-bottom: 5px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2)); animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0% {transform: translateY(0px);} 50% {transform: translateY(-5px);} 100% {transform: translateY(0px);} }
+        /* --- V23: ALIVE MASCOT ANIMATIONS --- */
+        /* 1. Trạng thái sống (Lơ lửng + Thở) */
+        @keyframes mascot-idle {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            50% { transform: translateY(-8px) rotate(2deg) scale(1.02); }
+        }
         
+        /* 2. Hào quang (Glow) */
+        @keyframes mascot-glow {
+            0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4)); }
+            50% { filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8)); }
+        }
+
+        /* 3. Xoay vòng chiến thắng (Khi click) */
+        @keyframes mascot-spin {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.3) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        .mascot-display { 
+            font-size: 4.5rem; 
+            line-height: 1; 
+            margin-bottom: 10px; 
+            display: inline-block;
+            cursor: pointer;
+            /* Kết hợp 2 animation: chuyển động vật lý + ánh sáng */
+            animation: mascot-idle 4s ease-in-out infinite, mascot-glow 3s infinite;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            user-select: none;
+        }
+
+        /* Khi di chuột vào: Phấn khích */
+        .mascot-display:hover {
+            animation-play-state: paused; /* Tạm dừng idle */
+            transform: scale(1.2) rotate(-5deg); /* Nghiêng đầu chào */
+            filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.8));
+        }
+
+        /* Class kích hoạt khi click */
+        .mascot-display.joyful {
+            animation: mascot-spin 0.8s ease-in-out;
+        }
+        
+        /* Modal Mascot Selection Grid */
         .mascot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
         .mascot-option { 
             font-size: 2rem; padding: 10px; border-radius: 12px; cursor: pointer; 
             background: rgba(255,255,255,0.1); border: 2px solid transparent; 
             transition: 0.2s; text-align: center;
         }
-        .mascot-option:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
-        .mascot-option.selected { border-color: #8b5cf6; background: rgba(139, 92, 246, 0.2); box-shadow: 0 0 10px rgba(139, 92, 246, 0.5); }
+        .mascot-option:hover { 
+            background: rgba(255,255,255,0.2); 
+            transform: scale(1.2); /* Phóng to khi chọn */
+        }
+        .mascot-option.selected { 
+            border-color: #8b5cf6; background: rgba(139, 92, 246, 0.2); 
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.5); 
+            animation: mascot-idle 2s infinite; /* Con được chọn sẽ nhảy nhót trong modal */
+        }
 
         /* SECURITY GATE */
         #security-gate {
@@ -87,7 +135,7 @@
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
         @keyframes pulse { 0% {transform: scale(1); opacity: 1;} 50% {transform: scale(1.1); opacity: 0.8;} 100% {transform: scale(1); opacity: 1;} }
 
-        /* MAIN APP STRUCTURE */
+        /* APP LAYOUT */
         .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; filter: blur(0); transition: filter 0.5s; z-index: 1; }
         .top-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; z-index: 99; }
         .theme-toggle, .install-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 15px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; box-shadow: var(--shadow); font-weight: 600; backdrop-filter: blur(4px); transition: 0.2s; }
@@ -95,7 +143,6 @@
         .install-btn { background: #8b5cf6; color: white; border: none; }
 
         .app-header { text-align: center; margin-bottom: 25px; padding-top: 10px; }
-        /* Header customized for Mascot */
         .app-title { font-size: 1.8rem; font-weight: 800; text-transform: uppercase; color: var(--text-main); letter-spacing: 1px; margin: 0; margin-top: 5px; }
         .user-info { font-size: 1.1rem; color: var(--text-main); font-weight: 600; margin-top: 5px; cursor: pointer; display: inline-block; padding: 5px 15px; border-radius: 15px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); }
         .app-subtitle { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; color: var(--text-main); }
@@ -224,7 +271,7 @@
     </div>
 
     <div class="app-header">
-        <div class="mascot-display" id="mascot-display">👑</div>
+        <div class="mascot-display" id="mascot-display" onclick="mascotJoy()">👑</div>
         <h1 class="app-title">Hệ thống quản lý điểm GPA</h1>
         <div class="user-info" onclick="openProfileModal()" id="display-name">Sinh viên: Chưa cập nhật tên</div>
         <div class="app-subtitle" id="display-id">MSSV: ---</div>
@@ -348,7 +395,7 @@
 </div>
 
 <script>
-    const STORAGE_KEY = 'gpaData_v22'; // V22 Mascot
+    const STORAGE_KEY = 'gpaData_v23'; // V23 Key
     let semestersData = {};
     let currentInputPin = "";
     let savedPin = localStorage.getItem('appPIN');
@@ -360,7 +407,15 @@
     let currentTotalGPA = 0;
     let currentTotalCredits = 0;
     let targetTotalCredits = 135;
-    let selectedMascot = '👑'; // Default
+    let selectedMascot = '👑'; 
+
+    // --- MASCOT INTERACTION (V23) ---
+    function mascotJoy() {
+        const m = document.getElementById('mascot-display');
+        m.classList.remove('joyful'); // Reset
+        void m.offsetWidth; // Trigger reflow
+        m.classList.add('joyful'); // Add class to start animation
+    }
 
     // --- FIREWORKS (V21) ---
     let fireworks;
@@ -380,10 +435,9 @@
         setTimeout(() => { fireworks.stop(); }, 8000);
     }
 
-    // --- MASCOT LOGIC (V22) ---
+    // --- MASCOT SELECTION ---
     function selectMascot(char) {
         selectedMascot = char;
-        // Visual feedback
         const options = document.querySelectorAll('.mascot-option');
         options.forEach(opt => {
             if(opt.innerText === char) opt.classList.add('selected');
@@ -488,9 +542,10 @@
         try { const theme = localStorage.getItem('theme'); if (theme === 'dark') document.body.classList.add('dark-mode'); } catch(e) {}
         loadProfile();
         let savedData = localStorage.getItem(STORAGE_KEY);
+        // Migration V22 -> V23
+        if(!savedData) savedData = localStorage.getItem('gpaData_v22');
         if(!savedData) savedData = localStorage.getItem('gpaData_v21');
         if(!savedData) savedData = localStorage.getItem('gpaData_v20');
-        if(!savedData) savedData = localStorage.getItem('gpaData_v19');
         if (savedData) semestersData = JSON.parse(savedData);
         else for(let i=1; i<=8; i++) semestersData[i] = [];
         renderAllSemesters(); calculateAll(false);
@@ -648,7 +703,6 @@
         document.getElementById('profileModal').style.display = 'flex'; 
         let p = JSON.parse(localStorage.getItem('userProfile') || '{}');
         document.getElementById('profile-target-credits').value = p.targetCredits || 135;
-        // Init selection state
         selectMascot(p.mascot || '👑');
     }
     function saveProfile() {
