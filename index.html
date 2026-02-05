@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GPA Manager - Private Fortress</title>
+    <title>GPA Manager - V20 (Grand Victory)</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#4c1d95">
     <link rel="apple-touch-icon" href="https://img.icons8.com/color/96/000000/student-male--v1.png">
-    <link rel="manifest" href='data:application/manifest+json;base64,ewogICJuYW1lIjogIkhlIFRob25nIEdQQSIsCiAgInNob3J0X25hbWUiOiAiR1BBIE1hbmFnZXIiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzFhMWEyZSIsCiAgInRoZW1lX2NvbG9yIjogIiM0YzFkOTUiLAogICJpY29ucyI6IFt7CiAgICAic3JjIjogImh0dHBzOi8vaW1nLmljb25zOC5jb20vY29sb3IvMTkyLzAwMDAwMC9zdHVkZW50LW1hbGUtLXYxLnBuZyIsCiAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgfV0KfQ=='>
-
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
+        /* CSS GIỮ NGUYÊN NHƯ V19 */
         :root {
             --aurora-bg: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
             --card-bg: rgba(255, 255, 255, 0.85);
@@ -51,10 +51,10 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* --- SECURITY GATE (LOCK SCREEN) --- */
+        /* SECURITY GATE */
         #security-gate {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px);
+            background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(20px);
             z-index: 10000; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             color: white; transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
@@ -66,40 +66,31 @@
         .gate-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
         .gate-msg { font-size: 0.9rem; color: #94a3b8; margin-bottom: 30px; }
         
-        .pin-display { 
-            display: flex; gap: 15px; justify-content: center; margin-bottom: 30px; 
-        }
-        .pin-dot { 
-            width: 15px; height: 15px; border-radius: 50%; 
-            border: 2px solid rgba(255,255,255,0.3); transition: 0.2s; 
-        }
+        .pin-display { display: flex; gap: 15px; justify-content: center; margin-bottom: 30px; }
+        .pin-dot { width: 15px; height: 15px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); transition: 0.2s; }
         .pin-dot.filled { background: #8b5cf6; border-color: #8b5cf6; box-shadow: 0 0 10px #8b5cf6; }
         
         .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-        .num-btn { 
-            width: 60px; height: 60px; border-radius: 50%; 
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1);
-            color: white; font-size: 1.2rem; font-weight: 600; cursor: pointer;
-            transition: 0.2s; display: flex; align-items: center; justify-content: center;
-        }
+        .num-btn { width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: white; font-size: 1.2rem; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .num-btn:hover { background: rgba(255,255,255,0.2); }
         .num-btn:active { transform: scale(0.9); }
-        
         .shake-anim { animation: shake 0.4s ease-in-out; }
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
         @keyframes pulse { 0% {transform: scale(1); opacity: 1;} 50% {transform: scale(1.1); opacity: 0.8;} 100% {transform: scale(1); opacity: 1;} }
 
-        /* --- MAIN APP --- */
+        /* MAIN APP */
         .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; filter: blur(0); transition: filter 0.5s; }
         
-        /* HEADER & CONTROLS */
-        .theme-toggle { position: absolute; top: 10px; right: 10px; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 15px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; box-shadow: var(--shadow); z-index: 99; font-weight: 600; backdrop-filter: blur(4px); }
+        .top-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; z-index: 99; }
+        .theme-toggle, .install-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 15px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; box-shadow: var(--shadow); font-weight: 600; backdrop-filter: blur(4px); transition: 0.2s; }
+        .theme-toggle:hover, .install-btn:hover { transform: scale(1.05); }
+        .install-btn { background: #8b5cf6; color: white; border: none; }
+
         .app-header { text-align: center; margin-bottom: 25px; padding-top: 20px; }
         .app-title { font-size: 2rem; font-weight: 800; text-transform: uppercase; color: var(--text-main); letter-spacing: 1px; margin: 0; }
         .user-info { font-size: 1.1rem; color: var(--text-main); font-weight: 600; margin-top: 5px; cursor: pointer; display: inline-block; padding: 5px 15px; border-radius: 15px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); }
         .app-subtitle { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; color: var(--text-main); }
 
-        /* DASHBOARD GLASS */
         .dashboard { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); margin-bottom: 25px; display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 20px; align-items: center; }
         .stat-item { background: rgba(255, 255, 255, 0.05); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; height: 160px; transition: transform 0.3s ease; position: relative; }
         .stat-item:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.15); }
@@ -113,7 +104,6 @@
         .edit-target-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .edit-target-btn:hover { background: rgba(255,255,255,0.4); }
 
-        /* CARDS */
         .chart-card, .semester-card { background: var(--card-bg); backdrop-filter: blur(10px); border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 20px; }
         .chart-card { padding: 20px; height: 300px; }
         .semester-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: transparent; transition: background 0.2s; color: var(--text-main); }
@@ -126,7 +116,6 @@
         .semester-content.active { display: block; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* INPUTS & BUTTONS */
         .subject-row { display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 10px; align-items: flex-end; }
         .field-group { flex: 1; min-width: 80px; }
         .field-group label { display: block; font-size: 0.7rem; color: var(--text-light); margin-bottom: 5px; font-weight: 700; text-transform: uppercase; }
@@ -184,7 +173,7 @@
             .field-group { width: 100%; }
             .controls { flex-direction: column-reverse; gap: 15px; }
             .controls-right, .btn-strategy { width: 100%; justify-content: center; }
-            .theme-toggle { top: 15px; right: 15px; }
+            .top-controls { top: 15px; right: 15px; }
         }
     </style>
 </head>
@@ -218,7 +207,10 @@
 </div>
 
 <div class="container" id="main-app">
-    <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i> <span>Dark Mode</span></button>
+    <div class="top-controls">
+        <button class="install-btn" onclick="showInstallGuide()"><i class="fas fa-download"></i> Cài App</button>
+        <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+    </div>
 
     <div class="app-header">
         <h1 class="app-title"><i class="fas fa-university"></i> Hệ thống quản lý điểm GPA</h1>
@@ -270,6 +262,16 @@
     <button class="btn-add-sem" onclick="addSemester()">+ Thêm Học Kỳ Mới</button>
 </div>
 
+<div class="modal-overlay" id="installModal">
+    <div class="modal">
+        <h3><i class="fas fa-mobile-alt"></i> Hướng Dẫn Cài App</h3>
+        <div id="install-instructions" style="text-align:left; color:var(--text-main); font-size:0.95rem; margin-bottom:20px;">
+            Đang xác định thiết bị...
+        </div>
+        <button class="modal-close" onclick="closeModal('installModal')">Đã Hiểu</button>
+    </div>
+</div>
+
 <div class="modal-overlay" id="targetModal">
     <div class="modal">
         <h3><i class="fas fa-magic"></i> Dự Tính Điểm Thi</h3>
@@ -318,13 +320,12 @@
 </div>
 
 <script>
-    const STORAGE_KEY = 'gpaData_v18';
+    const STORAGE_KEY = 'gpaData_v20'; // V20 Key
     let semestersData = {};
     let currentInputPin = "";
     let savedPin = localStorage.getItem('appPIN');
     let isSetupMode = !savedPin;
     
-    // VARIABLES
     let gpaChartInstance = null;
     let progressChartInstance = null;
     let currentCalcData = { s1: 0, r1: 0, r2: 0 };
@@ -332,7 +333,71 @@
     let currentTotalCredits = 0;
     let targetTotalCredits = 135;
 
-    // --- SECURITY LOGIC ---
+    // --- GRAND VICTORY FIREWORKS (V20) ---
+    function runConfetti() {
+        var duration = 5 * 1000; // 5 seconds
+        var animationEnd = Date.now() + duration;
+        var defaults = { startVelocity: 45, spread: 360, ticks: 100, zIndex: 9999 };
+
+        function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+        var interval = setInterval(function() {
+            var timeLeft = animationEnd - Date.now();
+
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
+            }
+
+            var particleCount = 70 * (timeLeft / duration);
+            
+            // Shoot from bottom left corner
+            confetti(Object.assign({}, defaults, { 
+                particleCount, 
+                origin: { x: 0, y: 1 }, 
+                angle: 60
+            }));
+            
+            // Shoot from bottom right corner
+            confetti(Object.assign({}, defaults, { 
+                particleCount, 
+                origin: { x: 1, y: 1 }, 
+                angle: 120 
+            }));
+        }, 250);
+    }
+
+    // --- INSTALL GUIDE ---
+    function showInstallGuide() {
+        const modal = document.getElementById('installModal');
+        const content = document.getElementById('install-instructions');
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        let instructions = "";
+        
+        if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+            instructions = `
+                <div style="text-align:center; margin-bottom:15px"><i class="fab fa-apple" style="font-size:3rem; color:#8b5cf6"></i></div>
+                <p>Để cài đặt trên <b>iPhone/iPad</b>:</p>
+                <ol style="margin-left:20px; line-height:1.6">
+                    <li>Nhấn nút <b>Chia sẻ</b> <img src="https://img.icons8.com/ios-glyphs/24/000000/share-rounded.png" style="vertical-align:middle; width:20px"> trên thanh công cụ.</li>
+                    <li>Chọn <b>"Thêm vào MH chính"</b>.</li>
+                    <li>Nhấn <b>Thêm</b>.</li>
+                </ol>`;
+        } else if (/android/i.test(userAgent)) {
+            instructions = `
+                <div style="text-align:center; margin-bottom:15px"><i class="fab fa-android" style="font-size:3rem; color:#10b981"></i></div>
+                <p>Để cài đặt trên <b>Android</b>:</p>
+                <ol style="margin-left:20px; line-height:1.6">
+                    <li>Nhấn dấu <b>3 chấm</b> <i class="fas fa-ellipsis-v"></i> góc trên phải.</li>
+                    <li>Chọn <b>"Cài đặt ứng dụng"</b>.</li>
+                </ol>`;
+        } else {
+            instructions = `<div style="text-align:center"><i class="fas fa-desktop" style="font-size:3rem; color:#3b82f6"></i><br>Lưu trang này vào Bookmark (Ctrl+D)</div>`;
+        }
+        content.innerHTML = instructions;
+        modal.style.display = 'flex';
+    }
+
+    // --- SECURITY ---
     function initSecurity() {
         const msg = document.getElementById('gate-msg');
         if(isSetupMode) {
@@ -348,16 +413,11 @@
         if(currentInputPin.length < 4) {
             currentInputPin += num;
             updatePinDisplay();
-            if(currentInputPin.length === 4) {
-                setTimeout(checkPin, 200);
-            }
+            if(currentInputPin.length === 4) setTimeout(checkPin, 200);
         }
     }
 
-    function clearPin() {
-        currentInputPin = "";
-        updatePinDisplay();
-    }
+    function clearPin() { currentInputPin = ""; updatePinDisplay(); }
 
     function updatePinDisplay() {
         const dots = document.querySelectorAll('.pin-dot');
@@ -372,61 +432,42 @@
         const msg = document.getElementById('gate-msg');
         
         if(isSetupMode) {
-            // Setup Mode
             localStorage.setItem('appPIN', currentInputPin);
-            savedPin = currentInputPin;
-            isSetupMode = false;
-            alert("Đã thiết lập mã PIN thành công! Hãy ghi nhớ nó.");
-            gate.classList.add('unlocked');
-            initApp();
+            savedPin = currentInputPin; isSetupMode = false;
+            alert("Đã thiết lập mã PIN!");
+            gate.classList.add('unlocked'); initApp();
         } else {
-            // Verify Mode
             if(currentInputPin === savedPin) {
-                gate.classList.add('unlocked');
-                initApp();
+                gate.classList.add('unlocked'); initApp();
             } else {
-                msg.innerText = "Sai mã PIN! Thử lại.";
-                msg.style.color = "#ef4444";
+                msg.innerText = "Sai mã PIN!"; msg.style.color = "#ef4444";
                 document.querySelector('.gate-icon').classList.add('shake-anim');
                 setTimeout(() => document.querySelector('.gate-icon').classList.remove('shake-anim'), 500);
-                currentInputPin = "";
-                updatePinDisplay();
+                currentInputPin = ""; updatePinDisplay();
             }
         }
     }
 
     function resetPin() {
-        if(confirm("Bạn có chắc muốn xóa mã PIN cũ và đặt lại?")) {
-            localStorage.removeItem('appPIN');
-            location.reload();
+        if(confirm("Xóa mã PIN cũ và đặt lại?")) {
+            localStorage.removeItem('appPIN'); location.reload();
         }
     }
 
-    // --- MAIN APP LOGIC ---
+    // --- APP LOGIC ---
     function initApp() {
-        try {
-            const theme = localStorage.getItem('theme');
-            if (theme === 'dark') document.body.classList.add('dark-mode');
-        } catch(e) {}
-        updateThemeIcon();
+        try { const theme = localStorage.getItem('theme'); if (theme === 'dark') document.body.classList.add('dark-mode'); } catch(e) {}
         loadProfile();
-
         let savedData = localStorage.getItem(STORAGE_KEY);
+        if(!savedData) savedData = localStorage.getItem('gpaData_v19');
+        if(!savedData) savedData = localStorage.getItem('gpaData_v18');
         if(!savedData) savedData = localStorage.getItem('gpaData_v17');
-        if(!savedData) savedData = localStorage.getItem('gpaData_v16');
-
-        if (savedData) {
-            semestersData = JSON.parse(savedData);
-        } else {
-            for(let i=1; i<=8; i++) semestersData[i] = [];
-        }
-
-        renderAllSemesters();
-        calculateAll(false);
+        if (savedData) semestersData = JSON.parse(savedData);
+        else for(let i=1; i<=8; i++) semestersData[i] = [];
+        renderAllSemesters(); calculateAll(false);
+        if (window.matchMedia('(display-mode: standalone)').matches) document.querySelector('.install-btn').style.display = 'none';
     }
 
-    // ... (Keep existing logic from V17 for calculations, charts, excel) ...
-    // Copying core functions for compactness:
     function animateValue(obj, start, end, duration) {
         let startTimestamp = null;
         const step = (timestamp) => {
@@ -436,10 +477,6 @@
             if (progress < 1) window.requestAnimationFrame(step);
         };
         window.requestAnimationFrame(step);
-    }
-
-    function runConfetti() {
-        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     }
 
     function renderAllSemesters() {
@@ -452,7 +489,7 @@
             semDiv.innerHTML = `
                 <div class="semester-header" onclick="toggleSemester(${i})">
                     <div class="sem-left"><div class="sem-icon"><i class="fas fa-folder-open"></i></div><div class="sem-title">Học Kỳ ${i}</div></div>
-                    <div class="sem-actions"><div class="sem-info" id="summary-${i}">Chưa có dữ liệu</div><button class="btn-sem-del" onclick="removeSemester(event, ${i})"><i class="fas fa-trash-alt"></i></button></div>
+                    <div class="sem-actions"><div class="sem-info" id="summary-${i}">...</div><button class="btn-sem-del" onclick="removeSemester(event, ${i})"><i class="fas fa-trash-alt"></i></button></div>
                 </div>
                 <div class="semester-content" id="content-${i}"><div id="list-${i}"></div><button class="btn-add" onclick="addSubjectRow(${i})"><i class="fas fa-plus"></i> Thêm môn học</button></div>
             `;
@@ -523,7 +560,7 @@
                     sumDiv.innerHTML = `GPA: <strong>${gpa}</strong> | ${semCredits} tín | ${getListRankBadge(gpa)}`;
                     grandPoints += semPoints; grandCredits += semCredits; chartData.push(gpa);
                 } else {
-                    sumDiv.innerHTML = `<span style="opacity:0.6; font-style:italic">Chưa có dữ liệu</span>`;
+                    sumDiv.innerHTML = `<span style="opacity:0.6; font-style:italic">...</span>`;
                     chartData.push(null);
                 }
             }
@@ -538,6 +575,7 @@
             currentTotalGPA = newGPA;
             animateValue(document.getElementById('total-gpa'), parseFloat(oldGPA), parseFloat(newGPA), 1000);
             updateDashboardRank(newGPA);
+            // VICTORY CHECK (V20)
             if(save && parseFloat(newGPA) >= 3.2) { runConfetti(); }
         } else {
             currentTotalGPA = 0;
@@ -548,7 +586,7 @@
         updateProgressChart(currentTotalCredits, targetTotalCredits);
 
         if (save) { 
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newData)); alert("Dữ liệu đã được lưu!"); } catch(e){}
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newData)); alert("Đã lưu dữ liệu!"); } catch(e){}
         }
     }
 
@@ -575,12 +613,7 @@
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
         try { localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); } catch(e){}
-        updateThemeIcon(); calculateAll(false);
-    }
-    function updateThemeIcon() {
-        const btn = document.querySelector('.theme-toggle');
-        const isDark = document.body.classList.contains('dark-mode');
-        btn.innerHTML = isDark ? '<i class="fas fa-sun"></i> <span>Light Mode</span>' : '<i class="fas fa-moon"></i> <span>Dark Mode</span>';
+        calculateAll(false);
     }
     function openProfileModal() { 
         document.getElementById('profileModal').style.display = 'flex'; 
@@ -772,7 +805,7 @@
         reader.readAsArrayBuffer(file);
     }
 
-    initSecurity(); // START AT LOCK SCREEN
+    initSecurity();
 </script>
 </body>
 </html>
