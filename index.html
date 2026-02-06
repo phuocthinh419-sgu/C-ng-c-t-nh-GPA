@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GPA Manager - V33 (Wisdom)</title>
+    <title>GPA Manager - V34 (Pomodoro Cycle)</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -24,12 +24,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
     <style>
-        /* CSS CORE (GIỮ NGUYÊN) */
+        /* CSS GIỮ NGUYÊN TỪ V33 */
         :root { --card-bg: rgba(255, 255, 255, 0.1); --text-main: #e2e8f0; --text-light: #94a3b8; --border-color: rgba(255,255,255,0.2); --input-bg: rgba(255, 255, 255, 0.15); --input-border: rgba(255,255,255,0.3); --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); --btn-strategy-bg: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); --btn-excel-bg: #107c41; }
         body { font-family: 'Segoe UI', Roboto, sans-serif; background: #000510; color: var(--text-main); margin: 0; padding: 20px; min-height: 100vh; overflow-x: hidden; }
         #aurora-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -999; pointer-events: none; }
         
-        /* DASHBOARD & UI */
         .dashboard { padding: 25px; border-radius: 20px; margin-bottom: 25px; display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 20px; align-items: center; background: rgba(20, 30, 50, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); }
         .stat-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; height: 180px; transition: transform 0.3s ease; position: relative; }
         .stat-item:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.1); }
@@ -39,7 +38,7 @@
         .chart-card { padding: 20px; height: 300px; }
         input, select { color: #fff; background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.2); } input::placeholder { color: rgba(255,255,255,0.4); } option { background: #1e293b; color: #fff; }
         
-        /* ZEN MODE (V33 UPDATE) */
+        /* ZEN MODE */
         #zen-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 5000;
@@ -49,7 +48,7 @@
         }
         #zen-overlay.active { display: flex; opacity: 1; }
         
-        /* Đồng hồ 3D */
+        /* 3D TIMER FONT */
         .zen-timer { 
             font-family: 'Alfa Slab One', cursive; font-size: 8rem; color: #fff; letter-spacing: 5px; margin: 10px 0; position: relative;
             text-shadow: 1px 1px 0 #000, 2px 2px 0 #000, 3px 3px 0 #000, 4px 4px 0 #000, 5px 5px 0 #000, 6px 6px 0 #000, 8px 8px 15px rgba(0,0,0,0.5);
@@ -62,12 +61,10 @@
         }
         .zen-timer.ticking { animation: timer-pulse 1s infinite ease-in-out; }
 
-        /* V33: QUOTE STYLES */
         .zen-quote-container {
             margin-top: 30px; max-width: 800px;
             background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.1);
-            animation: fadeIn 1s ease-in-out;
+            border: 1px solid rgba(255,255,255,0.1); animation: fadeIn 1s ease-in-out;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .zen-quote-en { font-size: 1.2rem; font-style: italic; color: #cbd5e1; margin-bottom: 5px; font-family: 'Segoe UI', serif; }
@@ -82,7 +79,6 @@
         .zen-btn-exit:hover { color: #ef4444; transform: rotate(90deg) scale(1.2); }
         .zen-mascot { font-size: 6rem; animation: mascot-idle 6s ease-in-out infinite, mascot-glow 4s infinite; }
 
-        /* ... (OTHER CSS SAME AS V32) ... */
         @keyframes mascot-idle { 0%, 100% { transform: translateY(0) rotate(0deg) scale(1); } 50% { transform: translateY(-8px) rotate(2deg) scale(1.02); } }
         @keyframes mascot-glow { 0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4)); } 50% { filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8)); } }
         @keyframes mascot-spin { 0% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.3) rotate(180deg); } 100% { transform: scale(1) rotate(360deg); } }
@@ -201,7 +197,7 @@
     </div>
 
     <div class="zen-controls">
-        <button class="zen-btn" onclick="startTimer()">Bắt đầu</button>
+        <button class="zen-btn" id="btn-zen-start" onclick="startTimer()">Bắt đầu</button>
         <button class="zen-btn" onclick="resetTimer()">Đặt lại</button>
     </div>
 </div>
@@ -342,7 +338,7 @@
 </div>
 
 <script>
-    const STORAGE_KEY = 'gpaData_v33';
+    const STORAGE_KEY = 'gpaData_v34';
     let semestersData = {};
     let currentInputPin = "";
     let savedPin = localStorage.getItem('appPIN');
@@ -356,7 +352,25 @@
     let selectedMascot = '👑'; 
     let deferredPrompt;
 
-    // --- MOTIVATIONAL QUOTES (V33) ---
+    // --- SOUND (V34 CHIME) ---
+    function playChime() {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const t = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.setValueAtTime(880, t); // High pitch Ding
+        osc.frequency.exponentialRampToValueAtTime(0.01, t + 1.5);
+        gain.gain.setValueAtTime(0.3, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 1.5);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + 1.5);
+    }
+
+    // --- MOTIVATIONAL QUOTES ---
     const quotes = [
         { en: "Education is the most powerful weapon which you can use to change the world.", vi: "Giáo dục là vũ khí mạnh nhất để thay đổi thế giới.", author: "Nelson Mandela" },
         { en: "Live as if you were to die tomorrow. Learn as if you were to live forever.", vi: "Hãy sống như thể ngày mai bạn sẽ chết. Hãy học như thể bạn sẽ sống mãi mãi.", author: "Mahatma Gandhi" },
@@ -379,23 +393,21 @@
         const idx = Math.floor(Math.random() * quotes.length);
         const q = quotes[idx];
         const container = document.getElementById('zen-quote-box');
-        
-        // Fade out
         container.style.opacity = '0';
         setTimeout(() => {
             document.getElementById('q-en').innerText = `"${q.en}"`;
             document.getElementById('q-vi').innerText = `"${q.vi}"`;
             document.getElementById('q-author').innerText = `- ${q.author}`;
-            // Fade in
             container.style.opacity = '1';
             container.style.animation = 'fadeIn 1s ease-in-out';
         }, 500);
     }
 
-    // --- ZEN MODE LOGIC ---
+    // --- ZEN MODE & POMODORO CYCLE (V34) ---
     let zenTimer = null;
     let timeLeft = 25 * 60; 
     let isTimerRunning = false;
+    let isWorkSession = true; // NEW: Track cycle state
 
     function toggleZenMode() {
         const overlay = document.getElementById('zen-overlay');
@@ -406,7 +418,7 @@
             resetTimer(); 
         } else {
             document.getElementById('zen-mascot').innerText = selectedMascot;
-            showRandomQuote(); // Show quote immediately
+            showRandomQuote();
             overlay.classList.add('active');
             main.style.filter = 'blur(10px)'; 
         }
@@ -415,17 +427,44 @@
     function startTimer() {
         if (isTimerRunning) return;
         isTimerRunning = true;
-        showRandomQuote(); // Refresh quote on start
-        document.getElementById('zen-status').innerText = "Đang tập trung...";
+        
+        // Update status text based on current session type
+        if (isWorkSession) {
+            document.getElementById('zen-status').innerText = "Đang tập trung...";
+            document.getElementById('zen-status').style.color = "white";
+        } else {
+            document.getElementById('zen-status').innerText = "Đang nghỉ ngơi...";
+            document.getElementById('zen-status').style.color = "#10b981"; // Green for relax
+        }
+        
         document.getElementById('zen-timer').classList.add('ticking');
+        
         zenTimer = setInterval(() => {
             if (timeLeft <= 0) {
                 clearInterval(zenTimer);
                 isTimerRunning = false;
-                document.getElementById('zen-status').innerText = "Hoàn thành!";
-                document.getElementById('zen-timer').innerText = "00:00";
                 document.getElementById('zen-timer').classList.remove('ticking');
-                runBigFireworks();
+                
+                // END OF SESSION LOGIC
+                if (isWorkSession) {
+                    // Finished Work -> Go to Break
+                    runBigFireworks(); // Celebrate work done
+                    playChime();
+                    isWorkSession = false;
+                    timeLeft = 5 * 60; // 5 mins break
+                    document.getElementById('zen-status').innerText = "Hết giờ! Hãy nghỉ ngơi.";
+                    document.getElementById('zen-status').style.color = "#10b981";
+                    document.getElementById('btn-zen-start').innerText = "Bắt đầu nghỉ";
+                } else {
+                    // Finished Break -> Back to Work
+                    playChime();
+                    isWorkSession = true;
+                    timeLeft = 25 * 60; // 25 mins work
+                    document.getElementById('zen-status').innerText = "Hết giờ nghỉ! Quay lại nào.";
+                    document.getElementById('zen-status').style.color = "white";
+                    document.getElementById('btn-zen-start').innerText = "Bắt đầu làm";
+                }
+                updateTimerDisplay();
                 return;
             }
             timeLeft--;
@@ -436,9 +475,12 @@
     function resetTimer() {
         clearInterval(zenTimer);
         isTimerRunning = false;
+        isWorkSession = true; // Reset to work mode
         timeLeft = 25 * 60;
         document.getElementById('zen-status').innerText = "Sẵn sàng tu luyện";
+        document.getElementById('zen-status').style.color = "white";
         document.getElementById('zen-timer').classList.remove('ticking');
+        document.getElementById('btn-zen-start').innerText = "Bắt đầu";
         updateTimerDisplay();
     }
 
@@ -448,7 +490,7 @@
         document.getElementById('zen-timer').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     }
 
-    // --- AURORA BOREALIS ---
+    // --- AURORA & FIREWORKS ---
     let scene, camera, renderer, auroraMesh, stars;
     function initAurora() {
         const canvas = document.getElementById('aurora-canvas');
@@ -500,7 +542,7 @@
     function resetPin() { if(confirm("Xóa PIN cũ?")) { localStorage.removeItem('appPIN'); location.reload(); } }
 
     // --- APP ---
-    function initApp() { document.removeEventListener('keydown', handleKeyboardPin); loadProfile(); let d = localStorage.getItem(STORAGE_KEY); if(!d) d = localStorage.getItem('gpaData_v32') || localStorage.getItem('gpaData_v31') || localStorage.getItem('gpaData_v30'); if (d) semestersData = JSON.parse(d); else for(let i=1; i<=8; i++) semestersData[i] = []; renderAllSemesters(); calculateAll(false); if (window.matchMedia('(display-mode: standalone)').matches) document.querySelector('.install-btn').style.display = 'none'; initFireworks(); initAurora(); }
+    function initApp() { document.removeEventListener('keydown', handleKeyboardPin); loadProfile(); let d = localStorage.getItem(STORAGE_KEY); if(!d) d = localStorage.getItem('gpaData_v33') || localStorage.getItem('gpaData_v32'); if (d) semestersData = JSON.parse(d); else for(let i=1; i<=8; i++) semestersData[i] = []; renderAllSemesters(); calculateAll(false); if (window.matchMedia('(display-mode: standalone)').matches) document.querySelector('.install-btn').style.display = 'none'; initFireworks(); initAurora(); }
     function mascotJoy() { const m = document.getElementById('mascot-display'); m.classList.remove('joyful'); void m.offsetWidth; m.classList.add('joyful'); }
     let fireworks; function initFireworks() { fireworks = new Fireworks.default(document.getElementById('fireworks-container'), { autoresize: true, opacity: 0.5, acceleration: 1.05, friction: 0.97, gravity: 1.5, particles: 150, traceLength: 3, traceSpeed: 10, explosion: 5, intensity: 30, flickering: 50, lineStyle: 'round', hue: { min: 0, max: 360 }, delay: { min: 15, max: 30 }, rocketsPoint: { min: 0, max: 100 }, lineWidth: { explosion: { min: 1, max: 3 }, trace: { min: 1, max: 2 } }, brightness: { min: 50, max: 80 }, decay: { min: 0.015, max: 0.03 }, mouse: { click: false, move: false, max: 1 } }); }
     function runBigFireworks() { if (!fireworks) initFireworks(); fireworks.start(); setTimeout(() => { fireworks.stop(); }, 8000); }
