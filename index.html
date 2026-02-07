@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GPA Manager - V41 (Ghostbuster Fix)</title>
+    <title>GPA Manager - V44 (Final Clean)</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -29,12 +29,12 @@
         
         #aurora-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -999; pointer-events: none; }
         
-        /* ORB CANVAS - FIX */
+        /* ORB CANVAS (V44 FIXED) */
         #orb-canvas { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            z-index: 5001; /* Trên lớp mờ */
+            z-index: 5001; 
             pointer-events: none; /* Cho phép click xuyên qua */
-            display: none; /* Mặc định ẩn */
+            display: none; 
         }
 
         /* DASHBOARD & UI */
@@ -361,7 +361,7 @@
 </div>
 
 <script>
-    const STORAGE_KEY = 'gpaData_v41';
+    const STORAGE_KEY = 'gpaData_v44';
     let semestersData = {};
     let currentInputPin = "";
     let savedPin = localStorage.getItem('appPIN');
@@ -385,15 +385,20 @@
     function addTuVi(amount) { const oldRank = getRealmInfo(cultivationData.points).current.name; cultivationData.points += amount; localStorage.setItem('cultivationData', JSON.stringify(cultivationData)); updateRankDisplay(); const newRank = getRealmInfo(cultivationData.points).current.name; if (newRank !== oldRank) { alert(`Chúc mừng! Bệ hạ đã đột phá lên ${newRank}!`); runBigFireworks(); playRealisticBoom(); } }
     function triggerRebirth() { if(confirm("Bệ hạ có chắc chắn muốn CHUYỂN SINH? Tu vi sẽ về 0, nhưng sẽ nhận được danh hiệu [Kiếp " + (cultivationData.generation + 1) + "] và Sức mạnh tia sét tăng cường!")) { cultivationData.points = 0; cultivationData.generation += 1; localStorage.setItem('cultivationData', JSON.stringify(cultivationData)); updateRankDisplay(); runBigFireworks(); playRealisticBoom(); alert("Chuyển sinh thành công!"); } }
 
-    // --- ORB VISUALS (FIXED HIDING) ---
+    // --- ORB VISUALS (V44: CLEANUP FIX) ---
     const OrbVisuals = {
-        canvas: null, ctx: null, width: 0, height: 0, animationId: null, particles: [], filaments: [], inflowParticles: [], orbColor: { r: 200, g: 200, b: 200 }, targetColor: { r: 200, g: 200, b: 200 }, mouseX: -1000, mouseY: -1000, isHovering: false, orbRadius: 180, cx: 0, cy: 0, speedMultiplier: 1,
+        canvas: null, ctx: null, width: 0, height: 0, animationId: null, particles: [], filaments: [], inflowParticles: [],
+        orbColor: { r: 200, g: 200, b: 200 }, targetColor: { r: 200, g: 200, b: 200 }, mouseX: -1000, mouseY: -1000, isHovering: false, orbRadius: 180, cx: 0, cy: 0, speedMultiplier: 1,
+        isRunning: false, // Flag quan trọng
+
         init: function() { this.canvas = document.getElementById('orb-canvas'); this.ctx = this.canvas.getContext('2d'); this.resize(); window.addEventListener('resize', () => this.resize()); window.addEventListener('mousemove', (e) => this.handleMouseMove(e)); this.createInflowParticles(); },
         resize: function() { this.width = window.innerWidth; this.height = window.innerHeight; this.canvas.width = this.width; this.canvas.height = this.height; if (this.width > 768) { this.cx = this.width * 0.75; this.orbRadius = 180; } else { this.cx = this.width / 2; this.orbRadius = 120; } this.cy = this.height / 2; },
         handleMouseMove: function(e) { this.mouseX = e.clientX; this.mouseY = e.clientY; const dx = this.mouseX - this.cx; const dy = this.mouseY - this.cy; this.isHovering = (dx*dx + dy*dy) < (this.orbRadius * this.orbRadius); },
         lerp: function(start, end, amt) { return (1 - amt) * start + amt * end; },
         createInflowParticles: function() { for(let i=0; i<50; i++) { this.inflowParticles.push({ angle: Math.random() * Math.PI * 2, dist: this.orbRadius + Math.random() * 300 + 50, speed: Math.random() * 1 + 0.5, size: Math.random() * 2 }); } },
         animate: function() {
+            if (!this.isRunning) return; // Chặn ngay đầu
+
             this.ctx.clearRect(0, 0, this.width, this.height);
             this.orbColor.r = this.lerp(this.orbColor.r, this.targetColor.r, 0.05); this.orbColor.g = this.lerp(this.orbColor.g, this.targetColor.g, 0.05); this.orbColor.b = this.lerp(this.orbColor.b, this.targetColor.b, 0.05);
             const mainColor = `rgb(${this.orbColor.r},${this.orbColor.g},${this.orbColor.b})`;
@@ -412,14 +417,15 @@
             this.animationId = requestAnimationFrame(() => this.animate());
         },
         start: function() { 
-            const el = document.getElementById('orb-canvas');
-            if(el) el.style.display = 'block'; 
+            this.isRunning = true;
+            document.getElementById('orb-canvas').style.display = 'block'; 
             this.animate(); 
         }, 
         stop: function() { 
-            const el = document.getElementById('orb-canvas');
-            if(el) el.style.display = 'none'; 
-            cancelAnimationFrame(this.animationId); 
+            this.isRunning = false;
+            document.getElementById('orb-canvas').style.display = 'none'; 
+            cancelAnimationFrame(this.animationId);
+            this.ctx.clearRect(0, 0, this.width, this.height); // Xóa sạch tàn dư
         }
     };
 
@@ -431,7 +437,7 @@
     const quotes = [ { en: "Education is the most powerful weapon which you can use to change the world.", vi: "Giáo dục là vũ khí mạnh nhất để thay đổi thế giới.", author: "Nelson Mandela" }, { en: "Live as if you were to die tomorrow. Learn as if you were to live forever.", vi: "Hãy sống như thể ngày mai bạn sẽ chết. Hãy học như thể bạn sẽ sống mãi mãi.", author: "Mahatma Gandhi" }, { en: "The roots of education are bitter, but the fruit is sweet.", vi: "Rễ của sự học tập thì đắng, nhưng quả của nó lại ngọt.", author: "Aristotle" } ];
     function showRandomQuote() { const idx = Math.floor(Math.random() * quotes.length); const q = quotes[idx]; const c = document.getElementById('zen-quote-box'); c.style.opacity = '0'; setTimeout(() => { document.getElementById('q-en').innerText = `"${q.en}"`; document.getElementById('q-vi').innerText = `"${q.vi}"`; document.getElementById('q-author').innerText = `- ${q.author}`; c.style.opacity = '1'; c.style.animation = 'fadeIn 1s ease-in-out'; }, 500); }
 
-    // --- ZEN MODE TOGGLE FIX (V41) ---
+    // --- ZEN MODE TOGGLE FIX ---
     let zenTimer = null; let timeLeft = 25 * 60; let isTimerRunning = false; let isWorkSession = true; const WORK_TIME = 25 * 60;
     
     function toggleZenMode() {
@@ -498,7 +504,7 @@
     function updatePinDisplay() { document.querySelectorAll('.pin-dot').forEach((d, i) => { if(i < currentInputPin.length) d.classList.add('filled'); else d.classList.remove('filled'); }); }
     function checkPin() { const g = document.getElementById('security-gate'); if(isSetupMode) { localStorage.setItem('appPIN', currentInputPin); savedPin = currentInputPin; isSetupMode = false; alert("Đã lưu PIN!"); g.classList.add('unlocked'); initApp(); } else { if(currentInputPin === savedPin) { g.classList.add('unlocked'); initApp(); } else { document.getElementById('gate-msg').innerText = "Sai PIN!"; document.querySelector('.gate-icon').classList.add('shake-anim'); setTimeout(()=>document.querySelector('.gate-icon').classList.remove('shake-anim'),500); currentInputPin = ""; updatePinDisplay(); } } }
     function resetPin() { if(confirm("Xóa PIN cũ?")) { localStorage.removeItem('appPIN'); location.reload(); } }
-    function initApp() { document.removeEventListener('keydown', handleKeyboardPin); loadProfile(); let d = localStorage.getItem(STORAGE_KEY); if(!d) d = localStorage.getItem('gpaData_v40') || localStorage.getItem('gpaData_v39'); if (d) semestersData = JSON.parse(d); else for(let i=1; i<=8; i++) semestersData[i] = []; renderAllSemesters(); calculateAll(false); if (window.matchMedia('(display-mode: standalone)').matches) document.querySelector('.install-btn').style.display = 'none'; initFireworks(); initAurora(); OrbVisuals.init(); }
+    function initApp() { document.removeEventListener('keydown', handleKeyboardPin); loadProfile(); let d = localStorage.getItem(STORAGE_KEY); if(!d) d = localStorage.getItem('gpaData_v43') || localStorage.getItem('gpaData_v42'); if (d) semestersData = JSON.parse(d); else for(let i=1; i<=8; i++) semestersData[i] = []; renderAllSemesters(); calculateAll(false); if (window.matchMedia('(display-mode: standalone)').matches) document.querySelector('.install-btn').style.display = 'none'; initFireworks(); initAurora(); OrbVisuals.init(); }
     function mascotJoy() { const m = document.getElementById('mascot-display'); m.classList.remove('joyful'); void m.offsetWidth; m.classList.add('joyful'); }
     let fireworks; function initFireworks() { fireworks = new Fireworks.default(document.getElementById('fireworks-container'), { autoresize: true, opacity: 0.5, acceleration: 1.05, friction: 0.97, gravity: 1.5, particles: 150, traceLength: 3, traceSpeed: 10, explosion: 5, intensity: 30, flickering: 50, lineStyle: 'round', hue: { min: 0, max: 360 }, delay: { min: 15, max: 30 }, rocketsPoint: { min: 0, max: 100 }, lineWidth: { explosion: { min: 1, max: 3 }, trace: { min: 1, max: 2 } }, brightness: { min: 50, max: 80 }, decay: { min: 0.015, max: 0.03 }, mouse: { click: false, move: false, max: 1 } }); }
     function runBigFireworks() { if (!fireworks) initFireworks(); fireworks.start(); playRealisticBoom(); setTimeout(() => { fireworks.stop(); }, 8000); }
@@ -536,9 +542,15 @@
     function getListRankBadge(g) { let l='Yếu', c='bg-y'; if(g>=3.6){l='Xuất Sắc';c='bg-xs'}else if(g>=3.2){l='Giỏi';c='bg-g'}else if(g>=2.5){l='Khá';c='bg-k'}else if(g>=2.0){l='TB';c='bg-tb'} return `<span class="list-badge ${c}">${l}</span>`; }
     function updateDashboardRank(g) { let l='---', c='rank-gray'; if(g>0){ if(g>=3.6){l='Xuất Sắc';c='rank-gold'}else if(g>=3.2){l='Giỏi';c='rank-silver'}else if(g>=2.5){l='Khá';c='rank-bronze'}else if(g>=2.0){l='Trung Bình';c='rank-gray'}else{l='Yếu';c='rank-red'} } document.getElementById('academic-rank-area').innerHTML = `<span class="dash-badge ${c}">${l}</span>`; }
     function updateChart(d) { const c = document.getElementById('gpaChart').getContext('2d'); if(gpaChartInstance) gpaChartInstance.destroy(); const g = c.createLinearGradient(0,0,0,400); g.addColorStop(0, 'rgba(139,92,246,0.5)'); g.addColorStop(1, 'rgba(118,75,162,0)'); gpaChartInstance = new Chart(c, { type: 'line', data: { labels: Object.keys(semestersData).map(k=>`Kỳ ${k}`), datasets: [{ label: 'GPA', data: d, borderColor: '#a78bfa', backgroundColor: g, fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 4.0, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'rgba(255,255,255,0.7)' } }, x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.7)' } } }, plugins: { legend: { display: false } } } }); }
-    function exportExcel() { calculateAll(false); let r = [["Học Kỳ", "Tên Môn", "Số TC", "Tỷ Lệ", "Điểm QT", "Điểm CK"]]; Object.keys(semestersData).map(Number).sort((a,b)=>a-b).forEach(i => { if (semestersData[i]) { semestersData[i].forEach(s => { r.push([i, s.name, s.credit, s.ratio, s.s1, s.s2]); }); } }); let p = JSON.parse(localStorage.getItem('userProfile') || '{}'); let i = [["Key", "Value"], ["Name", p.name || ""], ["ID", p.id || ""], ["Theme", 'light'], ["TargetCredits", p.targetCredits || 135]]; i.push(["CultivationPoints", cultivationData.points || 0]); const wb = XLSX.utils.book_new(); const wg = XLSX.utils.aoa_to_sheet(r); const wi = XLSX.utils.aoa_to_sheet(i); XLSX.utils.book_append_sheet(wb, wg, "BangDiem"); XLSX.utils.book_append_sheet(wb, wi, "HoSo"); XLSX.writeFile(wb, `GPA_${p.name||"BangDiem"}.xlsx`); }
+    function exportExcel() { calculateAll(false); let r = [["Học Kỳ", "Tên Môn", "Số TC", "Tỷ Lệ", "Điểm QT", "Điểm CK"]]; Object.keys(semestersData).map(Number).sort((a,b)=>a-b).forEach(i => { if (semestersData[i]) { semestersData[i].forEach(s => { r.push([i, s.name, s.credit, s.ratio, s.s1, s.s2]); }); } }); let p = JSON.parse(localStorage.getItem('userProfile') || '{}'); let i = [["Key", "Value"], ["Name", p.name || ""], ["ID", p.id || ""], ["Theme", 'light'], ["TargetCredits", p.targetCredits || 135]]; 
+    /* V42: Add Cultivation to Excel */
+    i.push(["CultivationPoints", cultivationData.points || 0]);
+    const wb = XLSX.utils.book_new(); const wg = XLSX.utils.aoa_to_sheet(r); const wi = XLSX.utils.aoa_to_sheet(i); XLSX.utils.book_append_sheet(wb, wg, "BangDiem"); XLSX.utils.book_append_sheet(wb, wi, "HoSo"); XLSX.writeFile(wb, `GPA_${p.name||"BangDiem"}.xlsx`); }
     function triggerImport() { document.getElementById('file-input').click(); }
-    function importExcel(inp) { const f = inp.files[0]; if (!f) return; const r = new FileReader(); r.onload = function(e) { try { const d = new Uint8Array(e.target.result); const wb = XLSX.read(d, {type: 'array'}); const wg = wb.Sheets["BangDiem"]; if (wg) { const j = XLSX.utils.sheet_to_json(wg); semestersData = {}; j.forEach(row => { const s = row["Học Kỳ"]; if (!semestersData[s]) semestersData[s] = []; semestersData[s].push({ name: row["Tên Môn"] || "", credit: row["Số TC"] || "", ratio: row["Tỷ Lệ"] || "40-60", s1: row["Điểm QT"], s2: row["Điểm CK"] }); }); localStorage.setItem(STORAGE_KEY, JSON.stringify(semestersData)); } const wi = wb.Sheets["HoSo"]; if (wi) { const ji = XLSX.utils.sheet_to_json(wi); let p = {}; ji.forEach(row => { if (row.Key === "Name") p.name = row.Value; if (row.Key === "ID") p.id = row.Value; if (row.Key === "TargetCredits") p.targetCredits = row.Value; if (row.Key === "CultivationPoints") { cultivationData.points = parseInt(row.Value); localStorage.setItem('cultivationData', JSON.stringify(cultivationData)); } }); localStorage.setItem('userProfile', JSON.stringify(p)); } alert('Thành công! Tu vi đã được khôi phục.'); location.reload(); } catch (err) { alert('Lỗi file!'); } }; r.readAsArrayBuffer(f); }
+    function importExcel(inp) { const f = inp.files[0]; if (!f) return; const r = new FileReader(); r.onload = function(e) { try { const d = new Uint8Array(e.target.result); const wb = XLSX.read(d, {type: 'array'}); const wg = wb.Sheets["BangDiem"]; if (wg) { const j = XLSX.utils.sheet_to_json(wg); semestersData = {}; j.forEach(row => { const s = row["Học Kỳ"]; if (!semestersData[s]) semestersData[s] = []; semestersData[s].push({ name: row["Tên Môn"] || "", credit: row["Số TC"] || "", ratio: row["Tỷ Lệ"] || "40-60", s1: row["Điểm QT"], s2: row["Điểm CK"] }); }); localStorage.setItem(STORAGE_KEY, JSON.stringify(semestersData)); } const wi = wb.Sheets["HoSo"]; if (wi) { const ji = XLSX.utils.sheet_to_json(wi); let p = {}; ji.forEach(row => { if (row.Key === "Name") p.name = row.Value; if (row.Key === "ID") p.id = row.Value; if (row.Key === "TargetCredits") p.targetCredits = row.Value; 
+    /* V42: Import Cultivation */
+    if (row.Key === "CultivationPoints") { cultivationData.points = parseInt(row.Value); localStorage.setItem('cultivationData', JSON.stringify(cultivationData)); }
+    }); localStorage.setItem('userProfile', JSON.stringify(p)); } alert('Thành công! Tu vi đã được khôi phục.'); location.reload(); } catch (err) { alert('Lỗi file!'); } }; r.readAsArrayBuffer(f); }
 
     initSecurity();
 </script>
