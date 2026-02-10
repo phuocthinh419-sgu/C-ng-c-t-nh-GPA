@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GPA Manager - V51 Refined (Royal Edition)</title>
+    <title>GPA Manager - V52 Secure (Royal Edition)</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -20,12 +20,13 @@
     <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.10.0/dist/index.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     
     <style>
         :root { --card-bg: rgba(255, 255, 255, 0.1); --text-main: #e2e8f0; --text-light: #94a3b8; --border-color: rgba(255,255,255,0.2); --input-bg: rgba(255, 255, 255, 0.15); --input-border: rgba(255,255,255,0.3); --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); --btn-strategy-bg: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); --btn-excel-bg: #107c41; }
         body { font-family: 'Segoe UI', Roboto, sans-serif; background: #000510; color: var(--text-main); margin: 0; padding: 20px; min-height: 100vh; overflow-x: hidden; }
         
-        #aurora-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -999; pointer-events: none; }
+        #aurora-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -999; pointer-events: none; opacity: 1; transition: opacity 1s; }
         #orb-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5001; pointer-events: none; display: none; }
 
         /* DASHBOARD & UI */
@@ -52,7 +53,6 @@
         .zen-xp-bar-fill { height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); width: 0%; transition: width 0.5s ease-out; box-shadow: 0 0 10px #fbbf24; }
         .zen-xp-text { font-size: 0.9rem; color: #94a3b8; margin-top: 5px; font-weight: bold; }
         
-        /* RUNNING LED BORDER EFFECT */
         .zen-quote-container { margin-top: 30px; max-width: 800px; padding: 20px; border-radius: 15px; position: relative; background: transparent; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .zen-quote-container::before { content: ''; position: absolute; top: 50%; left: 50%; width: 200%; height: 500%; background: conic-gradient(transparent 0deg, transparent 270deg, #00f2ff 300deg, #bc13fe 360deg); transform: translate(-50%, -50%); animation: rotate-border 4s linear infinite; z-index: -2; }
         .zen-quote-container::after { content: ''; position: absolute; inset: 3px; background: rgba(15, 23, 42, 0.95); border-radius: 12px; z-index: -1; }
@@ -102,11 +102,14 @@
         @keyframes pulse { 0% {transform: scale(1); opacity: 1;} 50% {transform: scale(1.1); opacity: 0.8;} 100% {transform: scale(1); opacity: 1;} }
         
         .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; filter: blur(0); transition: filter 0.5s; z-index: 1; }
-        .top-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; z-index: 99; }
+        .top-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; z-index: 99; flex-wrap: wrap; justify-content: flex-end; }
         .theme-toggle, .install-btn, .zen-mode-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: #fff; padding: 8px 15px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; box-shadow: var(--shadow); font-weight: 600; backdrop-filter: blur(4px); transition: 0.2s; }
         .theme-toggle:hover, .install-btn:hover, .zen-mode-btn:hover { transform: scale(1.05); background: rgba(255,255,255,0.2); }
         .install-btn { background: #8b5cf6; color: white; border: none; }
         .zen-mode-btn { background: #10b981; color: white; border: none; }
+        .eco-btn { background: #64748b; color: white; border: none; }
+        .eco-btn.active { background: #ef4444; }
+        
         .app-header { text-align: center; margin-bottom: 25px; padding-top: 10px; }
         .app-title { font-size: 1.8rem; font-weight: 800; text-transform: uppercase; color: #fff; letter-spacing: 1px; margin: 0; margin-top: 5px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
         .user-info { font-size: 1.1rem; color: #e2e8f0; font-weight: 600; margin-top: 5px; cursor: pointer; display: inline-block; padding: 5px 15px; border-radius: 15px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); }
@@ -219,11 +222,13 @@
             <div class="num-btn" style="opacity:0"></div><div class="num-btn" onclick="enterDigit(0)">0</div><div class="num-btn" onclick="clearPin()"><i class="fas fa-backspace"></i></div>
         </div>
         <div style="margin-top:20px; font-size:0.8rem; opacity:0.6"><i class="fas fa-keyboard"></i> Hỗ trợ bàn phím PC</div>
+        <div style="margin-top:20px; color:#f59e0b; font-size:0.8rem; display:none" id="setup-hint">Lần đầu: Thiết lập mã PIN mới</div>
     </div>
 </div>
 
 <div class="container" id="main-app">
     <div class="top-controls">
+        <button class="eco-btn" id="eco-toggle" onclick="toggleEcoMode()" title="Tiết kiệm pin"><i class="fas fa-leaf"></i></button>
         <button class="zen-mode-btn" onclick="toggleZenMode()"><i class="fas fa-spa"></i> Tu Luyện</button>
         <button class="install-btn" id="btn-install-app" onclick="triggerInstallApp()"><i class="fas fa-download"></i> Cài App</button>
     </div>
@@ -259,8 +264,8 @@
         <button class="btn btn-strategy" onclick="openStrategyModal()"><i class="fas fa-chess"></i> Chiến Lược</button>
         <div class="controls-right">
             <button class="btn btn-share" onclick="openShareModal()"><i class="fas fa-camera"></i> Khoe Điểm</button>
-            <button class="btn btn-excel" onclick="exportExcel()"><i class="fas fa-file-excel"></i> Xuất Excel</button>
-            <button class="btn btn-excel" onclick="triggerImport()"><i class="fas fa-file-upload"></i> Nạp Excel</button>
+            <button class="btn btn-excel" onclick="exportExcel()"><i class="fas fa-file-export"></i> Xuất Excel</button>
+            <button class="btn btn-excel" onclick="triggerImport()"><i class="fas fa-file-import"></i> Nạp Excel</button>
             <button class="btn btn-save" onclick="calculateAll(true)"><i class="fas fa-save"></i> Lưu Dữ Liệu</button>
             <input type="file" id="file-input" style="display:none" accept=".xlsx, .xls" onchange="importExcel(this)">
         </div>
@@ -335,7 +340,7 @@
             <div class="mascot-option" onclick="selectMascot('👻')">👻</div><div class="mascot-option" onclick="selectMascot('⚽')">⚽</div><div class="mascot-option" onclick="selectMascot('🎓')">🎓</div><div class="mascot-option" onclick="selectMascot('🐱')">🐱</div>
         </div>
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
-        <button class="btn-calc-modal" style="background: #ef4444;" onclick="resetPin()">Đặt Lại Mã PIN</button>
+        <button class="btn-calc-modal" style="background: #ef4444;" onclick="resetPin()">Xóa Dữ Liệu & PIN</button>
         <button class="btn-calc-modal" style="margin-top:20px" onclick="saveProfile()">Lưu Cài Đặt</button>
         <button class="modal-close" onclick="closeModal('profileModal')">Đóng</button>
     </div>
@@ -343,7 +348,6 @@
 
 <script>
     // --- 1. CONFIGURATION (DỄ SỬA ĐỔI) ---
-    // Bảng cấu hình điểm số (Edit tại đây để đổi thang điểm)
     const GRADE_CONFIG = [
         { min: 8.5, g4: 4.0, char: 'A', text: 'Giỏi', css: 'bg-gioi' },
         { min: 8.0, g4: 3.5, char: 'B+', text: 'Khá', css: 'bg-kha' },
@@ -356,11 +360,9 @@
     ];
 
     // --- 2. GLOBAL VARIABLES ---
-    const STORAGE_KEY = 'gpaData_v51';
+    const STORAGE_KEY = 'gpaData_v52_secure';
     let semestersData = {};
     let currentInputPin = "";
-    let savedPin = localStorage.getItem('appPIN');
-    let isSetupMode = !savedPin;
     let gpaChartInstance = null;
     let progressChartInstance = null;
     let currentCalcData = { s1: 0, r1: 0, r2: 0 };
@@ -369,6 +371,7 @@
     let targetTotalCredits = 135;
     let selectedMascot = '👑'; 
     let deferredPrompt;
+    let isEcoMode = false;
 
     // --- 3. CULTIVATION & ZEN LOGIC ---
     const REALMS = [ 
@@ -382,7 +385,13 @@
     let cultivationData = { points: 0, generation: 1 };
     const MAX_POINTS = 5000; 
     
-    function loadCultivation() { try { const saved = localStorage.getItem('cultivationData'); if (saved) cultivationData = JSON.parse(saved); if (!cultivationData.generation) cultivationData.generation = 1; } catch(e) {} updateRankDisplay(); }
+    function loadCultivation(pin) { 
+        const saved = loadDecryptedData('cultivationData', pin);
+        if (saved) cultivationData = saved;
+        if (!cultivationData.generation) cultivationData.generation = 1; 
+        updateRankDisplay(); 
+    }
+
     function getRealmInfo(points) { let current = REALMS[0]; let next = REALMS[1]; for (let i = 0; i < REALMS.length; i++) { if (points >= REALMS[i].min) { current = REALMS[i]; next = REALMS[i+1]; } } return { current, next }; }
     function updateRankDisplay() { 
         const { current, next } = getRealmInfo(cultivationData.points); 
@@ -408,12 +417,12 @@
         } 
         document.getElementById('zen-xp-fill').style.width = `${percent}%`; 
         document.getElementById('zen-xp-text').innerText = progressText; 
-        OrbVisuals.orbColor = { ...current.color }; OrbVisuals.targetColor = { ...current.color }; OrbVisuals.speedMultiplier = 1 + (cultivationData.generation - 1) * 0.5; 
+        if(!isEcoMode) { OrbVisuals.orbColor = { ...current.color }; OrbVisuals.targetColor = { ...current.color }; OrbVisuals.speedMultiplier = 1 + (cultivationData.generation - 1) * 0.5; }
     }
     function addTuVi(amount) { 
         const oldRank = getRealmInfo(cultivationData.points).current.name; 
         cultivationData.points += amount; 
-        localStorage.setItem('cultivationData', JSON.stringify(cultivationData)); 
+        saveEncryptedData('cultivationData', cultivationData);
         updateRankDisplay(); 
         const newRank = getRealmInfo(cultivationData.points).current.name; 
         if (newRank !== oldRank) { alert(`Chúc mừng! Bệ hạ đã đột phá lên ${newRank}!`); runBigFireworks(); playRealisticBoom(); } 
@@ -421,7 +430,7 @@
     function triggerRebirth() { 
         if(confirm("Bệ hạ có chắc chắn muốn CHUYỂN SINH? Tu vi sẽ về 0, nhưng sẽ nhận được danh hiệu [Kiếp " + (cultivationData.generation + 1) + "] và Sức mạnh tia sét tăng cường!")) { 
             cultivationData.points = 0; cultivationData.generation += 1; 
-            localStorage.setItem('cultivationData', JSON.stringify(cultivationData)); 
+            saveEncryptedData('cultivationData', cultivationData);
             updateRankDisplay(); runBigFireworks(); playRealisticBoom(); alert("Chuyển sinh thành công!"); 
         } 
     }
@@ -435,7 +444,7 @@
         lerp: function(start, end, amt) { return (1 - amt) * start + amt * end; },
         createInflowParticles: function() { for(let i=0; i<50; i++) { this.inflowParticles.push({ angle: Math.random() * Math.PI * 2, dist: this.orbRadius + Math.random() * 300 + 50, speed: Math.random() * 1 + 0.5, size: Math.random() * 2 }); } },
         animate: function() {
-            if (!this.isRunning) return;
+            if (!this.isRunning || isEcoMode) return;
             this.ctx.clearRect(0, 0, this.width, this.height);
             this.orbColor.r = this.lerp(this.orbColor.r, this.targetColor.r, 0.05); this.orbColor.g = this.lerp(this.orbColor.g, this.targetColor.g, 0.05); this.orbColor.b = this.lerp(this.orbColor.b, this.targetColor.b, 0.05);
             const mainColor = `rgb(${this.orbColor.r},${this.orbColor.g},${this.orbColor.b})`;
@@ -460,12 +469,11 @@
 
     // --- 5. AUDIO & QUOTES ---
     function playChime() { const AudioContext = window.AudioContext || window.webkitAudioContext; if (!AudioContext) return; const ctx = new AudioContext(); const t = ctx.currentTime; const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.frequency.setValueAtTime(880, t); osc.frequency.exponentialRampToValueAtTime(0.01, t + 1.5); gain.gain.setValueAtTime(0.3, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 1.5); osc.connect(gain); gain.connect(ctx.destination); osc.start(t); osc.stop(t + 1.5); }
-    function playRealisticBoom() { const AudioContext = window.AudioContext || window.webkitAudioContext; if (!AudioContext) return; const ctx = new AudioContext(); const t = ctx.currentTime; const bufferSize = ctx.sampleRate * 2; const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate); const data = buffer.getChannelData(0); let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0; for (let i=0; i<bufferSize; i++) { const w = Math.random() * 2 - 1; b0 = 0.99886 * b0 + w * 0.0555179; b1 = 0.99332 * b1 + w * 0.0750759; b2 = 0.96900 * b2 + w * 0.1538520; b3 = 0.86650 * b3 + w * 0.3104856; b4 = 0.55000 * b4 + w * 0.5329522; b5 = -0.7616 * b5 - w * 0.0168980; data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362; data[i] *= 0.11; b6 = w * 0.115926; } const noise = ctx.createBufferSource(); noise.buffer = buffer; const filter = ctx.createBiquadFilter(); filter.type = "lowpass"; filter.frequency.value = 800; filter.frequency.exponentialRampToValueAtTime(100, t + 0.3); const gain = ctx.createGain(); gain.gain.setValueAtTime(1, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 1.5); noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination); noise.start(t); noise.stop(t + 2); }
+    function playRealisticBoom() { if(isEcoMode) return; const AudioContext = window.AudioContext || window.webkitAudioContext; if (!AudioContext) return; const ctx = new AudioContext(); const t = ctx.currentTime; const bufferSize = ctx.sampleRate * 2; const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate); const data = buffer.getChannelData(0); let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0; for (let i=0; i<bufferSize; i++) { const w = Math.random() * 2 - 1; b0 = 0.99886 * b0 + w * 0.0555179; b1 = 0.99332 * b1 + w * 0.0750759; b2 = 0.96900 * b2 + w * 0.1538520; b3 = 0.86650 * b3 + w * 0.3104856; b4 = 0.55000 * b4 + w * 0.5329522; b5 = -0.7616 * b5 - w * 0.0168980; data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362; data[i] *= 0.11; b6 = w * 0.115926; } const noise = ctx.createBufferSource(); noise.buffer = buffer; const filter = ctx.createBiquadFilter(); filter.type = "lowpass"; filter.frequency.value = 800; filter.frequency.exponentialRampToValueAtTime(100, t + 0.3); const gain = ctx.createGain(); gain.gain.setValueAtTime(1, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 1.5); noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination); noise.start(t); noise.stop(t + 2); }
     
     const quotes = [
         { en: "Education is the most powerful weapon which you can use to change the world.", vi: "Giáo dục là vũ khí mạnh nhất để thay đổi thế giới.", author: "Nelson Mandela" },
         { en: "Live as if you were to die tomorrow. Learn as if you were to live forever.", vi: "Hãy sống như thể ngày mai bạn sẽ chết. Hãy học như thể bạn sẽ sống mãi mãi.", author: "Mahatma Gandhi" },
-        // ... (Keep other quotes or add more here) ...
         { en: "The only place where success comes before work is in the dictionary.", vi: "Nơi duy nhất mà thành công đến trước khi làm việc là trong từ điển.", author: "Vidal Sassoon" }
     ];
     function showRandomQuote() { const idx = Math.floor(Math.random() * quotes.length); const q = quotes[idx]; const c = document.getElementById('zen-quote-box'); c.style.opacity = '0'; setTimeout(() => { document.getElementById('q-en').innerText = `"${q.en}"`; document.getElementById('q-vi').innerText = `"${q.vi}"`; document.getElementById('q-author').innerText = `- ${q.author}`; c.style.opacity = '1'; c.style.animation = 'fadeIn 1s ease-in-out'; }, 500); }
@@ -479,7 +487,8 @@
         if (overlay.classList.contains('active')) { // EXIT
             overlay.classList.remove('active'); main.style.filter = 'blur(0)'; resetTimer(); OrbVisuals.stop();
         } else { // ENTER
-            document.getElementById('zen-mascot').innerText = selectedMascot; showRandomQuote(); overlay.classList.add('active'); main.style.filter = 'blur(10px)'; loadCultivation(); OrbVisuals.start();
+            document.getElementById('zen-mascot').innerText = selectedMascot; showRandomQuote(); overlay.classList.add('active'); main.style.filter = 'blur(10px)'; loadCultivation(currentInputPin); 
+            if(!isEcoMode) OrbVisuals.start();
         }
     }
     function startTimer() {
@@ -499,7 +508,7 @@
                 }
                 timeLeft--; 
                 if(isWorkSession && timeLeft % 60 === 0 && timeLeft !== WORK_TIME) { addTuVi(1); showRandomQuote(); }
-                if(isWorkSession) { const progress = 1 - (timeLeft / WORK_TIME); OrbVisuals.setMode(progress); }
+                if(isWorkSession && !isEcoMode) { const progress = 1 - (timeLeft / WORK_TIME); OrbVisuals.setMode(progress); }
                 updateTimerDisplay();
             }, 1000);
         } catch(e) { console.error("Timer error:", e); }
@@ -509,31 +518,139 @@
 
     // --- 7. THREE.JS AURORA ---
     function initAurora() { const c = document.getElementById('aurora-canvas'); renderer = new THREE.WebGLRenderer({ canvas: c, antialias: true }); renderer.setSize(window.innerWidth, window.innerHeight); scene = new THREE.Scene(); camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000); camera.position.z = 5; const g = new THREE.BufferGeometry(); const v = []; for(let i=0;i<3000;i++) v.push((Math.random()-0.5)*2000, (Math.random()-0.5)*2000, (Math.random()-0.5)*2000); g.setAttribute('position', new THREE.Float32BufferAttribute(v,3)); stars = new THREE.Points(g, new THREE.PointsMaterial({color:0xffffff, size:0.7, transparent:true, opacity:0.8})); scene.add(stars); const vs=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`; const fs=`uniform float time;varying vec2 vUv;vec3 permute(vec3 x){return mod(((x*34.0)+1.0)*x,289.0);}float snoise(vec2 v){const vec4 C=vec4(0.211324865405187,0.366025403784439,-0.577350269189626,0.024390243902439);vec2 i=floor(v+dot(v,C.yy));vec2 x0=v-i+dot(i,C.xx);vec2 i1;i1=(x0.x>x0.y)?vec2(1.0,0.0):vec2(0.0,1.0);vec4 x12=x0.xyxy+C.xxzz;x12.xy-=i1;i=mod(i,289.0);vec3 p=permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0));vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.0);m=m*m;m=m*m;vec3 x=2.0*fract(p*C.www)-1.0;vec3 h=abs(x)-0.5;vec3 ox=floor(x+0.5);vec3 a0=x-ox;m*=1.79284291400159-0.85373472095314*(a0*a0+h*h);vec3 g;g.x=a0.x*x0.x+h.x*x0.y;g.yz=a0.yz*x12.xz+h.yz*x12.yw;return 130.0*dot(m,g);}void main(){vec2 uv=vUv;float n1=snoise(vec2(uv.x*1.5,uv.y*0.5-time*0.1));float n2=snoise(vec2(uv.x*2.5+time*0.05,uv.y*2.0-time*0.2));float n3=snoise(vec2(uv.x*4.0-time*0.1,uv.y*3.0+time*0.1));float i=smoothstep(0.2,0.8,n1*0.5+n2*0.3+n3*0.2+uv.y*0.3);float m=smoothstep(0.0,0.2,uv.y)*smoothstep(1.0,0.6,uv.y);i*=m;vec3 c=mix(vec3(0.0,1.0,0.6),vec3(0.0,0.4,1.0),uv.y+n1*0.2);c=mix(c,vec3(0.6,0.0,1.0),smoothstep(0.3,0.7,uv.y+n2*0.3));c=mix(c,vec3(1.0,0.2,0.6),smoothstep(0.6,1.0,uv.y));gl_FragColor=vec4(vec3(0.0,0.02,0.05)+c*i*1.5,1.0);}`; auroraMesh = new THREE.Mesh(new THREE.PlaneGeometry(20,12), new THREE.ShaderMaterial({uniforms:{time:{value:0}},vertexShader:vs,fragmentShader:fs,transparent:true,depthWrite:false})); auroraMesh.position.z=-1; scene.add(auroraMesh); animateAurora(); }
-    function animateAurora() { requestAnimationFrame(animateAurora); if(auroraMesh) auroraMesh.material.uniforms.time.value += 0.005; if(stars) stars.rotation.y += 0.0001; renderer.render(scene, camera); }
+    function animateAurora() { if(isEcoMode) return; requestAnimationFrame(animateAurora); if(auroraMesh) auroraMesh.material.uniforms.time.value += 0.005; if(stars) stars.rotation.y += 0.0001; renderer.render(scene, camera); }
     window.addEventListener('resize', () => { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); if(OrbVisuals.ctx) OrbVisuals.resize(); });
+    
+    function toggleEcoMode() {
+        isEcoMode = !isEcoMode;
+        const btn = document.getElementById('eco-toggle');
+        if(isEcoMode) {
+            btn.classList.add('active');
+            document.getElementById('aurora-canvas').style.opacity = '0';
+            if(fireworks) fireworks.stop();
+        } else {
+            btn.classList.remove('active');
+            document.getElementById('aurora-canvas').style.opacity = '1';
+            animateAurora();
+        }
+    }
 
     // --- 8. HELPER UI FUNCTIONS ---
-    function openShareModal() { let p = JSON.parse(localStorage.getItem('userProfile') || '{}'); document.getElementById('sc-mascot').innerText = selectedMascot; document.getElementById('sc-name').innerText = p.name || "Chưa cập nhật"; document.getElementById('sc-id').innerText = p.id ? `MSSV: ${p.id}` : ""; document.getElementById('sc-gpa').innerText = currentTotalGPA; const b = document.getElementById('academic-rank-area').querySelector('.dash-badge'); const rc = document.getElementById('sc-rank-badge'); rc.innerHTML = ''; if(b) { const c = b.cloneNode(true); c.style.boxShadow = 'none'; rc.appendChild(c); } document.getElementById('shareModal').style.display = 'flex'; }
+    function openShareModal() { let p = loadDecryptedData('userProfile', currentInputPin) || {}; document.getElementById('sc-mascot').innerText = selectedMascot; document.getElementById('sc-name').innerText = p.name || "Chưa cập nhật"; document.getElementById('sc-id').innerText = p.id ? `MSSV: ${p.id}` : ""; document.getElementById('sc-gpa').innerText = currentTotalGPA; const b = document.getElementById('academic-rank-area').querySelector('.dash-badge'); const rc = document.getElementById('sc-rank-badge'); rc.innerHTML = ''; if(b) { const c = b.cloneNode(true); c.style.boxShadow = 'none'; rc.appendChild(c); } document.getElementById('shareModal').style.display = 'flex'; }
     function downloadShareCard() { html2canvas(document.getElementById('capture-area'), { scale: 3, backgroundColor: null, useCORS: true }).then(c => { const l = document.createElement('a'); l.download = `GPA_Share_${Date.now()}.png`; l.href = c.toDataURL("image/png"); l.click(); }); }
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('btn-install-app').style.display = 'flex'; });
     function triggerInstallApp() { if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; }); } else { showInstallGuide(); } }
     function showInstallGuide() { const m = document.getElementById('installModal'); const c = document.getElementById('install-instructions'); if (window.location.protocol === 'file:') { c.innerHTML = `<div style="color:#ef4444;margin-bottom:15px;font-weight:bold;">⚠️ Lưu ý</div><p>Cần Hosting để cài App.</p>`; m.style.display = 'flex'; return; } c.innerHTML = `<div style="text-align:center;margin-bottom:15px"><i class="fas fa-download" style="font-size:3rem;color:#10b981"></i></div><p>Menu > <b>Thêm vào màn hình chính</b>.</p>`; m.style.display = 'flex'; }
     
-    // Security Logic
-    function initSecurity() { const m = document.getElementById('gate-msg'); if(isSetupMode) { m.innerText = "Thiết lập PIN mới"; m.style.color = "#3b82f6"; } else { m.innerText = "Nhập PIN"; m.style.color = "#94a3b8"; } document.addEventListener('keydown', handleKeyboardPin); }
+    // --- SECURITY LOGIC (ENHANCED AES) ---
+    function initSecurity() { 
+        const m = document.getElementById('gate-msg'); 
+        const hint = document.getElementById('setup-hint');
+        
+        // Kiểm tra xem đã có dữ liệu mã hóa chưa
+        if(!localStorage.getItem(STORAGE_KEY)) { 
+            m.innerText = "Chưa có dữ liệu"; 
+            m.style.color = "#3b82f6";
+            hint.style.display = "block";
+        } else { 
+            m.innerText = "Nhập PIN để giải mã"; 
+            m.style.color = "#94a3b8"; 
+            hint.style.display = "none";
+        } 
+        document.addEventListener('keydown', handleKeyboardPin); 
+    }
+    
+    function saveEncryptedData(key, data) {
+        if (!currentInputPin || currentInputPin.length !== 4) return;
+        try {
+            const jsonString = JSON.stringify(data);
+            const encrypted = CryptoJS.AES.encrypt(jsonString, currentInputPin).toString();
+            localStorage.setItem(key, encrypted);
+        } catch (e) {
+            console.error("Encryption failed", e);
+            alert("Lỗi mã hóa! Dữ liệu chưa được lưu.");
+        }
+    }
+
+    function loadDecryptedData(key, pin) {
+        const encrypted = localStorage.getItem(key);
+        if (!encrypted) return null;
+        try {
+            const bytes = CryptoJS.AES.decrypt(encrypted, pin);
+            const str = bytes.toString(CryptoJS.enc.Utf8);
+            if(!str) return false; // Sai PIN -> không ra chuỗi UTF8
+            return JSON.parse(str);
+        } catch (e) {
+            return false;
+        }
+    }
+
     function handleKeyboardPin(e) { if (document.getElementById('security-gate').classList.contains('unlocked')) return; if (e.key >= '0' && e.key <= '9') enterDigit(parseInt(e.key)); else if (e.key === 'Backspace' || e.key === 'Delete') clearPin(); }
     function enterDigit(n) { if(currentInputPin.length < 4) { currentInputPin += n; updatePinDisplay(); if(currentInputPin.length === 4) setTimeout(checkPin, 200); } }
     function clearPin() { currentInputPin = ""; updatePinDisplay(); }
     function updatePinDisplay() { document.querySelectorAll('.pin-dot').forEach((d, i) => { if(i < currentInputPin.length) d.classList.add('filled'); else d.classList.remove('filled'); }); }
-    function checkPin() { const g = document.getElementById('security-gate'); if(isSetupMode) { localStorage.setItem('appPIN', currentInputPin); savedPin = currentInputPin; isSetupMode = false; alert("Đã lưu PIN!"); g.classList.add('unlocked'); initApp(); } else { if(currentInputPin === savedPin) { g.classList.add('unlocked'); initApp(); } else { document.getElementById('gate-msg').innerText = "Sai PIN!"; document.querySelector('.gate-icon').classList.add('shake-anim'); setTimeout(()=>document.querySelector('.gate-icon').classList.remove('shake-anim'),500); currentInputPin = ""; updatePinDisplay(); } } }
-    function resetPin() { if(confirm("Xóa PIN cũ?")) { localStorage.removeItem('appPIN'); location.reload(); } }
+    
+    function checkPin() { 
+        const g = document.getElementById('security-gate'); 
+        const msg = document.getElementById('gate-msg');
+        
+        // Trường hợp 1: Chưa có dữ liệu -> Tạo mới với PIN này
+        if (!localStorage.getItem(STORAGE_KEY)) {
+            // Không lưu PIN trần! Chỉ dùng PIN này trong phiên làm việc để mã hóa
+            msg.innerText = "Đang khởi tạo...";
+            g.classList.add('unlocked');
+            initApp(); 
+            return;
+        } 
+        
+        // Trường hợp 2: Đã có dữ liệu -> Thử giải mã
+        const testLoad = loadDecryptedData(STORAGE_KEY, currentInputPin);
+        
+        if (testLoad !== false) { 
+            g.classList.add('unlocked'); 
+            initApp(); 
+        } else { 
+            msg.innerText = "Sai PIN! Không thể giải mã."; 
+            msg.style.color = "#ef4444"; 
+            document.querySelector('.gate-icon').classList.add('shake-anim'); 
+            setTimeout(()=>document.querySelector('.gate-icon').classList.remove('shake-anim'),500); 
+            currentInputPin = ""; 
+            updatePinDisplay(); 
+        } 
+    }
+    
+    function resetPin() { 
+        if(confirm("CẢNH BÁO: Hành động này sẽ xóa toàn bộ dữ liệu Bảng điểm và Tu vi vĩnh viễn vì chúng đã bị mã hóa theo PIN cũ. Bạn có chắc chắn muốn làm mới?")) { 
+            localStorage.clear(); 
+            location.reload(); 
+        } 
+    }
     
     // --- 9. MAIN APP INIT ---
-    function initApp() { document.removeEventListener('keydown', handleKeyboardPin); loadProfile(); let d = localStorage.getItem(STORAGE_KEY); if(!d) d = localStorage.getItem('gpaData_v51') || localStorage.getItem('gpaData_v50'); if (d) semestersData = JSON.parse(d); else for(let i=1; i<=8; i++) semestersData[i] = []; renderAllSemesters(); calculateAll(false); if (window.matchMedia('(display-mode: standalone)').matches) document.querySelector('.install-btn').style.display = 'none'; initFireworks(); initAurora(); OrbVisuals.init(); }
+    function initApp() { 
+        document.removeEventListener('keydown', handleKeyboardPin); 
+        
+        loadProfile(); 
+        
+        // Tải dữ liệu Bảng điểm (Đã giải mã từ bước checkPin)
+        let d = loadDecryptedData(STORAGE_KEY, currentInputPin);
+        if (d === false) { alert("Lỗi dữ liệu nghiêm trọng!"); return; }
+        
+        if (d) semestersData = d; 
+        else for(let i=1; i<=8; i++) semestersData[i] = []; 
+        
+        // Tải dữ liệu Tu tiên
+        loadCultivation(currentInputPin);
+        
+        renderAllSemesters(); 
+        calculateAll(false); 
+        if (window.matchMedia('(display-mode: standalone)').matches) document.querySelector('.install-btn').style.display = 'none'; 
+        initFireworks(); initAurora(); OrbVisuals.init(); 
+    }
     function mascotJoy() { const m = document.getElementById('mascot-display'); m.classList.remove('joyful'); void m.offsetWidth; m.classList.add('joyful'); }
     
     let fireworks; function initFireworks() { fireworks = new Fireworks.default(document.getElementById('fireworks-container'), { autoresize: true, opacity: 0.5, acceleration: 1.05, friction: 0.97, gravity: 1.5, particles: 150, traceLength: 3, traceSpeed: 10, explosion: 5, intensity: 30, flickering: 50, lineStyle: 'round', hue: { min: 0, max: 360 }, delay: { min: 15, max: 30 }, rocketsPoint: { min: 0, max: 100 }, lineWidth: { explosion: { min: 1, max: 3 }, trace: { min: 1, max: 2 } }, brightness: { min: 50, max: 80 }, decay: { min: 0.015, max: 0.03 }, mouse: { click: false, move: false, max: 1 } }); }
-    function runBigFireworks() { if (!fireworks) initFireworks(); fireworks.start(); playRealisticBoom(); setTimeout(() => { fireworks.stop(); }, 8000); }
+    function runBigFireworks() { if(isEcoMode) return; if (!fireworks) initFireworks(); fireworks.start(); playRealisticBoom(); setTimeout(() => { fireworks.stop(); }, 8000); }
     function selectMascot(c) { selectedMascot = c; document.querySelectorAll('.mascot-option').forEach(o => { if(o.innerText === c) o.classList.add('selected'); else o.classList.remove('selected'); }); updateMascotDisplay(); }
     function updateMascotDisplay() { document.getElementById('mascot-display').innerText = selectedMascot; }
     function animateValue(o, s, e, d) { let start = null; const step = (t) => { if (!start) start = t; const p = Math.min((t - start) / d, 1); o.innerHTML = (p * (e - s) + s).toFixed(2); if (p < 1) window.requestAnimationFrame(step); }; window.requestAnimationFrame(step); }
@@ -542,10 +659,7 @@
     function addSemester() { const k = Object.keys(semestersData).map(Number); const n = (k.length > 0 ? Math.max(...k) : 0) + 1; semestersData[n] = []; renderAllSemesters(); calculateAll(false); setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100); }
     function removeSemester(e, id) { e.stopPropagation(); if (semestersData[id] && semestersData[id].length > 0 && !confirm(`Xóa học kỳ ${id}?`)) return; delete semestersData[id]; renderAllSemesters(); calculateAll(true); }
     
-    // *** CORE LOGIC UPDATED FOR CONFIG ***
-    function getCourseResult(s) { 
-        return GRADE_CONFIG.find(g => s >= g.min) || GRADE_CONFIG[GRADE_CONFIG.length - 1];
-    }
+    function getCourseResult(s) { return GRADE_CONFIG.find(g => s >= g.min) || GRADE_CONFIG[GRADE_CONFIG.length - 1]; }
 
     function calculateAll(save = true) {
         let gp = 0, gc = 0, nd = {}, cd = [];
@@ -602,13 +716,16 @@
             if(save && parseFloat(newG) >= 3.2) runBigFireworks(); 
         } else { currentTotalGPA = 0; document.getElementById('total-gpa').innerText = "0.00"; updateDashboardRank(0); }
         updateChart(cd); updateProgressChart(gc, targetTotalCredits);
-        if (save) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(nd)); alert("Đã lưu!"); } catch(e){} }
+        if (save) { 
+            saveEncryptedData(STORAGE_KEY, nd);
+            saveEncryptedData('cultivationData', cultivationData);
+        }
     }
 
     function updateProgressChart(e, t) { const ctx = document.getElementById('progressChart').getContext('2d'); const rem = Math.max(0, t - e); const pct = t > 0 ? Math.round((e / t) * 100) : 0; document.getElementById('progress-percent').innerText = `${pct}%`; document.getElementById('progress-detail').innerText = `${e}/${t} TC`; if (progressChartInstance) progressChartInstance.destroy(); let c = '#3b82f6'; if(pct >= 100) c = '#10b981'; else if(pct >= 50) c = '#f59e0b'; else if(pct < 50) c = '#ef4444'; progressChartInstance = new Chart(ctx, { type: 'doughnut', data: { labels: ['Đã tích lũy', 'Còn lại'], datasets: [{ data: [e, rem], backgroundColor: [c, 'rgba(255,255,255,0.2)'], borderWidth: 0, hoverOffset: 4 }] }, options: { cutout: '80%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
-    function openProfileModal() { document.getElementById('profileModal').style.display = 'flex'; let p = JSON.parse(localStorage.getItem('userProfile') || '{}'); document.getElementById('profile-target-credits').value = p.targetCredits || 135; selectMascot(p.mascot || '👑'); }
-    function saveProfile() { const name = document.getElementById('profile-name').value; const id = document.getElementById('profile-id').value; const t = document.getElementById('profile-target-credits').value; localStorage.setItem('userProfile', JSON.stringify({ name, id, targetCredits: t, mascot: selectedMascot })); loadProfile(); closeModal('profileModal'); calculateAll(false); }
-    function loadProfile() { let d = null; try{d=localStorage.getItem('userProfile')}catch(e){} if(d){ const p=JSON.parse(d); if(p.name) document.getElementById('display-name').innerText=p.name; if(p.id) document.getElementById('display-id').innerText=`MSSV: ${p.id}`; document.getElementById('profile-name').value=p.name||''; document.getElementById('profile-id').value=p.id||''; targetTotalCredits = p.targetCredits || 135; document.getElementById('strat-total-credits').value = targetTotalCredits; if(p.mascot) { selectedMascot = p.mascot; updateMascotDisplay(); } } }
+    function openProfileModal() { document.getElementById('profileModal').style.display = 'flex'; let p = loadDecryptedData('userProfile', currentInputPin) || {}; document.getElementById('profile-target-credits').value = p.targetCredits || 135; selectMascot(p.mascot || '👑'); }
+    function saveProfile() { const name = document.getElementById('profile-name').value; const id = document.getElementById('profile-id').value; const t = document.getElementById('profile-target-credits').value; saveEncryptedData('userProfile', { name, id, targetCredits: t, mascot: selectedMascot }); loadProfile(); closeModal('profileModal'); calculateAll(false); }
+    function loadProfile() { let p = loadDecryptedData('userProfile', currentInputPin) || {}; if(p.name) document.getElementById('display-name').innerText=p.name; if(p.id) document.getElementById('display-id').innerText=`MSSV: ${p.id}`; document.getElementById('profile-name').value=p.name||''; document.getElementById('profile-id').value=p.id||''; targetTotalCredits = p.targetCredits || 135; document.getElementById('strat-total-credits').value = targetTotalCredits; if(p.mascot) { selectedMascot = p.mascot; updateMascotDisplay(); } }
     function toggleSemester(id) { document.getElementById(`content-${id}`).classList.toggle('active'); }
     function addSubjectRow(semId, data = null) { const l = document.getElementById(`list-${semId}`); const d = document.createElement('div'); d.className = 'subject-row'; const n = data ? data.name : ''; const c = data ? data.credit : ''; const r = data ? data.ratio : '40-60'; const s1 = data ? data.s1 : ''; const s2 = data ? data.s2 : ''; d.innerHTML = `<div class="field-group" style="flex:2;min-width:150px;"><label>Tên Môn</label><input type="text" class="inp-name" value="${n}" placeholder="..."></div><div class="field-group"><label>Số TC</label><input type="number" class="inp-credit" value="${c}" min="0" placeholder="..."></div><div class="field-group" style="min-width:100px;"><label>Tỷ lệ</label><select class="inp-ratio" onchange="calculateAll(false)"><option value="40-60" ${r==='40-60'?'selected':''}>40/60</option><option value="50-50" ${r==='50-50'?'selected':''}>50/50</option><option value="30-70" ${r==='30-70'?'selected':''}>30/70</option><option value="100-0" ${r==='100-0'?'selected':''}>100%</option></select></div><div class="field-group"><label>Điểm QT</label><input type="number" class="inp-s1" value="${s1}" step="0.1" placeholder="..." oninput="calculateAll(false)"></div><div class="field-group"><label>Điểm CK</label><input type="number" class="inp-s2" value="${s2}" step="0.1" placeholder="..." oninput="calculateAll(false)"></div><div class="field-group" style="flex:0.8;text-align:center;"><label>Hệ 10</label><div class="preview-box preview-10">...</div></div><div class="field-group" style="flex:1.2;text-align:center;"><label>Hệ 4</label><div class="preview-box preview-convert" style="color:#fff;">...</div></div><div class="field-group" style="flex:0.8;text-align:center;"><label>Xếp Loại</label><div class="preview-rank">...</div></div><div style="display:flex;flex-direction:column;gap:5px;justify-content:center;margin-left:5px;"><button class="btn-icon btn-del" onclick="deleteRow(this, ${semId})"><i class="fas fa-times"></i></button><button class="btn-icon btn-calc-target" onclick="openTargetModal(this)"><i class="fas fa-wand-magic-sparkles"></i></button></div>`; l.appendChild(d); }
     function deleteRow(b, i) { b.closest('.subject-row').remove(); calculateAll(false); }
@@ -620,9 +737,20 @@
     function getListRankBadge(g) { let l='Yếu', c='bg-y'; if(g>=3.6){l='Xuất Sắc';c='bg-xs'}else if(g>=3.2){l='Giỏi';c='bg-g'}else if(g>=2.5){l='Khá';c='bg-k'}else if(g>=2.0){l='TB';c='bg-tb'} return `<span class="list-badge ${c}">${l}</span>`; }
     function updateDashboardRank(g) { let l='---', c='rank-gray'; if(g>0){ if(g>=3.6){l='Xuất Sắc';c='rank-gold'}else if(g>=3.2){l='Giỏi';c='rank-silver'}else if(g>=2.5){l='Khá';c='rank-bronze'}else if(g>=2.0){l='Trung Bình';c='rank-gray'}else{l='Yếu';c='rank-red'} } document.getElementById('academic-rank-area').innerHTML = `<span class="dash-badge ${c}">${l}</span>`; }
     function updateChart(d) { const c = document.getElementById('gpaChart').getContext('2d'); if(gpaChartInstance) gpaChartInstance.destroy(); const g = c.createLinearGradient(0,0,0,400); g.addColorStop(0, 'rgba(139,92,246,0.5)'); g.addColorStop(1, 'rgba(118,75,162,0)'); gpaChartInstance = new Chart(c, { type: 'line', data: { labels: Object.keys(semestersData).map(k=>`Kỳ ${k}`), datasets: [{ label: 'GPA', data: d, borderColor: '#a78bfa', backgroundColor: g, fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 4.0, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'rgba(255,255,255,0.7)' } }, x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.7)' } } }, plugins: { legend: { display: false } } } }); }
-    function exportExcel() { calculateAll(false); let r = [["Học Kỳ", "Tên Môn", "Số TC", "Tỷ Lệ", "Điểm QT", "Điểm CK"]]; Object.keys(semestersData).map(Number).sort((a,b)=>a-b).forEach(i => { if (semestersData[i]) { semestersData[i].forEach(s => { r.push([i, s.name, s.credit, s.ratio, s.s1, s.s2]); }); } }); let p = JSON.parse(localStorage.getItem('userProfile') || '{}'); let i = [["Key", "Value"], ["Name", p.name || ""], ["ID", p.id || ""], ["Theme", 'light'], ["TargetCredits", p.targetCredits || 135]]; i.push(["CultivationPoints", cultivationData.points || 0]); const wb = XLSX.utils.book_new(); const wg = XLSX.utils.aoa_to_sheet(r); const wi = XLSX.utils.aoa_to_sheet(i); XLSX.utils.book_append_sheet(wb, wg, "BangDiem"); XLSX.utils.book_append_sheet(wb, wi, "HoSo"); XLSX.writeFile(wb, `GPA_${p.name||"BangDiem"}.xlsx`); }
+    
+    function exportExcel() { 
+        calculateAll(false); 
+        let r = [["Học Kỳ", "Tên Môn", "Số TC", "Tỷ Lệ", "Điểm QT", "Điểm CK"]]; 
+        Object.keys(semestersData).map(Number).sort((a,b)=>a-b).forEach(i => { if (semestersData[i]) { semestersData[i].forEach(s => { r.push([i, s.name, s.credit, s.ratio, s.s1, s.s2]); }); } }); 
+        let p = loadDecryptedData('userProfile', currentInputPin) || {}; 
+        let i = [["Key", "Value"], ["Name", p.name || ""], ["ID", p.id || ""], ["Theme", 'light'], ["TargetCredits", p.targetCredits || 135]]; 
+        i.push(["CultivationPoints", cultivationData.points || 0]); 
+        i.push(["CultivationGen", cultivationData.generation || 1]);
+        const wb = XLSX.utils.book_new(); const wg = XLSX.utils.aoa_to_sheet(r); const wi = XLSX.utils.aoa_to_sheet(i); XLSX.utils.book_append_sheet(wb, wg, "BangDiem"); XLSX.utils.book_append_sheet(wb, wi, "HoSo"); XLSX.writeFile(wb, `GPA_Backup_${p.name||"User"}.xlsx`); 
+    }
+    
     function triggerImport() { document.getElementById('file-input').click(); }
-    function importExcel(inp) { const f = inp.files[0]; if (!f) return; const r = new FileReader(); r.onload = function(e) { try { const d = new Uint8Array(e.target.result); const wb = XLSX.read(d, {type: 'array'}); const wg = wb.Sheets["BangDiem"]; if (wg) { const j = XLSX.utils.sheet_to_json(wg); semestersData = {}; j.forEach(row => { const s = row["Học Kỳ"]; if (!semestersData[s]) semestersData[s] = []; semestersData[s].push({ name: row["Tên Môn"] || "", credit: row["Số TC"] || "", ratio: row["Tỷ Lệ"] || "40-60", s1: row["Điểm QT"], s2: row["Điểm CK"] }); }); localStorage.setItem(STORAGE_KEY, JSON.stringify(semestersData)); } const wi = wb.Sheets["HoSo"]; if (wi) { const ji = XLSX.utils.sheet_to_json(wi); let p = {}; ji.forEach(row => { if (row.Key === "Name") p.name = row.Value; if (row.Key === "ID") p.id = row.Value; if (row.Key === "TargetCredits") p.targetCredits = row.Value; if (row.Key === "CultivationPoints") { cultivationData.points = parseInt(row.Value); localStorage.setItem('cultivationData', JSON.stringify(cultivationData)); } }); localStorage.setItem('userProfile', JSON.stringify(p)); } alert('Thành công! Tu vi đã được khôi phục.'); location.reload(); } catch (err) { alert('Lỗi file!'); } }; r.readAsArrayBuffer(f); }
+    function importExcel(inp) { const f = inp.files[0]; if (!f) return; const r = new FileReader(); r.onload = function(e) { try { const d = new Uint8Array(e.target.result); const wb = XLSX.read(d, {type: 'array'}); const wg = wb.Sheets["BangDiem"]; if (wg) { const j = XLSX.utils.sheet_to_json(wg); semestersData = {}; j.forEach(row => { const s = row["Học Kỳ"]; if (!semestersData[s]) semestersData[s] = []; semestersData[s].push({ name: row["Tên Môn"] || "", credit: row["Số TC"] || "", ratio: row["Tỷ Lệ"] || "40-60", s1: row["Điểm QT"], s2: row["Điểm CK"] }); }); saveEncryptedData(STORAGE_KEY, semestersData); } const wi = wb.Sheets["HoSo"]; if (wi) { const ji = XLSX.utils.sheet_to_json(wi); let p = {}; ji.forEach(row => { if (row.Key === "Name") p.name = row.Value; if (row.Key === "ID") p.id = row.Value; if (row.Key === "TargetCredits") p.targetCredits = row.Value; if (row.Key === "CultivationPoints") cultivationData.points = parseInt(row.Value); if (row.Key === "CultivationGen") cultivationData.generation = parseInt(row.Value); }); saveEncryptedData('userProfile', p); saveEncryptedData('cultivationData', cultivationData); } alert('Thành công! Dữ liệu đã được nạp vào thành.'); location.reload(); } catch (err) { alert('Lỗi file!'); } }; r.readAsArrayBuffer(f); }
 
     initSecurity();
 </script>
