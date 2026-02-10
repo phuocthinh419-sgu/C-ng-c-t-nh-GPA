@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GPA Manager - V52 Secure (Royal Edition)</title>
+    <title>GPA Manager - V53 (100 Quotes Edition)</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -53,11 +53,11 @@
         .zen-xp-bar-fill { height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); width: 0%; transition: width 0.5s ease-out; box-shadow: 0 0 10px #fbbf24; }
         .zen-xp-text { font-size: 0.9rem; color: #94a3b8; margin-top: 5px; font-weight: bold; }
         
-        .zen-quote-container { margin-top: 30px; max-width: 800px; padding: 20px; border-radius: 15px; position: relative; background: transparent; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .zen-quote-container { margin-top: 30px; max-width: 800px; padding: 20px; border-radius: 15px; position: relative; background: transparent; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); min-height: 150px; display: flex; flex-direction: column; justify-content: center; }
         .zen-quote-container::before { content: ''; position: absolute; top: 50%; left: 50%; width: 200%; height: 500%; background: conic-gradient(transparent 0deg, transparent 270deg, #00f2ff 300deg, #bc13fe 360deg); transform: translate(-50%, -50%); animation: rotate-border 4s linear infinite; z-index: -2; }
         .zen-quote-container::after { content: ''; position: absolute; inset: 3px; background: rgba(15, 23, 42, 0.95); border-radius: 12px; z-index: -1; }
         @keyframes rotate-border { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
-        .zen-quote-en, .zen-quote-vi, .zen-quote-author { position: relative; z-index: 5; }
+        .zen-quote-en, .zen-quote-vi, .zen-quote-author { position: relative; z-index: 5; transition: opacity 0.5s ease; }
         .zen-quote-en { font-size: 1.2rem; font-style: italic; color: #cbd5e1; margin-bottom: 5px; font-family: 'Segoe UI', serif; }
         .zen-quote-vi { font-size: 1.1rem; color: #a5b4fc; font-weight: 600; margin-bottom: 10px; }
         .zen-quote-author { font-size: 0.9rem; color: #fbbf24; text-transform: uppercase; letter-spacing: 1px; text-align: right; }
@@ -467,16 +467,141 @@
         setMode: function(progress) { this.progress = progress; const r = 0 + (255 - 0) * progress; const g = 200 + (0 - 200) * progress; const b = 255 + (255 - 255) * progress; this.targetColor = { r: r, g: g, b: b }; }
     };
 
-    // --- 5. AUDIO & QUOTES ---
+    // --- 5. AUDIO & QUOTES (100 MIXED QUOTES) ---
     function playChime() { const AudioContext = window.AudioContext || window.webkitAudioContext; if (!AudioContext) return; const ctx = new AudioContext(); const t = ctx.currentTime; const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.frequency.setValueAtTime(880, t); osc.frequency.exponentialRampToValueAtTime(0.01, t + 1.5); gain.gain.setValueAtTime(0.3, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 1.5); osc.connect(gain); gain.connect(ctx.destination); osc.start(t); osc.stop(t + 1.5); }
     function playRealisticBoom() { if(isEcoMode) return; const AudioContext = window.AudioContext || window.webkitAudioContext; if (!AudioContext) return; const ctx = new AudioContext(); const t = ctx.currentTime; const bufferSize = ctx.sampleRate * 2; const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate); const data = buffer.getChannelData(0); let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0; for (let i=0; i<bufferSize; i++) { const w = Math.random() * 2 - 1; b0 = 0.99886 * b0 + w * 0.0555179; b1 = 0.99332 * b1 + w * 0.0750759; b2 = 0.96900 * b2 + w * 0.1538520; b3 = 0.86650 * b3 + w * 0.3104856; b4 = 0.55000 * b4 + w * 0.5329522; b5 = -0.7616 * b5 - w * 0.0168980; data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362; data[i] *= 0.11; b6 = w * 0.115926; } const noise = ctx.createBufferSource(); noise.buffer = buffer; const filter = ctx.createBiquadFilter(); filter.type = "lowpass"; filter.frequency.value = 800; filter.frequency.exponentialRampToValueAtTime(100, t + 0.3); const gain = ctx.createGain(); gain.gain.setValueAtTime(1, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 1.5); noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination); noise.start(t); noise.stop(t + 2); }
     
+    // --- 100 MIXED QUOTES (ANH - VIỆT - LỘN XỘN) ---
     const quotes = [
         { en: "Education is the most powerful weapon which you can use to change the world.", vi: "Giáo dục là vũ khí mạnh nhất để thay đổi thế giới.", author: "Nelson Mandela" },
-        { en: "Live as if you were to die tomorrow. Learn as if you were to live forever.", vi: "Hãy sống như thể ngày mai bạn sẽ chết. Hãy học như thể bạn sẽ sống mãi mãi.", author: "Mahatma Gandhi" },
-        { en: "The only place where success comes before work is in the dictionary.", vi: "Nơi duy nhất mà thành công đến trước khi làm việc là trong từ điển.", author: "Vidal Sassoon" }
+        { en: "Live as if you were to die tomorrow. Learn as if you were to live forever.", vi: "Sống như thể mai là ngày tận thế. Học như thể bạn sẽ sống mãi mãi.", author: "Mahatma Gandhi" },
+        { en: "The only place where success comes before work is in the dictionary.", vi: "Nơi duy nhất thành công đến trước làm việc là trong từ điển.", author: "Vidal Sassoon" },
+        { en: "It does not matter how slowly you go as long as you do not stop.", vi: "Chậm bao nhiêu không quan trọng, miễn là đừng dừng lại.", author: "Confucius" },
+        { en: "Genius is 1% talent and 99% percent hard work.", vi: "Thiên tài chỉ có 1% là năng khiếu, 99% là khổ luyện.", author: "Albert Einstein" },
+        { en: "Don't let yesterday take up too much of today.", vi: "Đừng để ngày hôm qua chiếm quá nhiều thời gian của hôm nay.", author: "Will Rogers" },
+        { en: "Failure is the opportunity to begin again more intelligently.", vi: "Thất bại là cơ hội để bắt đầu lại một cách thông minh hơn.", author: "Henry Ford" },
+        { en: "The best way to predict the future is to create it.", vi: "Cách tốt nhất để dự đoán tương lai là tạo ra nó.", author: "Peter Drucker" },
+        { en: "Believe you can and you're halfway there.", vi: "Tin rằng bạn có thể là bạn đã đi được nửa chặng đường.", author: "Theodore Roosevelt" },
+        { en: "Hard work beats talent when talent doesn't work hard.", vi: "Chăm chỉ sẽ đánh bại thiên tài khi thiên tài không chịu chăm chỉ.", author: "Tim Notke" },
+        { en: "Study while others are sleeping; work while others are loafing.", vi: "Học khi kẻ khác ngủ, làm khi kẻ khác lười.", author: "William A. Ward" },
+        { en: "Discipline is doing what needs to be done, even if you don't want to.", vi: "Kỷ luật là làm việc cần làm, ngay cả khi không muốn.", author: "Anonymous" },
+        { en: "No pressure, no diamonds.", vi: "Không có áp lực, không có kim cương.", author: "Thomas Carlyle" },
+        { en: "Học, học nữa, học mãi.", vi: "Study, study more, study forever.", author: "Lenin" },
+        { en: "You don't have to be great to start, but you have to start to be great.", vi: "Bạn không cần vĩ đại để bắt đầu, nhưng phải bắt đầu để vĩ đại.", author: "Zig Ziglar" },
+        { en: "Focus on the process, not the outcome.", vi: "Tập trung vào quá trình, đừng chỉ nhìn kết quả.", author: "Anonymous" },
+        { en: "A smooth sea never made a skilled sailor.", vi: "Biển lặng không tạo nên thủy thủ giỏi.", author: "F.D. Roosevelt" },
+        { en: "Your time is limited, so don't waste it living someone else's life.", vi: "Thời gian có hạn, đừng phí nó sống cuộc đời người khác.", author: "Steve Jobs" },
+        { en: "Stay hungry, stay foolish.", vi: "Hãy cứ khát khao, hãy cứ dại khờ.", author: "Steve Jobs" },
+        { en: "The expert in anything was once a beginner.", vi: "Chuyên gia nào cũng từng là người mới bắt đầu.", author: "Helen Hayes" },
+        { en: "Dream big and dare to fail.", vi: "Mơ lớn và dám thất bại.", author: "Norman Vaughan" },
+        { en: "I never lose. I either win or learn.", vi: "Tôi không bao giờ thua. Tôi thắng hoặc tôi học được bài học.", author: "Nelson Mandela" },
+        { en: "Success consists of going from failure to failure without loss of enthusiasm.", vi: "Thành công là đi từ thất bại này đến thất bại khác mà không mất nhiệt huyết.", author: "Winston Churchill" },
+        { en: "Knowledge is power.", vi: "Tri thức là sức mạnh.", author: "Francis Bacon" },
+        { en: "Don't watch the clock; do what it does. Keep going.", vi: "Đừng nhìn đồng hồ; hãy làm như nó. Cứ đi tiếp.", author: "Sam Levenson" },
+        { en: "If you can dream it, you can do it.", vi: "Nếu bạn dám mơ, bạn có thể làm được.", author: "Walt Disney" },
+        { en: "Hành trình vạn dặm bắt đầu từ một bước chân.", vi: "A journey of a thousand miles begins with a single step.", author: "Lão Tử" },
+        { en: "Action is the foundational key to all success.", vi: "Hành động là chìa khóa cơ bản của mọi thành công.", author: "Pablo Picasso" },
+        { en: "The secret of getting ahead is getting started.", vi: "Bí quyết để dẫn đầu là bắt đầu.", author: "Mark Twain" },
+        { en: "Impossible is just an opinion.", vi: "Không thể chỉ là một ý kiến.", author: "Paulo Coelho" },
+        { en: "Don't stop until you're proud.", vi: "Đừng dừng lại cho đến khi bạn thấy tự hào.", author: "Anonymous" },
+        { en: "Great things never come from comfort zones.", vi: "Điều tuyệt vời không bao giờ đến từ vùng an toàn.", author: "Anonymous" },
+        { en: "Motivation is what gets you started. Habit is what keeps you going.", vi: "Động lực giúp bạn bắt đầu. Thói quen giúp bạn đi tiếp.", author: "Jim Ryun" },
+        { en: "Success doesn't come to you, you go to it.", vi: "Thành công không tự tìm đến, bạn phải đi tìm nó.", author: "Marva Collins" },
+        { en: "Work hard in silence, let your success be your noise.", vi: "Hãy nỗ lực trong im lặng, để thành công lên tiếng thay bạn.", author: "Frank Ocean" },
+        { en: "Trên bước đường thành công không có dấu chân của kẻ lười biếng.", vi: "Laziness leaves no footprints on the path to success.", author: "Lỗ Tấn" },
+        { en: "Be stronger than your excuses.", vi: "Hãy mạnh mẽ hơn những lời viện cớ của bạn.", author: "Anonymous" },
+        { en: "Don't wish for it. Work for it.", vi: "Đừng chỉ ước. Hãy làm vì nó.", author: "Anonymous" },
+        { en: "Push yourself, because no one else is going to do it for you.", vi: "Hãy tự thúc đẩy bản thân, vì không ai làm điều đó thay bạn đâu.", author: "Anonymous" },
+        { en: "The pain you feel today will be the strength you feel tomorrow.", vi: "Nỗi đau hôm nay sẽ là sức mạnh của ngày mai.", author: "Anonymous" },
+        { en: "Success is the sum of small efforts, repeated day in and day out.", vi: "Thành công là tổng hợp của những nỗ lực nhỏ, lặp lại mỗi ngày.", author: "Robert Collier" },
+        { en: "Do something today that your future self will thank you for.", vi: "Hãy làm điều gì đó hôm nay để tương lai bạn sẽ cảm ơn chính mình.", author: "Anonymous" },
+        { en: "Discipline is the bridge between goals and accomplishment.", vi: "Kỷ luật là cầu nối giữa mục tiêu và thành tựu.", author: "Jim Rohn" },
+        { en: "Learning never exhausts the mind.", vi: "Học tập không bao giờ làm trí óc kiệt sức.", author: "Leonardo da Vinci" },
+        { en: "An investment in knowledge pays the best interest.", vi: "Đầu tư vào tri thức mang lại lợi nhuận cao nhất.", author: "Benjamin Franklin" },
+        { en: "There is no substitute for hard work.", vi: "Không gì thay thế được sự chăm chỉ.", author: "Thomas Edison" },
+        { en: "Today a reader, tomorrow a leader.", vi: "Hôm nay là người đọc, ngày mai là người dẫn đầu.", author: "Margaret Fuller" },
+        { en: "Học thầy không tày học bạn.", vi: "Learning from friends is as important as learning from teachers.", author: "Tục ngữ Việt Nam" },
+        { en: "The beautiful thing about learning is that no one can take it away from you.", vi: "Điều tuyệt đẹp của việc học là không ai có thể lấy nó khỏi bạn.", author: "B.B. King" },
+        { en: "Education is not preparation for life; education is life itself.", vi: "Giáo dục không phải là chuẩn bị cho cuộc sống; nó chính là cuộc sống.", author: "John Dewey" },
+        { en: "Change is the end result of all true learning.", vi: "Thay đổi là kết quả cuối cùng của việc học thực sự.", author: "Leo Buscaglia" },
+        { en: "Live as if everything is a miracle.", vi: "Sống như thể mọi thứ đều là phép màu.", author: "Einstein" },
+        { en: "Everything you can imagine is real.", vi: "Mọi thứ bạn tưởng tượng đều có thể thành hiện thực.", author: "Picasso" },
+        { en: "Simplicity is the ultimate sophistication.", vi: "Đơn giản là đỉnh cao của sự tinh tế.", author: "Leonardo da Vinci" },
+        { en: "Tương lai khóc hay cười phụ thuộc vào độ lười của quá khứ.", vi: "Your future tears or smiles depend on your past laziness.", author: "Dân mạng" },
+        { en: "Nếu không tiến lên, bạn đang thụt lùi.", vi: "If you are not moving forward, you are moving backward.", author: "Anonymous" },
+        { en: "Opportunities don't happen, you create them.", vi: "Cơ hội không tự xảy ra, bạn tạo ra chúng.", author: "Chris Grosser" },
+        { en: "Try not to become a man of success. Rather become a man of value.", vi: "Đừng cố trở thành người thành công. Hãy thành người có giá trị.", author: "Albert Einstein" },
+        { en: "Stop afraid of what could go wrong, and focus on what could go right.", vi: "Ngừng sợ hãi điều gì sẽ sai, hãy tập trung vào điều gì sẽ đúng.", author: "Anonymous" },
+        { en: "You become what you believe.", vi: "Bạn trở thành những gì bạn tin tưởng.", author: "Oprah Winfrey" },
+        { en: "Whatever you are, be a good one.", vi: "Dù bạn là ai, hãy là một người tốt.", author: "Abraham Lincoln" },
+        { en: "If you're going through hell, keep going.", vi: "Nếu đang đi qua địa ngục, hãy cứ đi tiếp.", author: "Winston Churchill" },
+        { en: "It always seems impossible until it's done.", vi: "Mọi thứ luôn có vẻ bất khả thi cho đến khi nó hoàn thành.", author: "Nelson Mandela" },
+        { en: "Keep your face always toward the sunshine—and shadows will fall behind you.", vi: "Luôn hướng về ánh mặt trời, bóng tối sẽ ngả sau lưng bạn.", author: "Walt Whitman" },
+        { en: "Có công mài sắt, có ngày nên kim.", vi: "Practice makes perfect.", author: "Tục ngữ Việt Nam" },
+        { en: "Thất bại là mẹ thành công.", vi: "Failure is the mother of success.", author: "Tục ngữ Việt Nam" },
+        { en: "Muốn biết phải hỏi, muốn giỏi phải học.", vi: "If you want to know, ask; if you want to be good, learn.", author: "Tục ngữ Việt Nam" },
+        { en: "Đi một ngày đàng, học một sàng khôn.", vi: "Travel broadens the mind.", author: "Tục ngữ Việt Nam" },
+        { en: "Ngựa non háu đá.", vi: "Young and impulsive.", author: "Thành ngữ" },
+        { en: "Gần mực thì đen, gần đèn thì sáng.", vi: "Show me your friends, I'll show you your future.", author: "Tục ngữ Việt Nam" },
+        { en: "Practice makes perfect.", vi: "Có công mài sắt có ngày nên kim.", author: "Anonymous" },
+        { en: "Be the change that you wish to see in the world.", vi: "Hãy là sự thay đổi bạn muốn thấy trên thế giới.", author: "Gandhi" },
+        { en: "Happiness depends upon ourselves.", vi: "Hạnh phúc phụ thuộc vào chính chúng ta.", author: "Aristotle" },
+        { en: "Do what you can, with what you have, where you are.", vi: "Làm những gì có thể, với những gì đang có, ở nơi bạn đang đứng.", author: "Theodore Roosevelt" },
+        { en: "Quality is not an act, it is a habit.", vi: "Chất lượng không phải là hành động, nó là thói quen.", author: "Aristotle" },
+        { en: "Ever tried. Ever failed. No matter. Try Again. Fail again. Fail better.", vi: "Đã thử. Đã thất bại. Không sao. Thử lại. Thất bại lần nữa. Thất bại tốt hơn.", author: "Samuel Beckett" },
+        { en: "Life is 10% what happens to us and 90% how we react to it.", vi: "Cuộc sống là 10% những gì xảy ra và 90% cách ta phản ứng.", author: "Charles R. Swindoll" },
+        { en: "Limit your 'always' and your 'nevers'.", vi: "Hạn chế nói 'luôn luôn' và 'không bao giờ'.", author: "Amy Poehler" },
+        { en: "Nothing is impossible, the word itself says 'I'm possible'!", vi: "Không gì là không thể, chính từ này nói 'Tôi có thể'!", author: "Audrey Hepburn" },
+        { en: "Winning isn't everything, but wanting to win is.", vi: "Chiến thắng không là tất cả, nhưng muốn thắng thì có.", author: "Vince Lombardi" },
+        { en: "You miss 100% of the shots you don't take.", vi: "Bạn bỏ lỡ 100% cơ hội nếu không nắm lấy.", author: "Wayne Gretzky" },
+        { en: "I attribute my success to this: I never gave or took any excuse.", vi: "Tôi thành công vì: Tôi không bao giờ viện cớ.", author: "Florence Nightingale" },
+        { en: "The mind is everything. What you think you become.", vi: "Tâm trí là tất cả. Bạn nghĩ gì, bạn trở thành thế ấy.", author: "Buddha" },
+        { en: "Your time is now.", vi: "Thời điểm của bạn là ngay bây giờ.", author: "Anonymous" },
+        { en: "Dream it. Wish it. Do it.", vi: "Mơ về nó. Ước muốn nó. Thực hiện nó.", author: "Anonymous" },
+        { en: "Don't stop when you're tired. Stop when you're done.", vi: "Đừng dừng lại khi mệt. Hãy dừng khi đã xong.", author: "Anonymous" },
+        { en: "Wake up with determination. Go to bed with satisfaction.", vi: "Thức dậy với quyết tâm. Đi ngủ với sự hài lòng.", author: "Anonymous" },
+        { en: "Little things make big days.", vi: "Những điều nhỏ bé tạo nên ngày vĩ đại.", author: "Anonymous" },
+        { en: "It’s going to be hard, but hard does not mean impossible.", vi: "Sẽ khó khăn đấy, nhưng khó không có nghĩa là không thể.", author: "Anonymous" },
+        { en: "Wait for it? No. Work for it.", vi: "Chờ đợi ư? Không. Hãy làm việc vì nó.", author: "Anonymous" },
+        { en: "Doubt kills more dreams than failure ever will.", vi: "Sự nghi ngờ giết chết nhiều ước mơ hơn là thất bại.", author: "Suzy Kassem" },
+        { en: "Winners never quit, and quitters never win.", vi: "Người thắng không bao giờ bỏ cuộc, kẻ bỏ cuộc không bao giờ thắng.", author: "Vince Lombardi" },
+        { en: "Energy flows where attention goes.", vi: "Năng lượng chảy về nơi sự chú ý hướng tới.", author: "Tony Robbins" },
+        { en: "Don't count the days, make the days count.", vi: "Đừng đếm ngày tháng, hãy làm ngày tháng trở nên ý nghĩa.", author: "Muhammad Ali" },
+        { en: "Make your life a masterpiece.", vi: "Hãy biến cuộc đời bạn thành kiệt tác.", author: "Anonymous" },
+        { en: "Prove them wrong.", vi: "Hãy chứng minh họ đã sai.", author: "Anonymous" },
+        { en: "Tiên học lễ, hậu học văn.", vi: "First learn manners, then learn knowledge.", author: "Tục ngữ" }
     ];
-    function showRandomQuote() { const idx = Math.floor(Math.random() * quotes.length); const q = quotes[idx]; const c = document.getElementById('zen-quote-box'); c.style.opacity = '0'; setTimeout(() => { document.getElementById('q-en').innerText = `"${q.en}"`; document.getElementById('q-vi').innerText = `"${q.vi}"`; document.getElementById('q-author').innerText = `- ${q.author}`; c.style.opacity = '1'; c.style.animation = 'fadeIn 1s ease-in-out'; }, 500); }
+
+    let currentQuoteIndex = -1; // Biến ghi nhớ câu đang hiển thị
+
+    function showRandomQuote() {
+        // Thuật toán chọn lọc (Đảm bảo không bao giờ lặp lại câu cũ)
+        let idx;
+        do {
+            idx = Math.floor(Math.random() * quotes.length);
+        } while (idx === currentQuoteIndex && quotes.length > 1);
+
+        currentQuoteIndex = idx; // Lưu lại vị trí mới
+        const q = quotes[idx];
+        
+        const c = document.getElementById('zen-quote-box');
+        
+        // Hiệu ứng mờ dần
+        c.style.opacity = '0';
+        c.style.transform = 'translateY(10px)';
+        c.style.transition = 'all 0.5s ease';
+
+        setTimeout(() => {
+            // Thay đổi nội dung khi đang ẩn
+            document.getElementById('q-en').innerText = `"${q.en}"`;
+            document.getElementById('q-vi').innerText = `"${q.vi}"`;
+            document.getElementById('q-author').innerText = `- ${q.author}`;
+            
+            // Hiệu ứng hiện ra
+            c.style.opacity = '1';
+            c.style.transform = 'translateY(0)';
+        }, 500);
+    }
 
     // --- 6. ZEN TIMER LOGIC ---
     let zenTimer = null; let timeLeft = 25 * 60; let isTimerRunning = false; let isWorkSession = true; const WORK_TIME = 25 * 60;
