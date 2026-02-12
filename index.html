@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GPA Manager - V54 (Zen Master Edition)</title>
+    <title>GPA Manager - V57 (Golden Zen Edition)</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,7 +12,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Dancing+Script:wght@700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Orbitron:wght@700;900&family=Dancing+Script:wght@700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -44,9 +44,31 @@
         #zen-overlay.active { display: flex; opacity: 1; }
         .zen-ui-layer { z-index: 5002; position: relative; pointer-events: auto; }
 
-        .zen-timer { font-family: 'Alfa Slab One', cursive; font-size: 8rem; color: #fff; letter-spacing: 5px; margin: 10px 0; position: relative; text-shadow: 1px 1px 0 #000, 4px 4px 0 #000, 8px 8px 15px rgba(0,0,0,0.8); -webkit-text-stroke: 2px #000; }
-        @keyframes timer-pulse { 0% { filter: drop-shadow(0 0 0 rgba(255, 215, 0, 0)); transform: scale(1); } 50% { filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.9)); transform: scale(1.02); } 100% { filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0)); transform: scale(1); } }
-        .zen-timer.ticking { animation: timer-pulse 1s infinite ease-in-out; }
+        /* --- FONT ORBITRON (SANG TRỌNG, DỄ ĐỌC) --- */
+        .zen-timer { 
+            font-family: 'Orbitron', sans-serif;
+            font-size: 9rem; 
+            /* Màu vàng kim loại (Gold) dịu mắt */
+            color: #fcd34d; 
+            letter-spacing: 5px; 
+            margin: 10px 0; 
+            position: relative; 
+            
+            /* Bóng đổ cứng (Hard Shadow) tạo khối, KHÔNG dùng Glow nhòe */
+            text-shadow: 
+                4px 4px 0px #b45309,
+                8px 8px 20px rgba(0,0,0,0.8);
+            
+            font-weight: 900;
+        }
+        
+        /* Hiệu ứng nhịp đập nhẹ nhàng */
+        @keyframes timer-pulse-calm { 
+            0% { transform: scale(1); } 
+            50% { transform: scale(1.02); } 
+            100% { transform: scale(1); } 
+        }
+        .zen-timer.ticking { animation: timer-pulse-calm 1s infinite ease-in-out; }
 
         .zen-rank-badge { font-family: 'Cinzel', serif; font-size: 1.5rem; color: #fbbf24; border: 2px solid #fbbf24; padding: 5px 20px; border-radius: 4px; background: rgba(0,0,0,0.6); margin-bottom: 5px; box-shadow: 0 0 15px rgba(251, 191, 36, 0.3); text-transform: uppercase; }
         .zen-xp-bar-container { width: 300px; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-bottom: 20px; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
