@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GPA Manager - V53 (100 Quotes Edition)</title>
+    <title>GPA Manager - V54 (Zen Master Edition)</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -203,9 +203,15 @@
         <div class="zen-quote-vi" id="q-vi"></div>
         <div class="zen-quote-author" id="q-author"></div>
     </div>
-    <div class="zen-controls zen-ui-layer">
+    
+    <div class="zen-controls zen-ui-layer" id="zen-controls">
         <button class="zen-btn" id="btn-zen-start" onclick="startTimer()">Bắt đầu</button>
         <button class="zen-btn" onclick="resetTimer()">Đặt lại</button>
+    </div>
+    
+    <div class="zen-controls zen-ui-layer" id="zen-break-options" style="display:none; gap:15px; flex-wrap:wrap; justify-content:center;">
+        <button class="zen-btn" style="background:rgba(16, 185, 129, 0.2); border-color:#10b981;" onclick="startBreak(5)">🍵 Nghỉ Ngắn (5p)</button>
+        <button class="zen-btn" style="background:rgba(59, 130, 246, 0.2); border-color:#3b82f6;" onclick="startBreak(15)">🎮 Nghỉ Dài (15p)</button>
     </div>
 </div>
 
@@ -572,38 +578,24 @@
         { en: "Tiên học lễ, hậu học văn.", vi: "First learn manners, then learn knowledge.", author: "Tục ngữ" }
     ];
 
-    let currentQuoteIndex = -1; // Biến ghi nhớ câu đang hiển thị
+    let currentQuoteIndex = -1; 
 
     function showRandomQuote() {
-        // Thuật toán chọn lọc (Đảm bảo không bao giờ lặp lại câu cũ)
         let idx;
-        do {
-            idx = Math.floor(Math.random() * quotes.length);
-        } while (idx === currentQuoteIndex && quotes.length > 1);
-
-        currentQuoteIndex = idx; // Lưu lại vị trí mới
+        do { idx = Math.floor(Math.random() * quotes.length); } while (idx === currentQuoteIndex && quotes.length > 1);
+        currentQuoteIndex = idx; 
         const q = quotes[idx];
-        
         const c = document.getElementById('zen-quote-box');
-        
-        // Hiệu ứng mờ dần
-        c.style.opacity = '0';
-        c.style.transform = 'translateY(10px)';
-        c.style.transition = 'all 0.5s ease';
-
+        c.style.opacity = '0'; c.style.transform = 'translateY(10px)'; c.style.transition = 'all 0.5s ease';
         setTimeout(() => {
-            // Thay đổi nội dung khi đang ẩn
             document.getElementById('q-en').innerText = `"${q.en}"`;
             document.getElementById('q-vi').innerText = `"${q.vi}"`;
             document.getElementById('q-author').innerText = `- ${q.author}`;
-            
-            // Hiệu ứng hiện ra
-            c.style.opacity = '1';
-            c.style.transform = 'translateY(0)';
+            c.style.opacity = '1'; c.style.transform = 'translateY(0)';
         }, 500);
     }
 
-    // --- 6. ZEN TIMER LOGIC ---
+    // --- 6. ZEN TIMER LOGIC (UPDATED V54) ---
     let zenTimer = null; let timeLeft = 25 * 60; let isTimerRunning = false; let isWorkSession = true; const WORK_TIME = 25 * 60;
     
     function toggleZenMode() {
@@ -616,29 +608,105 @@
             if(!isEcoMode) OrbVisuals.start();
         }
     }
+    
     function startTimer() {
-        if (isTimerRunning) return; 
-        try {
-            isTimerRunning = true;
-            if (isWorkSession) { document.getElementById('zen-status').innerText = "Đang tập trung..."; document.getElementById('zen-status').style.color = "white"; }
-            else { document.getElementById('zen-status').innerText = "Đang nghỉ ngơi..."; document.getElementById('zen-status').style.color = "#10b981"; }
-            document.getElementById('zen-timer').classList.add('ticking');
+        const btn = document.getElementById('btn-zen-start');
+        
+        // CASE 1: Đang chạy -> TẠM DỪNG
+        if (isTimerRunning) {
+            clearInterval(zenTimer);
+            isTimerRunning = false;
+            btn.innerText = "Tiếp tục";
+            document.getElementById('zen-status').innerText = "Đang tạm dừng";
+            document.getElementById('zen-timer').classList.remove('ticking');
+            return; 
+        }
 
-            zenTimer = setInterval(() => {
-                if (timeLeft <= 0) {
-                    clearInterval(zenTimer); isTimerRunning = false; document.getElementById('zen-timer').classList.remove('ticking');
-                    if (isWorkSession) { runBigFireworks(); playRealisticBoom(); addTuVi(5); isWorkSession = false; timeLeft = 5 * 60; document.getElementById('zen-status').innerText = "Hết giờ! Hãy nghỉ ngơi."; document.getElementById('zen-status').style.color = "#10b981"; document.getElementById('btn-zen-start').innerText = "Bắt đầu nghỉ"; OrbVisuals.setMode(1); }
-                    else { playChime(); isWorkSession = true; timeLeft = 25 * 60; document.getElementById('zen-status').innerText = "Hết giờ nghỉ! Quay lại nào."; document.getElementById('zen-status').style.color = "white"; document.getElementById('btn-zen-start').innerText = "Bắt đầu làm"; OrbVisuals.setMode(0); }
-                    updateTimerDisplay(); return;
+        // CASE 2: Đang dừng -> CHẠY TIẾP
+        isTimerRunning = true;
+        btn.innerText = "Tạm dừng";
+        document.getElementById('zen-timer').classList.add('ticking');
+        
+        if (isWorkSession) {
+             document.getElementById('zen-status').innerText = "Đang tập trung...";
+             document.getElementById('zen-status').style.color = "white";
+        } else {
+             document.getElementById('zen-status').innerText = "Đang nghỉ ngơi...";
+             document.getElementById('zen-status').style.color = "#10b981";
+        }
+
+        zenTimer = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(zenTimer);
+                isTimerRunning = false;
+                document.getElementById('zen-timer').classList.remove('ticking');
+                
+                if (isWorkSession) {
+                    // KẾT THÚC FOCUS 25P
+                    runBigFireworks(); 
+                    playRealisticBoom(); 
+                    addTuVi(5); 
+                    
+                    // Hiện tùy chọn nghỉ
+                    document.getElementById('zen-status').innerText = "Đợt tu luyện hoàn tất!";
+                    document.getElementById('zen-controls').style.display = 'none'; 
+                    document.getElementById('zen-break-options').style.display = 'flex'; 
+                    
+                    OrbVisuals.setMode(1); 
+                } else {
+                    // KẾT THÚC NGHỈ
+                    playChime(); 
+                    isWorkSession = true; 
+                    timeLeft = 25 * 60; 
+                    
+                    document.getElementById('zen-status').innerText = "Hết giờ nghỉ! Quay lại nào."; 
+                    document.getElementById('zen-status').style.color = "white"; 
+                    
+                    btn.innerText = "Bắt đầu"; 
+                    document.getElementById('zen-controls').style.display = 'flex'; 
+                    OrbVisuals.setMode(0);
+                    updateTimerDisplay();
                 }
-                timeLeft--; 
-                if(isWorkSession && timeLeft % 60 === 0 && timeLeft !== WORK_TIME) { addTuVi(1); showRandomQuote(); }
-                if(isWorkSession && !isEcoMode) { const progress = 1 - (timeLeft / WORK_TIME); OrbVisuals.setMode(progress); }
-                updateTimerDisplay();
-            }, 1000);
-        } catch(e) { console.error("Timer error:", e); }
+                return;
+            }
+            timeLeft--; 
+            if(isWorkSession && timeLeft % 60 === 0 && timeLeft !== WORK_TIME) { addTuVi(1); showRandomQuote(); }
+            if(isWorkSession && !isEcoMode) { const progress = 1 - (timeLeft / WORK_TIME); OrbVisuals.setMode(progress); }
+            updateTimerDisplay();
+        }, 1000);
     }
-    function resetTimer() { clearInterval(zenTimer); isTimerRunning = false; isWorkSession = true; timeLeft = 25 * 60; document.getElementById('zen-status').innerText = "Sẵn sàng tu luyện"; document.getElementById('zen-status').style.color = "white"; document.getElementById('zen-timer').classList.remove('ticking'); document.getElementById('btn-zen-start').innerText = "Bắt đầu"; updateTimerDisplay(); OrbVisuals.setMode(0); }
+    
+    function startBreak(minutes) {
+        isWorkSession = false;
+        timeLeft = minutes * 60;
+        
+        document.getElementById('zen-break-options').style.display = 'none';
+        document.getElementById('zen-controls').style.display = 'flex';
+        
+        // Tự động bắt đầu nghỉ
+        document.getElementById('btn-zen-start').innerText = "Tạm dừng";
+        startTimer(); 
+    }
+
+    function resetTimer() {
+        clearInterval(zenTimer);
+        isTimerRunning = false;
+        isWorkSession = true;
+        timeLeft = 25 * 60;
+        
+        document.getElementById('zen-status').innerText = "Sẵn sàng tu luyện";
+        document.getElementById('zen-status').style.color = "white";
+        document.getElementById('zen-timer').classList.remove('ticking');
+        document.getElementById('btn-zen-start').innerText = "Bắt đầu";
+        
+        // Reset UI visibility
+        document.getElementById('zen-controls').style.display = 'flex';
+        document.getElementById('zen-break-options').style.display = 'none';
+        
+        updateTimerDisplay();
+        OrbVisuals.setMode(0);
+    }
+    
     function updateTimerDisplay() { const m = Math.floor(timeLeft / 60); const s = timeLeft % 60; document.getElementById('zen-timer').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`; }
 
     // --- 7. THREE.JS AURORA ---
