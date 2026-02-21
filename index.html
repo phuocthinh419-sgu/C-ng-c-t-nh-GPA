@@ -31,7 +31,6 @@
         body { font-family: 'Segoe UI', Roboto, sans-serif; background: #000510; color: var(--text-main); margin: 0; padding: 20px; min-height: 100vh; overflow-x: hidden; }
         
         #aurora-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -999; pointer-events: none; opacity: 1; transition: opacity 1s; }
-        /* VÁ LỖI: Container chứa pháo hoa */
         #fireworks-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; }
 
         /* DASHBOARD & UI */
@@ -62,9 +61,10 @@
         
         .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; z-index: 1; }
         .top-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; z-index: 99; }
-        .eco-btn, .install-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: #fff; padding: 8px 15px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; backdrop-filter: blur(4px); transition: 0.2s; }
+        .eco-btn, .install-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: #fff; padding: 8px 15px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; box-shadow: var(--shadow); font-weight: 600; backdrop-filter: blur(4px); transition: 0.2s; }
         .install-btn:hover, .eco-btn:hover { transform: scale(1.05); background: rgba(255,255,255,0.2); }
-        .install-btn { background: #8b5cf6; border: none; display: none; } /* Mặc định ẩn, JS sẽ hiện khi khả dụng */
+        /* VÁ LỖI: Bỏ display:none đi để nút luôn hiện diện */
+        .install-btn { background: #8b5cf6; border: none; } 
         .eco-btn { background: #64748b; border: none; }
         .eco-btn.active { background: #ef4444; }
         
@@ -78,7 +78,8 @@
         .progress-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; pointer-events: none; }
         .progress-percent { font-size: 2.5rem; font-weight: 800; color: #fff; }
         .progress-detail { font-size: 0.85rem; color: rgba(255,255,255,0.8); }
-        .edit-target-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .edit-target-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .edit-target-btn:hover { background: rgba(255,255,255,0.3); }
         
         .semester-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: #fff; transition: 0.2s; }
         .semester-header:hover { background: rgba(255, 255, 255, 0.05); }
@@ -115,7 +116,7 @@
         .list-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; display: inline-block; }
         .bg-xs { background: #16a34a; color: white; } .bg-g { background: #0ea5e9; color: white; } .bg-k { background: #f59e0b; color: white; } .bg-tb { background: #6b7280; color: white; }
         .result-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 12px; font-weight: 700; text-transform: uppercase; display: inline-block; }
-        .bg-gioi { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; } .bg-kha { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; } .bg-tb { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; } .bg-tbyeu { background: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; } .bg-kem { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .bg-gioi { background: #dcfce7; color: #166534; } .bg-kha { background: #dbeafe; color: #1e40af; } .bg-tb { background: #fef9c3; color: #854d0e; } .bg-tbyeu { background: #fff7ed; color: #9a3412; } .bg-kem { background: #fee2e2; color: #991b1b; }
         
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
         .modal { background: rgba(30, 41, 59, 0.9); width: 90%; max-width: 450px; padding: 25px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; border: 1px solid rgba(255,255,255,0.2); animation: popIn 0.3s; }
@@ -130,13 +131,7 @@
         .share-card-container { width: 320px; margin: 0 auto; background: rgba(15, 23, 42, 0.7); border-radius: 15px; border: 2px solid rgba(255,255,255,0.2); color: white; text-align: center; backdrop-filter: blur(15px); }
         .sc-header { padding: 30px 20px 10px; background: rgba(255,255,255,0.05); }
         .sc-mascot { font-size: 5rem; line-height: 1; filter: drop-shadow(0 0 15px rgba(255,215,0,0.5)); margin-bottom: 10px; }
-        .sc-name { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
-        .sc-id { font-size: 0.8rem; opacity: 0.7; }
-        .sc-body { padding: 20px; }
-        .sc-gpa-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.8; margin-bottom: 5px; }
-        .sc-gpa { font-size: 4.5rem; font-weight: 800; line-height: 1; margin-bottom: 15px; background: -webkit-linear-gradient(#fff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); }
-        .sc-footer { padding: 15px; font-size: 0.7rem; opacity: 0.5; border-top: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); }
-        
+        .sc-gpa { font-size: 4.5rem; font-weight: 800; line-height: 1; margin-bottom: 15px; background: -webkit-linear-gradient(#fff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .mascot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
         .mascot-option { font-size: 2rem; padding: 10px; border-radius: 12px; cursor: pointer; background: rgba(255,255,255,0.1); border: 2px solid transparent; text-align: center; transition: 0.2s;}
         .mascot-option:hover { background: rgba(255,255,255,0.2); transform: scale(1.2); }
@@ -458,12 +453,11 @@
         });
         semestersData = nd; currentTotalCredits = gc;
         if (gc > 0) { 
-            const old = currentTotalGPA; const newG = (gp / gc).toFixed(2); currentTotalGPA = newG; 
-            animateValue(document.getElementById('total-gpa'), parseFloat(old), parseFloat(newG), 1000); 
-            updateDashboardRank(newG); 
+            const old = currentTotalGPA; const newG = (gp / gc).toFixed(2); currentTotalGPA = newG; animateValue(document.getElementById('total-gpa'), parseFloat(old), parseFloat(newG), 1000); updateDashboardRank(newG); 
             // KÍCH HOẠT PHÁO HOA KHI LƯU VÀ GPA >= 3.2
             if(save && parseFloat(newG) >= 3.2) runBigFireworks(); 
-        } else { currentTotalGPA = 0; document.getElementById('total-gpa').innerText = "0.00"; updateDashboardRank(0); }
+        } 
+        else { currentTotalGPA = 0; document.getElementById('total-gpa').innerText = "0.00"; updateDashboardRank(0); }
         updateChart(cd); updateProgressChart(gc, targetTotalCredits);
         if (save) { saveEncryptedData(STORAGE_KEY, nd); }
     }
@@ -494,10 +488,7 @@
     function triggerImport() { document.getElementById('file-input').click(); }
     function importExcel(inp) { const f = inp.files[0]; if (!f) return; const r = new FileReader(); r.onload = function(e) { try { const d = new Uint8Array(e.target.result); const wb = XLSX.read(d, {type: 'array'}); const wg = wb.Sheets["BangDiem"]; if (wg) { const j = XLSX.utils.sheet_to_json(wg); semestersData = {}; j.forEach(row => { const s = row["Học Kỳ"]; if (!semestersData[s]) semestersData[s] = []; semestersData[s].push({ name: row["Tên Môn"] || "", credit: row["Số TC"] || "", ratio: row["Tỷ Lệ"] || "40-60", s1: row["Điểm QT"], s2: row["Điểm CK"] }); }); saveEncryptedData(STORAGE_KEY, semestersData); } const wi = wb.Sheets["HoSo"]; if (wi) { const ji = XLSX.utils.sheet_to_json(wi); let p = {}; ji.forEach(row => { if (row.Key === "Name") p.name = row.Value; if (row.Key === "ID") p.id = row.Value; if (row.Key === "TargetCredits") p.targetCredits = row.Value; }); saveEncryptedData('userProfile', p); } alert('Thành công!'); location.reload(); } catch (err) { alert('Lỗi file!'); } }; r.readAsArrayBuffer(f); }
 
-    function initAurora() { const c = document.getElementById('aurora-canvas'); renderer = new THREE.WebGLRenderer({ canvas: c, antialias: true }); renderer.setSize(window.innerWidth, window.innerHeight); scene = new THREE.Scene(); camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000); camera.position.z = 5; const g = new THREE.BufferGeometry(); const v = []; for(let i=0;i<3000;i++) v.push((Math.random()-0.5)*2000, (Math.random()-0.5)*2000, (Math.random()-0.5)*2000); g.setAttribute('position', new THREE.Float32BufferAttribute(v,3)); stars = new THREE.Points(g, new THREE.PointsMaterial({color:0xffffff, size:0.7, transparent:true, opacity:0.8})); scene.add(stars); const vs=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`; const fs=`uniform float time;varying vec2 vUv;vec3 permute(vec3 x){return mod(((x*34.0)+1.0)*x,289.0);}float snoise(vec2 v){const vec4 C=vec4(0.211324865405187,0.366025403784439,-0.577350269189626,0.024390243902439);vec2 i=floor(v+dot(v,C.yy));vec2 x0=v-i+dot(i,C.xx);vec2 i1;i1=(x0.x>x0.y)?vec2(1.0,0.0):vec2(0.0,1.0);vec4 x12=x0.xyxy+C.xxzz;x12.xy-=i1;i=mod(i,289.0);vec3 p=permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0));vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.0);m=m*m;m=m*m;vec3 x=2.0*fract(p*C.www)-1.0;vec3 h=abs(x)-0.5;vec3 ox=floor(x+0.5);vec3 a0=x-ox;m*=1.79284291400159-0.85373472095314*(a0*a0+h*h);vec3 g;g.x=a0.x*x0.x+h.x*x0.y;g.yz=a0.yz*x12.xz+h.yz*x12.yw;return 130.0*dot(m,g);}void main(){vec2 uv=vUv;float n1=snoise(vec2(uv.x*1.5,uv.y*0.5-time*0.1));float n2=snoise(vec2(uv.x*2.5+time*0.05,uv.y*2.0-time*0.2));float n3=snoise(vec2(uv.x*4.0-time*0.1,uv.y*3.0+time*0.1));float i=smoothstep(0.2,0.8,n1*0.5+n2*0.3+n3*0.2+uv.y*0.3);float m=smoothstep(0.0,0.2,uv.y)*smoothstep(1.0,0.6,uv.y);i*=m;vec3 c=mix(vec3(0.0,1.0,0.6),vec3(0.0,0.4,1.0),uv.y+n1*0.2);c=mix(c,vec3(0.6,0.0,1.0),smoothstep(0.3,0.7,uv.y+n2*0.3));c=mix(c,vec3(1.0,0.2,0.6),smoothstep(0.6,1.0,uv.y));gl_FragColor=vec4(vec3(0.0,0.02,0.05)+c*i*1.5,1.0);}`; auroraMesh = new THREE.Mesh(new THREE.PlaneGeometry(20,12), new THREE.ShaderMaterial({uniforms:{time:{value:0}},vertexShader:vs,fragmentShader:fs,transparent:true,depthWrite:false})); auroraMesh.position.z=-1; scene.add(auroraMesh); animateAurora(); }
-    function animateAurora() { if(isEcoMode) return; requestAnimationFrame(animateAurora); if(auroraMesh) auroraMesh.material.uniforms.time.value += 0.005; if(stars) stars.rotation.y += 0.0001; renderer.render(scene, camera); }
-    window.addEventListener('resize', () => { if(camera){ camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); } });
-    
+    function initAurora() { const c = document.getElementById('aurora-canvas'); const renderer = new THREE.WebGLRenderer({ canvas: c, antialias: true }); renderer.setSize(window.innerWidth, window.innerHeight); const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000); camera.position.z = 5; const g = new THREE.BufferGeometry(); const v = []; for(let i=0;i<3000;i++) v.push((Math.random()-0.5)*2000, (Math.random()-0.5)*2000, (Math.random()-0.5)*2000); g.setAttribute('position', new THREE.Float32BufferAttribute(v,3)); const stars = new THREE.Points(g, new THREE.PointsMaterial({color:0xffffff, size:0.7, transparent:true, opacity:0.8})); scene.add(stars); const vs=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`; const fs=`uniform float time;varying vec2 vUv;vec3 permute(vec3 x){return mod(((x*34.0)+1.0)*x,289.0);}float snoise(vec2 v){const vec4 C=vec4(0.211324865405187,0.366025403784439,-0.577350269189626,0.024390243902439);vec2 i=floor(v+dot(v,C.yy));vec2 x0=v-i+dot(i,C.xx);vec2 i1;i1=(x0.x>x0.y)?vec2(1.0,0.0):vec2(0.0,1.0);vec4 x12=x0.xyxy+C.xxzz;x12.xy-=i1;i=mod(i,289.0);vec3 p=permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0));vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.0);m=m*m;m=m*m;vec3 x=2.0*fract(p*C.www)-1.0;vec3 h=abs(x)-0.5;vec3 ox=floor(x+0.5);vec3 a0=x-ox;m*=1.79284291400159-0.85373472095314*(a0*a0+h*h);vec3 g;g.x=a0.x*x0.x+h.x*x0.y;g.yz=a0.yz*x12.xz+h.yz*x12.yw;return 130.0*dot(m,g);}void main(){vec2 uv=vUv;float n1=snoise(vec2(uv.x*1.5,uv.y*0.5-time*0.1));float n2=snoise(vec2(uv.x*2.5+time*0.05,uv.y*2.0-time*0.2));float n3=snoise(vec2(uv.x*4.0-time*0.1,uv.y*3.0+time*0.1));float i=smoothstep(0.2,0.8,n1*0.5+n2*0.3+n3*0.2+uv.y*0.3);float m=smoothstep(0.0,0.2,uv.y)*smoothstep(1.0,0.6,uv.y);i*=m;vec3 c=mix(vec3(0.0,1.0,0.6),vec3(0.0,0.4,1.0),uv.y+n1*0.2);c=mix(c,vec3(0.6,0.0,1.0),smoothstep(0.3,0.7,uv.y+n2*0.3));c=mix(c,vec3(1.0,0.2,0.6),smoothstep(0.6,1.0,uv.y));gl_FragColor=vec4(vec3(0.0,0.02,0.05)+c*i*1.5,1.0);}`; const auroraMesh = new THREE.Mesh(new THREE.PlaneGeometry(20,12), new THREE.ShaderMaterial({uniforms:{time:{value:0}},vertexShader:vs,fragmentShader:fs,transparent:true,depthWrite:false})); auroraMesh.position.z=-1; scene.add(auroraMesh); function animate(){ if(isEcoMode) return; requestAnimationFrame(animate); auroraMesh.material.uniforms.time.value+=0.005; stars.rotation.y+=0.0001; renderer.render(scene, camera); } animate(); window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);}); }
     function toggleEcoMode() { isEcoMode = !isEcoMode; document.getElementById('eco-toggle').classList.toggle('active'); document.getElementById('aurora-canvas').style.opacity = isEcoMode ? '0' : '1'; if(!isEcoMode) animateAurora(); if(isEcoMode && typeof fireworks !== 'undefined' && fireworks) fireworks.stop(); }
     
     initSecurity();
