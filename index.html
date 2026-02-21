@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GPA Manager - V58 (Unstoppable Zen)</title>
+    <title>GPA Manager - Pure Royal Edition</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,22 +12,24 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Orbitron:wght@700;900&family=Dancing+Script:wght@700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.10.0/dist/index.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     
     <style>
-        :root { --card-bg: rgba(255, 255, 255, 0.1); --text-main: #e2e8f0; --text-light: #94a3b8; --border-color: rgba(255,255,255,0.2); --input-bg: rgba(255, 255, 255, 0.15); --input-border: rgba(255,255,255,0.3); --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); --btn-strategy-bg: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); --btn-excel-bg: #107c41; }
+        :root { 
+            --card-bg: rgba(255, 255, 255, 0.1); --text-main: #e2e8f0; --text-light: #94a3b8; --border-color: rgba(255,255,255,0.2); 
+            --input-bg: rgba(255, 255, 255, 0.15); --input-border: rgba(255,255,255,0.3); --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); 
+            --btn-strategy-bg: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); --btn-excel-bg: #107c41; 
+        }
         body { font-family: 'Segoe UI', Roboto, sans-serif; background: #000510; color: var(--text-main); margin: 0; padding: 20px; min-height: 100vh; overflow-x: hidden; }
         
         #aurora-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -999; pointer-events: none; opacity: 1; transition: opacity 1s; }
-        #orb-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5001; pointer-events: none; display: none; }
 
         /* DASHBOARD & UI */
         .dashboard { padding: 25px; border-radius: 20px; margin-bottom: 25px; display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 20px; align-items: center; background: rgba(20, 30, 50, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); }
@@ -38,62 +40,7 @@
         .chart-card, .semester-card { background: rgba(20, 30, 50, 0.4); backdrop-filter: blur(12px); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.15); margin-bottom: 20px; }
         .chart-card { padding: 20px; height: 300px; }
         input, select { color: #fff; background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.2); } input::placeholder { color: rgba(255,255,255,0.4); } option { background: #1e293b; color: #fff; }
-        
-        /* ZEN MODE OVERLAY */
-        #zen-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px); opacity: 0; transition: opacity 0.5s ease; text-align: center; padding: 20px; box-sizing: border-box; }
-        #zen-overlay.active { display: flex; opacity: 1; }
-        .zen-ui-layer { z-index: 5002; position: relative; pointer-events: auto; }
 
-        .zen-timer { 
-            font-family: 'Orbitron', sans-serif;
-            font-size: 9rem; 
-            color: #fcd34d; 
-            letter-spacing: 5px; 
-            margin: 10px 0; 
-            position: relative; 
-            text-shadow: 4px 4px 0px #b45309, 8px 8px 20px rgba(0,0,0,0.8);
-            font-weight: 900;
-        }
-        @keyframes timer-pulse-calm { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
-        .zen-timer.ticking { animation: timer-pulse-calm 1s infinite ease-in-out; }
-
-        .zen-rank-badge { font-family: 'Cinzel', serif; font-size: 1.5rem; color: #fbbf24; border: 2px solid #fbbf24; padding: 5px 20px; border-radius: 4px; background: rgba(0,0,0,0.6); margin-bottom: 5px; box-shadow: 0 0 15px rgba(251, 191, 36, 0.3); text-transform: uppercase; }
-        .zen-xp-bar-container { width: 300px; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-bottom: 20px; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
-        .zen-xp-bar-fill { height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); width: 0%; transition: width 0.5s ease-out; box-shadow: 0 0 10px #fbbf24; }
-        .zen-xp-text { font-size: 0.9rem; color: #94a3b8; margin-top: 5px; font-weight: bold; }
-        
-        .zen-quote-container { margin-top: 30px; max-width: 800px; padding: 20px; border-radius: 15px; position: relative; background: transparent; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); min-height: 150px; display: flex; flex-direction: column; justify-content: center; }
-        .zen-quote-container::before { content: ''; position: absolute; top: 50%; left: 50%; width: 200%; height: 500%; background: conic-gradient(transparent 0deg, transparent 270deg, #00f2ff 300deg, #bc13fe 360deg); transform: translate(-50%, -50%); animation: rotate-border 4s linear infinite; z-index: -2; }
-        .zen-quote-container::after { content: ''; position: absolute; inset: 3px; background: rgba(15, 23, 42, 0.95); border-radius: 12px; z-index: -1; }
-        @keyframes rotate-border { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
-        .zen-quote-en, .zen-quote-vi, .zen-quote-author { position: relative; z-index: 5; transition: opacity 0.5s ease; }
-        .zen-quote-en { font-size: 1.2rem; font-style: italic; color: #cbd5e1; margin-bottom: 5px; font-family: 'Segoe UI', serif; }
-        .zen-quote-vi { font-size: 1.1rem; color: #a5b4fc; font-weight: 600; margin-bottom: 10px; }
-        .zen-quote-author { font-size: 0.9rem; color: #fbbf24; text-transform: uppercase; letter-spacing: 1px; text-align: right; }
-        
-        .zen-status { font-size: 1.2rem; text-transform: uppercase; letter-spacing: 5px; color: rgba(255,255,255,0.9); margin-bottom: 10px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-        .zen-controls { display: flex; gap: 20px; margin-top: 20px; }
-        .zen-btn { background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.5); color: white; padding: 12px 40px; border-radius: 50px; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .zen-btn:hover { background: #fff; color: #000; transform: translateY(-3px); }
-        .zen-btn-exit { position: absolute; top: 30px; right: 30px; background: transparent; border: none; font-size: 2.5rem; color: rgba(255,255,255,0.5); cursor: pointer; transition: 0.3s; z-index: 6005; pointer-events: auto; }
-        .zen-btn-exit:hover { color: #ef4444; transform: rotate(90deg) scale(1.2); }
-        .zen-mascot { font-size: 6rem; animation: mascot-idle 6s ease-in-out infinite, mascot-glow 4s infinite; margin-bottom: 10px; }
-        .zen-rebirth-btn { display: none; margin-top: 10px; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); border: 2px solid #fecaca; color: white; padding: 10px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; animation: pulse-red 2s infinite; }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-
-        /* ANIMATIONS */
-        @keyframes mascot-idle { 0%, 100% { transform: translateY(0) rotate(0deg) scale(1); } 50% { transform: translateY(-8px) rotate(2deg) scale(1.02); } }
-        @keyframes mascot-glow { 0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4)); } 50% { filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8)); } }
-        @keyframes mascot-spin { 0% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.3) rotate(180deg); } 100% { transform: scale(1) rotate(360deg); } }
-        
-        .mascot-display { font-size: 4.5rem; line-height: 1; margin-bottom: 10px; display: inline-block; cursor: pointer; animation: mascot-idle 4s ease-in-out infinite, mascot-glow 3s infinite; transition: all 0.3s; user-select: none; }
-        .mascot-display:hover { animation-play-state: paused; transform: scale(1.2) rotate(-5deg); filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.8)); }
-        .mascot-display.joyful { animation: mascot-spin 0.8s ease-in-out; }
-        .mascot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
-        .mascot-option { font-size: 2rem; padding: 10px; border-radius: 12px; cursor: pointer; background: rgba(255,255,255,0.1); border: 2px solid transparent; transition: 0.2s; text-align: center; }
-        .mascot-option:hover { background: rgba(255,255,255,0.2); transform: scale(1.2); }
-        .mascot-option.selected { border-color: #8b5cf6; background: rgba(139, 92, 246, 0.2); box-shadow: 0 0 10px rgba(139, 92, 246, 0.5); animation: mascot-idle 2s infinite; }
-        
         #security-gate { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 10, 20, 0.95); backdrop-filter: blur(20px); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
         #security-gate.unlocked { transform: translateY(-100%); }
         .gate-content { text-align: center; max-width: 300px; outline: none; }
@@ -112,11 +59,10 @@
         
         .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; filter: blur(0); transition: filter 0.5s; z-index: 1; }
         .top-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; z-index: 99; flex-wrap: wrap; justify-content: flex-end; }
-        .theme-toggle, .install-btn, .zen-mode-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: #fff; padding: 8px 15px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; box-shadow: var(--shadow); font-weight: 600; backdrop-filter: blur(4px); transition: 0.2s; }
-        .theme-toggle:hover, .install-btn:hover, .zen-mode-btn:hover { transform: scale(1.05); background: rgba(255,255,255,0.2); }
-        .install-btn { background: #8b5cf6; color: white; border: none; }
-        .zen-mode-btn { background: #10b981; color: white; border: none; }
-        .eco-btn { background: #64748b; color: white; border: none; }
+        .install-btn, .eco-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: #fff; padding: 8px 15px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; box-shadow: var(--shadow); font-weight: 600; backdrop-filter: blur(4px); transition: 0.2s; }
+        .install-btn:hover, .eco-btn:hover { transform: scale(1.05); background: rgba(255,255,255,0.2); }
+        .install-btn { background: #8b5cf6; border: none; }
+        .eco-btn { background: #64748b; border: none; }
         .eco-btn.active { background: #ef4444; }
         
         .app-header { text-align: center; margin-bottom: 25px; padding-top: 10px; }
@@ -189,40 +135,19 @@
         .sc-gpa { font-size: 4.5rem; font-weight: 800; line-height: 1; margin-bottom: 15px; background: -webkit-linear-gradient(#fff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); }
         .sc-footer { padding: 15px; font-size: 0.7rem; opacity: 0.5; border-top: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); }
         
-        @media (max-width: 768px) { .dashboard { grid-template-columns: 1fr; gap: 10px; } .stat-item { height: auto; min-height: 120px; flex-direction: row; justify-content: space-between; padding: 15px 20px; } .stat-item:nth-child(2) { flex-direction: column; justify-content: center; } .stat-content-area { justify-content: flex-end; width: auto; flex: none; margin-bottom: 0; } .stat-label { margin-top: 0; order: 1; text-align: left; } .stat-content-area { order: 2; } .stat-value { font-size: 3rem; } .subject-row { flex-direction: column; align-items: stretch; gap: 8px; } .field-group { width: 100%; } .controls { flex-direction: column-reverse; gap: 15px; } .controls-right, .btn-strategy { width: 100%; justify-content: center; } .top-controls { top: 15px; right: 15px; } .zen-timer { font-size: 5rem; } .zen-quote-container { width: 90%; } }
+        .mascot-display { font-size: 4.5rem; line-height: 1; margin-bottom: 10px; display: inline-block; cursor: pointer; transition: all 0.3s; user-select: none; }
+        .mascot-display:hover { transform: scale(1.2) rotate(-5deg); filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.8)); }
+        .mascot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+        .mascot-option { font-size: 2rem; padding: 10px; border-radius: 12px; cursor: pointer; background: rgba(255,255,255,0.1); border: 2px solid transparent; transition: 0.2s; text-align: center; }
+        .mascot-option:hover { background: rgba(255,255,255,0.2); transform: scale(1.2); }
+        .mascot-option.selected { border-color: #8b5cf6; background: rgba(139, 92, 246, 0.2); box-shadow: 0 0 10px rgba(139, 92, 246, 0.5); }
+        
+        @media (max-width: 768px) { .dashboard { grid-template-columns: 1fr; gap: 10px; } .stat-item { height: auto; min-height: 120px; flex-direction: row; justify-content: space-between; padding: 15px 20px; } .stat-item:nth-child(2) { flex-direction: column; justify-content: center; } .stat-content-area { justify-content: flex-end; width: auto; flex: none; margin-bottom: 0; } .stat-label { margin-top: 0; order: 1; text-align: left; } .stat-content-area { order: 2; } .stat-value { font-size: 3rem; } .subject-row { flex-direction: column; align-items: stretch; gap: 8px; } .field-group { width: 100%; } .controls { flex-direction: column-reverse; gap: 15px; } .controls-right, .btn-strategy { width: 100%; justify-content: center; } .top-controls { top: 15px; right: 15px; } }
     </style>
 </head>
 <body>
 
 <canvas id="aurora-canvas"></canvas>
-<canvas id="orb-canvas"></canvas>
-<div id="fireworks-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999;"></div>
-
-<div id="zen-overlay">
-    <button class="zen-btn-exit zen-ui-layer" onclick="toggleZenMode()"><i class="fas fa-times"></i></button>
-    <div class="zen-mascot zen-ui-layer" id="zen-mascot">👑</div>
-    <div class="zen-rank-badge zen-ui-layer" id="zen-rank">Phàm Nhân</div>
-    <div class="zen-xp-bar-container zen-ui-layer"><div class="zen-xp-bar-fill" id="zen-xp-fill"></div></div>
-    <div class="zen-xp-text zen-ui-layer" id="zen-xp-text">0 / 25 Tu Vi</div>
-    <button class="zen-rebirth-btn zen-ui-layer" id="btn-rebirth" onclick="triggerRebirth()">🌀 CHUYỂN SINH</button>
-    <div class="zen-status zen-ui-layer" id="zen-status">Sẵn sàng tu luyện</div>
-    <div class="zen-timer zen-ui-layer" id="zen-timer">25:00</div>
-    <div class="zen-quote-container zen-ui-layer" id="zen-quote-box">
-        <div class="zen-quote-en" id="q-en"></div>
-        <div class="zen-quote-vi" id="q-vi"></div>
-        <div class="zen-quote-author" id="q-author"></div>
-    </div>
-    
-    <div class="zen-controls zen-ui-layer" id="zen-controls">
-        <button class="zen-btn" id="btn-zen-start" onclick="startTimer()">Bắt đầu</button>
-        <button class="zen-btn" onclick="resetTimer()">Đặt lại</button>
-    </div>
-    
-    <div class="zen-controls zen-ui-layer" id="zen-break-options" style="display:none; gap:15px; flex-wrap:wrap; justify-content:center;">
-        <button class="zen-btn" style="background:rgba(16, 185, 129, 0.2); border-color:#10b981;" onclick="startBreak(5)">🍵 Nghỉ Ngắn (5p)</button>
-        <button class="zen-btn" style="background:rgba(59, 130, 246, 0.2); border-color:#3b82f6;" onclick="startBreak(15)">🎮 Nghỉ Dài (15p)</button>
-    </div>
-</div>
 
 <div id="security-gate">
     <div class="gate-content" tabindex="0">
@@ -243,8 +168,7 @@
 
 <div class="container" id="main-app">
     <div class="top-controls">
-        <button class="eco-btn" id="eco-toggle" onclick="toggleEcoMode()" title="Tiết kiệm pin"><i class="fas fa-leaf"></i></button>
-        <button class="zen-mode-btn" onclick="toggleZenMode()"><i class="fas fa-spa"></i> Tu Luyện</button>
+        <button class="eco-btn" id="eco-toggle" onclick="toggleEcoMode()" title="Tiết kiệm pin"><i class="fas fa-leaf"></i> Cực quang</button>
         <button class="install-btn" id="btn-install-app" onclick="triggerInstallApp()"><i class="fas fa-download"></i> Cài App</button>
     </div>
 
@@ -362,7 +286,7 @@
 </div>
 
 <script>
-    // --- 1. CONFIGURATION (DỄ SỬA ĐỔI) ---
+    // --- 1. CONFIGURATION ---
     const GRADE_CONFIG = [
         { min: 8.5, g4: 4.0, char: 'A', text: 'Giỏi', css: 'bg-gioi' },
         { min: 8.0, g4: 3.5, char: 'B+', text: 'Khá', css: 'bg-kha' },
@@ -387,404 +311,13 @@
     let selectedMascot = '👑'; 
     let deferredPrompt;
     let isEcoMode = false;
+    let auroraMesh, stars, renderer, scene, camera;
 
-    // --- 3. CULTIVATION & ZEN LOGIC ---
-    const REALMS = [ 
-        { name: "Phàm Nhân", min: 0, color: {r:200, g:200, b:200} }, 
-        { name: "Luyện Khí Kỳ", min: 25, color: {r:0, g:242, b:255} }, 
-        { name: "Trúc Cơ Kỳ", min: 100, color: {r:0, g:255, b:127} }, 
-        { name: "Kim Đan Kỳ", min: 300, color: {r:255, g:215, b:0} }, 
-        { name: "Nguyên Anh Kỳ", min: 1000, color: {r:188, g:19, b:254} }, 
-        { name: "Hóa Thần Kỳ", min: 3000, color: {r:255, g:50, b:50} } 
-    ];
-    let cultivationData = { points: 0, generation: 1 };
-    const MAX_POINTS = 5000; 
-    
-    function loadCultivation(pin) { 
-        const saved = loadDecryptedData('cultivationData', pin);
-        if (saved) cultivationData = saved;
-        if (!cultivationData.generation) cultivationData.generation = 1; 
-        updateRankDisplay(); 
-    }
-
-    function getRealmInfo(points) { let current = REALMS[0]; let next = REALMS[1]; for (let i = 0; i < REALMS.length; i++) { if (points >= REALMS[i].min) { current = REALMS[i]; next = REALMS[i+1]; } } return { current, next }; }
-    function updateRankDisplay() { 
-        const { current, next } = getRealmInfo(cultivationData.points); 
-        const genPrefix = cultivationData.generation > 1 ? `[Kiếp ${cultivationData.generation}] ` : ""; 
-        const rankBadge = document.getElementById('zen-rank');
-        rankBadge.innerText = genPrefix + current.name; 
-        const colorStr = `rgb(${current.color.r},${current.color.g},${current.color.b})`;
-        rankBadge.style.color = colorStr; 
-        rankBadge.style.borderColor = colorStr; 
-        
-        let percent = 0; let progressText = ""; 
-        if (next) { 
-            const range = next.min - current.min; const progress = cultivationData.points - current.min; 
-            percent = (progress / range) * 100; 
-            progressText = `${cultivationData.points} / ${next.min} Tu Vi`; 
-            document.getElementById('btn-rebirth').style.display = 'none'; 
-        } else { 
-            const range = MAX_POINTS - current.min; const progress = cultivationData.points - current.min; 
-            percent = Math.min(100, (progress / range) * 100); 
-            progressText = `${cultivationData.points} / ${MAX_POINTS} (Đỉnh Phong)`; 
-            document.getElementById('btn-rebirth').style.display = (cultivationData.points >= MAX_POINTS) ? 'block' : 'none';
-            if (cultivationData.points >= MAX_POINTS) percent = 100; 
-        } 
-        document.getElementById('zen-xp-fill').style.width = `${percent}%`; 
-        document.getElementById('zen-xp-text').innerText = progressText; 
-        if(!isEcoMode) { OrbVisuals.orbColor = { ...current.color }; OrbVisuals.targetColor = { ...current.color }; OrbVisuals.speedMultiplier = 1 + (cultivationData.generation - 1) * 0.5; }
-    }
-    function addTuVi(amount) { 
-        const oldRank = getRealmInfo(cultivationData.points).current.name; 
-        cultivationData.points += amount; 
-        saveEncryptedData('cultivationData', cultivationData);
-        updateRankDisplay(); 
-        const newRank = getRealmInfo(cultivationData.points).current.name; 
-        if (newRank !== oldRank) { alert(`Chúc mừng! Bệ hạ đã đột phá lên ${newRank}!`); runBigFireworks(); playRealisticBoom(); } 
-    }
-    function triggerRebirth() { 
-        if(confirm("Bệ hạ có chắc chắn muốn CHUYỂN SINH? Tu vi sẽ về 0, nhưng sẽ nhận được danh hiệu [Kiếp " + (cultivationData.generation + 1) + "] và Sức mạnh tia sét tăng cường!")) { 
-            cultivationData.points = 0; cultivationData.generation += 1; 
-            saveEncryptedData('cultivationData', cultivationData);
-            updateRankDisplay(); runBigFireworks(); playRealisticBoom(); alert("Chuyển sinh thành công!"); 
-        } 
-    }
-
-    // --- 4. ORB VISUALS ---
-    const OrbVisuals = {
-        canvas: null, ctx: null, width: 0, height: 0, animationId: null, particles: [], inflowParticles: [], orbColor: { r: 200, g: 200, b: 200 }, targetColor: { r: 200, g: 200, b: 200 }, mouseX: -1000, mouseY: -1000, isHovering: false, orbRadius: 180, cx: 0, cy: 0, speedMultiplier: 1, isRunning: false,
-        init: function() { this.canvas = document.getElementById('orb-canvas'); this.ctx = this.canvas.getContext('2d'); this.resize(); window.addEventListener('resize', () => this.resize()); window.addEventListener('mousemove', (e) => this.handleMouseMove(e)); this.createInflowParticles(); },
-        resize: function() { this.width = window.innerWidth; this.height = window.innerHeight; this.canvas.width = this.width; this.canvas.height = this.height; if (this.width > 768) { this.cx = this.width * 0.75; this.orbRadius = 180; } else { this.cx = this.width / 2; this.orbRadius = 120; } this.cy = this.height / 2; },
-        handleMouseMove: function(e) { this.mouseX = e.clientX; this.mouseY = e.clientY; const dx = this.mouseX - this.cx; const dy = this.mouseY - this.cy; this.isHovering = (dx*dx + dy*dy) < (this.orbRadius * this.orbRadius); },
-        lerp: function(start, end, amt) { return (1 - amt) * start + amt * end; },
-        createInflowParticles: function() { for(let i=0; i<50; i++) { this.inflowParticles.push({ angle: Math.random() * Math.PI * 2, dist: this.orbRadius + Math.random() * 300 + 50, speed: Math.random() * 1 + 0.5, size: Math.random() * 2 }); } },
-        animate: function() {
-            if (!this.isRunning || isEcoMode) return;
-            this.ctx.clearRect(0, 0, this.width, this.height);
-            this.orbColor.r = this.lerp(this.orbColor.r, this.targetColor.r, 0.05); this.orbColor.g = this.lerp(this.orbColor.g, this.targetColor.g, 0.05); this.orbColor.b = this.lerp(this.orbColor.b, this.targetColor.b, 0.05);
-            const mainColor = `rgb(${this.orbColor.r},${this.orbColor.g},${this.orbColor.b})`;
-            this.ctx.fillStyle = `rgba(${this.orbColor.r},${this.orbColor.g},${this.orbColor.b}, 0.5)`;
-            for(let p of this.inflowParticles) { p.dist -= p.speed * this.speedMultiplier; if(p.dist < this.orbRadius) { p.dist = this.orbRadius + 300; } const px = this.cx + Math.cos(p.angle) * p.dist; const py = this.cy + Math.sin(p.angle) * p.dist; this.ctx.beginPath(); this.ctx.arc(px, py, p.size, 0, Math.PI * 2); this.ctx.fill(); }
-            const glow = this.ctx.createRadialGradient(this.cx, this.cy, this.orbRadius, this.cx, this.cy, this.orbRadius + 50); glow.addColorStop(0, `rgba(${this.orbColor.r},${this.orbColor.g},${this.orbColor.b}, 0.3)`); glow.addColorStop(1, 'transparent'); this.ctx.fillStyle = glow; this.ctx.beginPath(); this.ctx.arc(this.cx, this.cy, this.orbRadius + 50, 0, Math.PI * 2); this.ctx.fill();
-            const coreRadius = 30; this.ctx.fillStyle = 'white'; this.ctx.shadowBlur = 20; this.ctx.shadowColor = mainColor; this.ctx.beginPath(); this.ctx.arc(this.cx, this.cy, coreRadius, 0, Math.PI * 2); this.ctx.fill(); this.ctx.shadowBlur = 0;
-            const numFilaments = 15;
-            for (let i = 0; i < numFilaments; i++) {
-                let targetAngle; if (this.isHovering) { const dx = this.mouseX - this.cx; const dy = this.mouseY - this.cy; targetAngle = Math.atan2(dy, dx) + (Math.random() - 0.5) * 0.5; } else { targetAngle = (Date.now() * 0.0005 * (i + 1) * this.speedMultiplier) % (Math.PI * 2); }
-                this.ctx.strokeStyle = (Math.random() > 0.5) ? 'white' : mainColor; this.ctx.lineWidth = Math.random() * 2 + 1; this.ctx.beginPath(); this.ctx.moveTo(this.cx, this.cy);
-                let currentR = coreRadius; let currentAngle = targetAngle;
-                while(currentR < this.orbRadius) { currentR += Math.random() * 20 + 10; if(currentR > this.orbRadius) currentR = this.orbRadius; const jitter = (Math.random() - 0.5) * 0.2 * this.speedMultiplier; const x = this.cx + Math.cos(currentAngle + jitter) * currentR; const y = this.cy + Math.sin(currentAngle + jitter) * currentR; this.ctx.lineTo(x, y); } this.ctx.stroke();
-            }
-            const glass = this.ctx.createRadialGradient(this.cx - 50, this.cy - 50, 10, this.cx, this.cy, this.orbRadius); glass.addColorStop(0, 'rgba(255,255,255,0.1)'); glass.addColorStop(1, 'rgba(255,255,255,0)'); this.ctx.fillStyle = glass; this.ctx.beginPath(); this.ctx.arc(this.cx, this.cy, this.orbRadius, 0, Math.PI * 2); this.ctx.fill(); this.ctx.strokeStyle = 'rgba(255,255,255,0.3)'; this.ctx.lineWidth = 2; this.ctx.beginPath(); this.ctx.arc(this.cx, this.cy, this.orbRadius, 0, Math.PI * 2); this.ctx.stroke();
-            this.animationId = requestAnimationFrame(() => this.animate());
-        },
-        start: function() { this.isRunning = true; document.getElementById('orb-canvas').style.display = 'block'; this.animate(); }, 
-        stop: function() { this.isRunning = false; document.getElementById('orb-canvas').style.display = 'none'; cancelAnimationFrame(this.animationId); if(this.ctx) this.ctx.clearRect(0, 0, this.width, this.height); },
-        setMode: function(progress) { this.progress = progress; const r = 0 + (255 - 0) * progress; const g = 200 + (0 - 200) * progress; const b = 255 + (255 - 255) * progress; this.targetColor = { r: r, g: g, b: b }; }
-    };
-
-    // --- 5. AUDIO & QUOTES (100 MIXED QUOTES) ---
-    function playChime() { const AudioContext = window.AudioContext || window.webkitAudioContext; if (!AudioContext) return; const ctx = new AudioContext(); const t = ctx.currentTime; const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.frequency.setValueAtTime(880, t); osc.frequency.exponentialRampToValueAtTime(0.01, t + 1.5); gain.gain.setValueAtTime(0.3, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 1.5); osc.connect(gain); gain.connect(ctx.destination); osc.start(t); osc.stop(t + 1.5); }
-    function playRealisticBoom() { if(isEcoMode) return; const AudioContext = window.AudioContext || window.webkitAudioContext; if (!AudioContext) return; const ctx = new AudioContext(); const t = ctx.currentTime; const bufferSize = ctx.sampleRate * 2; const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate); const data = buffer.getChannelData(0); let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0; for (let i=0; i<bufferSize; i++) { const w = Math.random() * 2 - 1; b0 = 0.99886 * b0 + w * 0.0555179; b1 = 0.99332 * b1 + w * 0.0750759; b2 = 0.96900 * b2 + w * 0.1538520; b3 = 0.86650 * b3 + w * 0.3104856; b4 = 0.55000 * b4 + w * 0.5329522; b5 = -0.7616 * b5 - w * 0.0168980; data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362; data[i] *= 0.11; b6 = w * 0.115926; } const noise = ctx.createBufferSource(); noise.buffer = buffer; const filter = ctx.createBiquadFilter(); filter.type = "lowpass"; filter.frequency.value = 800; filter.frequency.exponentialRampToValueAtTime(100, t + 0.3); const gain = ctx.createGain(); gain.gain.setValueAtTime(1, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 1.5); noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination); noise.start(t); noise.stop(t + 2); }
-    
-    // --- 100 MIXED QUOTES (ANH - VIỆT - LỘN XỘN) ---
-    const quotes = [
-        { en: "Education is the most powerful weapon which you can use to change the world.", vi: "Giáo dục là vũ khí mạnh nhất để thay đổi thế giới.", author: "Nelson Mandela" },
-        { en: "Live as if you were to die tomorrow. Learn as if you were to live forever.", vi: "Sống như thể mai là ngày tận thế. Học như thể bạn sẽ sống mãi mãi.", author: "Mahatma Gandhi" },
-        { en: "The only place where success comes before work is in the dictionary.", vi: "Nơi duy nhất thành công đến trước làm việc là trong từ điển.", author: "Vidal Sassoon" },
-        { en: "It does not matter how slowly you go as long as you do not stop.", vi: "Chậm bao nhiêu không quan trọng, miễn là đừng dừng lại.", author: "Confucius" },
-        { en: "Genius is 1% talent and 99% percent hard work.", vi: "Thiên tài chỉ có 1% là năng khiếu, 99% là khổ luyện.", author: "Albert Einstein" },
-        { en: "Don't let yesterday take up too much of today.", vi: "Đừng để ngày hôm qua chiếm quá nhiều thời gian của hôm nay.", author: "Will Rogers" },
-        { en: "Failure is the opportunity to begin again more intelligently.", vi: "Thất bại là cơ hội để bắt đầu lại một cách thông minh hơn.", author: "Henry Ford" },
-        { en: "The best way to predict the future is to create it.", vi: "Cách tốt nhất để dự đoán tương lai là tạo ra nó.", author: "Peter Drucker" },
-        { en: "Believe you can and you're halfway there.", vi: "Tin rằng bạn có thể là bạn đã đi được nửa chặng đường.", author: "Theodore Roosevelt" },
-        { en: "Hard work beats talent when talent doesn't work hard.", vi: "Chăm chỉ sẽ đánh bại thiên tài khi thiên tài không chịu chăm chỉ.", author: "Tim Notke" },
-        { en: "Study while others are sleeping; work while others are loafing.", vi: "Học khi kẻ khác ngủ, làm khi kẻ khác lười.", author: "William A. Ward" },
-        { en: "Discipline is doing what needs to be done, even if you don't want to.", vi: "Kỷ luật là làm việc cần làm, ngay cả khi không muốn.", author: "Anonymous" },
-        { en: "No pressure, no diamonds.", vi: "Không có áp lực, không có kim cương.", author: "Thomas Carlyle" },
-        { en: "Học, học nữa, học mãi.", vi: "Study, study more, study forever.", author: "Lenin" },
-        { en: "You don't have to be great to start, but you have to start to be great.", vi: "Bạn không cần vĩ đại để bắt đầu, nhưng phải bắt đầu để vĩ đại.", author: "Zig Ziglar" },
-        { en: "Focus on the process, not the outcome.", vi: "Tập trung vào quá trình, đừng chỉ nhìn kết quả.", author: "Anonymous" },
-        { en: "A smooth sea never made a skilled sailor.", vi: "Biển lặng không tạo nên thủy thủ giỏi.", author: "F.D. Roosevelt" },
-        { en: "Your time is limited, so don't waste it living someone else's life.", vi: "Thời gian có hạn, đừng phí nó sống cuộc đời người khác.", author: "Steve Jobs" },
-        { en: "Stay hungry, stay foolish.", vi: "Hãy cứ khát khao, hãy cứ dại khờ.", author: "Steve Jobs" },
-        { en: "The expert in anything was once a beginner.", vi: "Chuyên gia nào cũng từng là người mới bắt đầu.", author: "Helen Hayes" },
-        { en: "Dream big and dare to fail.", vi: "Mơ lớn và dám thất bại.", author: "Norman Vaughan" },
-        { en: "I never lose. I either win or learn.", vi: "Tôi không bao giờ thua. Tôi thắng hoặc tôi học được bài học.", author: "Nelson Mandela" },
-        { en: "Success consists of going from failure to failure without loss of enthusiasm.", vi: "Thành công là đi từ thất bại này đến thất bại khác mà không mất nhiệt huyết.", author: "Winston Churchill" },
-        { en: "Knowledge is power.", vi: "Tri thức là sức mạnh.", author: "Francis Bacon" },
-        { en: "Don't watch the clock; do what it does. Keep going.", vi: "Đừng nhìn đồng hồ; hãy làm như nó. Cứ đi tiếp.", author: "Sam Levenson" },
-        { en: "If you can dream it, you can do it.", vi: "Nếu bạn dám mơ, bạn có thể làm được.", author: "Walt Disney" },
-        { en: "Hành trình vạn dặm bắt đầu từ một bước chân.", vi: "A journey of a thousand miles begins with a single step.", author: "Lão Tử" },
-        { en: "Action is the foundational key to all success.", vi: "Hành động là chìa khóa cơ bản của mọi thành công.", author: "Pablo Picasso" },
-        { en: "The secret of getting ahead is getting started.", vi: "Bí quyết để dẫn đầu là bắt đầu.", author: "Mark Twain" },
-        { en: "Impossible is just an opinion.", vi: "Không thể chỉ là một ý kiến.", author: "Paulo Coelho" },
-        { en: "Don't stop until you're proud.", vi: "Đừng dừng lại cho đến khi bạn thấy tự hào.", author: "Anonymous" },
-        { en: "Great things never come from comfort zones.", vi: "Điều tuyệt vời không bao giờ đến từ vùng an toàn.", author: "Anonymous" },
-        { en: "Motivation is what gets you started. Habit is what keeps you going.", vi: "Động lực giúp bạn bắt đầu. Thói quen giúp bạn đi tiếp.", author: "Jim Ryun" },
-        { en: "Success doesn't come to you, you go to it.", vi: "Thành công không tự tìm đến, bạn phải đi tìm nó.", author: "Marva Collins" },
-        { en: "Work hard in silence, let your success be your noise.", vi: "Hãy nỗ lực trong im lặng, để thành công lên tiếng thay bạn.", author: "Frank Ocean" },
-        { en: "Trên bước đường thành công không có dấu chân của kẻ lười biếng.", vi: "Laziness leaves no footprints on the path to success.", author: "Lỗ Tấn" },
-        { en: "Be stronger than your excuses.", vi: "Hãy mạnh mẽ hơn những lời viện cớ của bạn.", author: "Anonymous" },
-        { en: "Don't wish for it. Work for it.", vi: "Đừng chỉ ước. Hãy làm vì nó.", author: "Anonymous" },
-        { en: "Push yourself, because no one else is going to do it for you.", vi: "Hãy tự thúc đẩy bản thân, vì không ai làm điều đó thay bạn đâu.", author: "Anonymous" },
-        { en: "The pain you feel today will be the strength you feel tomorrow.", vi: "Nỗi đau hôm nay sẽ là sức mạnh của ngày mai.", author: "Anonymous" },
-        { en: "Success is the sum of small efforts, repeated day in and day out.", vi: "Thành công là tổng hợp của những nỗ lực nhỏ, lặp lại mỗi ngày.", author: "Robert Collier" },
-        { en: "Do something today that your future self will thank you for.", vi: "Hãy làm điều gì đó hôm nay để tương lai bạn sẽ cảm ơn chính mình.", author: "Anonymous" },
-        { en: "Discipline is the bridge between goals and accomplishment.", vi: "Kỷ luật là cầu nối giữa mục tiêu và thành tựu.", author: "Jim Rohn" },
-        { en: "Learning never exhausts the mind.", vi: "Học tập không bao giờ làm trí óc kiệt sức.", author: "Leonardo da Vinci" },
-        { en: "An investment in knowledge pays the best interest.", vi: "Đầu tư vào tri thức mang lại lợi nhuận cao nhất.", author: "Benjamin Franklin" },
-        { en: "There is no substitute for hard work.", vi: "Không gì thay thế được sự chăm chỉ.", author: "Thomas Edison" },
-        { en: "Today a reader, tomorrow a leader.", vi: "Hôm nay là người đọc, ngày mai là người dẫn đầu.", author: "Margaret Fuller" },
-        { en: "Học thầy không tày học bạn.", vi: "Learning from friends is as important as learning from teachers.", author: "Tục ngữ Việt Nam" },
-        { en: "The beautiful thing about learning is that no one can take it away from you.", vi: "Điều tuyệt đẹp của việc học là không ai có thể lấy nó khỏi bạn.", author: "B.B. King" },
-        { en: "Education is not preparation for life; education is life itself.", vi: "Giáo dục không phải là chuẩn bị cho cuộc sống; nó chính là cuộc sống.", author: "John Dewey" },
-        { en: "Change is the end result of all true learning.", vi: "Thay đổi là kết quả cuối cùng của việc học thực sự.", author: "Leo Buscaglia" },
-        { en: "Live as if everything is a miracle.", vi: "Sống như thể mọi thứ đều là phép màu.", author: "Einstein" },
-        { en: "Everything you can imagine is real.", vi: "Mọi thứ bạn tưởng tượng đều có thể thành hiện thực.", author: "Picasso" },
-        { en: "Simplicity is the ultimate sophistication.", vi: "Đơn giản là đỉnh cao của sự tinh tế.", author: "Leonardo da Vinci" },
-        { en: "Tương lai khóc hay cười phụ thuộc vào độ lười của quá khứ.", vi: "Your future tears or smiles depend on your past laziness.", author: "Dân mạng" },
-        { en: "Nếu không tiến lên, bạn đang thụt lùi.", vi: "If you are not moving forward, you are moving backward.", author: "Anonymous" },
-        { en: "Opportunities don't happen, you create them.", vi: "Cơ hội không tự xảy ra, bạn tạo ra chúng.", author: "Chris Grosser" },
-        { en: "Try not to become a man of success. Rather become a man of value.", vi: "Đừng cố trở thành người thành công. Hãy thành người có giá trị.", author: "Albert Einstein" },
-        { en: "Stop afraid of what could go wrong, and focus on what could go right.", vi: "Ngừng sợ hãi điều gì sẽ sai, hãy tập trung vào điều gì sẽ đúng.", author: "Anonymous" },
-        { en: "You become what you believe.", vi: "Bạn trở thành những gì bạn tin tưởng.", author: "Oprah Winfrey" },
-        { en: "Whatever you are, be a good one.", vi: "Dù bạn là ai, hãy là một người tốt.", author: "Abraham Lincoln" },
-        { en: "If you're going through hell, keep going.", vi: "Nếu đang đi qua địa ngục, hãy cứ đi tiếp.", author: "Winston Churchill" },
-        { en: "It always seems impossible until it's done.", vi: "Mọi thứ luôn có vẻ bất khả thi cho đến khi nó hoàn thành.", author: "Nelson Mandela" },
-        { en: "Keep your face always toward the sunshine—and shadows will fall behind you.", vi: "Luôn hướng về ánh mặt trời, bóng tối sẽ ngả sau lưng bạn.", author: "Walt Whitman" },
-        { en: "Có công mài sắt, có ngày nên kim.", vi: "Practice makes perfect.", author: "Tục ngữ Việt Nam" },
-        { en: "Thất bại là mẹ thành công.", vi: "Failure is the mother of success.", author: "Tục ngữ Việt Nam" },
-        { en: "Muốn biết phải hỏi, muốn giỏi phải học.", vi: "If you want to know, ask; if you want to be good, learn.", author: "Tục ngữ Việt Nam" },
-        { en: "Đi một ngày đàng, học một sàng khôn.", vi: "Travel broadens the mind.", author: "Tục ngữ Việt Nam" },
-        { en: "Ngựa non háu đá.", vi: "Young and impulsive.", author: "Thành ngữ" },
-        { en: "Gần mực thì đen, gần đèn thì sáng.", vi: "Show me your friends, I'll show you your future.", author: "Tục ngữ Việt Nam" },
-        { en: "Practice makes perfect.", vi: "Có công mài sắt có ngày nên kim.", author: "Anonymous" },
-        { en: "Be the change that you wish to see in the world.", vi: "Hãy là sự thay đổi bạn muốn thấy trên thế giới.", author: "Gandhi" },
-        { en: "Happiness depends upon ourselves.", vi: "Hạnh phúc phụ thuộc vào chính chúng ta.", author: "Aristotle" },
-        { en: "Do what you can, with what you have, where you are.", vi: "Làm những gì có thể, với những gì đang có, ở nơi bạn đang đứng.", author: "Theodore Roosevelt" },
-        { en: "Quality is not an act, it is a habit.", vi: "Chất lượng không phải là hành động, nó là thói quen.", author: "Aristotle" },
-        { en: "Ever tried. Ever failed. No matter. Try Again. Fail again. Fail better.", vi: "Đã thử. Đã thất bại. Không sao. Thử lại. Thất bại lần nữa. Thất bại tốt hơn.", author: "Samuel Beckett" },
-        { en: "Life is 10% what happens to us and 90% how we react to it.", vi: "Cuộc sống là 10% những gì xảy ra và 90% cách ta phản ứng.", author: "Charles R. Swindoll" },
-        { en: "Limit your 'always' and your 'nevers'.", vi: "Hạn chế nói 'luôn luôn' và 'không bao giờ'.", author: "Amy Poehler" },
-        { en: "Nothing is impossible, the word itself says 'I'm possible'!", vi: "Không gì là không thể, chính từ này nói 'Tôi có thể'!", author: "Audrey Hepburn" },
-        { en: "Winning isn't everything, but wanting to win is.", vi: "Chiến thắng không là tất cả, nhưng muốn thắng thì có.", author: "Vince Lombardi" },
-        { en: "You miss 100% of the shots you don't take.", vi: "Bạn bỏ lỡ 100% cơ hội nếu không nắm lấy.", author: "Wayne Gretzky" },
-        { en: "I attribute my success to this: I never gave or took any excuse.", vi: "Tôi thành công vì: Tôi không bao giờ viện cớ.", author: "Florence Nightingale" },
-        { en: "The mind is everything. What you think you become.", vi: "Tâm trí là tất cả. Bạn nghĩ gì, bạn trở thành thế ấy.", author: "Buddha" },
-        { en: "Your time is now.", vi: "Thời điểm của bạn là ngay bây giờ.", author: "Anonymous" },
-        { en: "Dream it. Wish it. Do it.", vi: "Mơ về nó. Ước muốn nó. Thực hiện nó.", author: "Anonymous" },
-        { en: "Don't stop when you're tired. Stop when you're done.", vi: "Đừng dừng lại khi mệt. Hãy dừng khi đã xong.", author: "Anonymous" },
-        { en: "Wake up with determination. Go to bed with satisfaction.", vi: "Thức dậy với quyết tâm. Đi ngủ với sự hài lòng.", author: "Anonymous" },
-        { en: "Little things make big days.", vi: "Những điều nhỏ bé tạo nên ngày vĩ đại.", author: "Anonymous" },
-        { en: "It’s going to be hard, but hard does not mean impossible.", vi: "Sẽ khó khăn đấy, nhưng khó không có nghĩa là không thể.", author: "Anonymous" },
-        { en: "Wait for it? No. Work for it.", vi: "Chờ đợi ư? Không. Hãy làm việc vì nó.", author: "Anonymous" },
-        { en: "Doubt kills more dreams than failure ever will.", vi: "Sự nghi ngờ giết chết nhiều ước mơ hơn là thất bại.", author: "Suzy Kassem" },
-        { en: "Winners never quit, and quitters never win.", vi: "Người thắng không bao giờ bỏ cuộc, kẻ bỏ cuộc không bao giờ thắng.", author: "Vince Lombardi" },
-        { en: "Energy flows where attention goes.", vi: "Năng lượng chảy về nơi sự chú ý hướng tới.", author: "Tony Robbins" },
-        { en: "Don't count the days, make the days count.", vi: "Đừng đếm ngày tháng, hãy làm ngày tháng trở nên ý nghĩa.", author: "Muhammad Ali" },
-        { en: "Make your life a masterpiece.", vi: "Hãy biến cuộc đời bạn thành kiệt tác.", author: "Anonymous" },
-        { en: "Prove them wrong.", vi: "Hãy chứng minh họ đã sai.", author: "Anonymous" },
-        { en: "Tiên học lễ, hậu học văn.", vi: "First learn manners, then learn knowledge.", author: "Tục ngữ" }
-    ];
-
-    let currentQuoteIndex = -1; 
-
-    function showRandomQuote() {
-        let idx;
-        do { idx = Math.floor(Math.random() * quotes.length); } while (idx === currentQuoteIndex && quotes.length > 1);
-        currentQuoteIndex = idx; 
-        const q = quotes[idx];
-        const c = document.getElementById('zen-quote-box');
-        c.style.opacity = '0'; c.style.transform = 'translateY(10px)'; c.style.transition = 'all 0.5s ease';
-        setTimeout(() => {
-            document.getElementById('q-en').innerText = `"${q.en}"`;
-            document.getElementById('q-vi').innerText = `"${q.vi}"`;
-            document.getElementById('q-author').innerText = `- ${q.author}`;
-            c.style.opacity = '1'; c.style.transform = 'translateY(0)';
-        }, 500);
-    }
-
-    // --- 6. ZEN TIMER LOGIC (V58 - BẤT DIỆT / UNSTOPPABLE TIMER) ---
-    let zenTimer = null; 
-    let timeLeft = 25 * 60; 
-    let isTimerRunning = false; 
-    let isWorkSession = true; 
-    let WORK_TIME = 25 * 60; 
-    
-    // Khai báo các biến lưu vết thời gian thực
-    let targetEndTime = 0;
-    let tuViEarned = 0; // Theo dõi lượng tu vi đã nhận trong phiên hiện tại
-    
-    function toggleZenMode() {
-        const overlay = document.getElementById('zen-overlay');
-        const main = document.getElementById('main-app');
-        if (overlay.classList.contains('active')) { // EXIT
-            overlay.classList.remove('active'); main.style.filter = 'blur(0)'; resetTimer(); OrbVisuals.stop();
-        } else { // ENTER
-            document.getElementById('zen-mascot').innerText = selectedMascot; showRandomQuote(); overlay.classList.add('active'); main.style.filter = 'blur(10px)'; loadCultivation(currentInputPin); 
-            if(!isEcoMode) OrbVisuals.start();
-        }
-    }
-    
-    function startTimer() {
-        const btn = document.getElementById('btn-zen-start');
-        
-        // CASE 1: Đang chạy -> TẠM DỪNG
-        if (isTimerRunning) {
-            clearInterval(zenTimer);
-            isTimerRunning = false;
-            btn.innerText = "Tiếp tục";
-            document.getElementById('zen-status').innerText = "Đang tạm dừng";
-            document.getElementById('zen-timer').classList.remove('ticking');
-            return; 
-        }
-
-        // CASE 2: Đang dừng -> CHẠY TIẾP
-        isTimerRunning = true;
-        btn.innerText = "Tạm dừng";
-        document.getElementById('zen-timer').classList.add('ticking');
-        
-        if (isWorkSession) {
-             document.getElementById('zen-status').innerText = "Đang tập trung...";
-             document.getElementById('zen-status').style.color = "white";
-        } else {
-             document.getElementById('zen-status').innerText = "Đang nghỉ ngơi...";
-             document.getElementById('zen-status').style.color = "#10b981";
-        }
-
-        // TÍNH TOÁN THỜI GIAN ĐÍCH BẰNG ĐỒNG HỒ HỆ THỐNG
-        targetEndTime = Date.now() + (timeLeft * 1000);
-
-        zenTimer = setInterval(() => {
-            const now = Date.now();
-            
-            // Tính số giây còn lại dựa trên giờ thực tế (Không sợ tab bị ngủ đông)
-            timeLeft = Math.max(0, Math.ceil((targetEndTime - now) / 1000));
-            
-            if (timeLeft <= 0) {
-                clearInterval(zenTimer);
-                isTimerRunning = false;
-                document.getElementById('zen-timer').classList.remove('ticking');
-                
-                if (isWorkSession) {
-                    // Cấp nốt Tu Vi nếu trình duyệt lag bỏ qua nhịp
-                    const remainingTuVi = 25 - tuViEarned;
-                    if(remainingTuVi > 0) addTuVi(remainingTuVi);
-                    
-                    runBigFireworks(); 
-                    playRealisticBoom(); 
-                    addTuVi(5); // Thưởng hoàn thành
-                    
-                    document.getElementById('zen-status').innerText = "Đợt tu luyện hoàn tất!";
-                    document.getElementById('zen-controls').style.display = 'none'; 
-                    document.getElementById('zen-break-options').style.display = 'flex'; 
-                    
-                    OrbVisuals.setMode(1); 
-                } else {
-                    playChime(); 
-                    isWorkSession = true; 
-                    WORK_TIME = 25 * 60; // Trả lại 25p
-                    timeLeft = WORK_TIME; 
-                    tuViEarned = 0; // Reset Tu Vi kiếm được
-                    
-                    document.getElementById('zen-status').innerText = "Hết giờ nghỉ! Quay lại nào."; 
-                    document.getElementById('zen-status').style.color = "white"; 
-                    
-                    btn.innerText = "Bắt đầu"; 
-                    document.getElementById('zen-controls').style.display = 'flex'; 
-                    OrbVisuals.setMode(0);
-                    updateTimerDisplay();
-                }
-                return;
-            }
-            
-            // Xử lý cộng Tu Vi theo mốc phút trôi qua (chuẩn xác dù bị lag)
-            if(isWorkSession) {
-                const minutesPassed = Math.floor((WORK_TIME - timeLeft) / 60);
-                if (minutesPassed > tuViEarned) {
-                    const diff = minutesPassed - tuViEarned;
-                    addTuVi(diff);
-                    tuViEarned = minutesPassed;
-                    showRandomQuote();
-                }
-                if(!isEcoMode) { const progress = 1 - (timeLeft / WORK_TIME); OrbVisuals.setMode(progress); }
-            }
-            
-            updateTimerDisplay();
-        }, 500); // Tốc độ quét 0.5s để UI phản hồi mượt hơn khi chuyển tab
-    }
-    
-    function startBreak(minutes) {
-        isWorkSession = false;
-        WORK_TIME = minutes * 60;
-        timeLeft = WORK_TIME;
-        tuViEarned = 0;
-        
-        document.getElementById('zen-break-options').style.display = 'none';
-        document.getElementById('zen-controls').style.display = 'flex';
-        
-        document.getElementById('btn-zen-start').innerText = "Tạm dừng";
-        startTimer(); 
-    }
-
-    function resetTimer() {
-        clearInterval(zenTimer);
-        isTimerRunning = false;
-        isWorkSession = true;
-        WORK_TIME = 25 * 60;
-        timeLeft = WORK_TIME;
-        tuViEarned = 0;
-        
-        document.getElementById('zen-status').innerText = "Sẵn sàng tu luyện";
-        document.getElementById('zen-status').style.color = "white";
-        document.getElementById('zen-timer').classList.remove('ticking');
-        document.getElementById('btn-zen-start').innerText = "Bắt đầu";
-        
-        document.getElementById('zen-controls').style.display = 'flex';
-        document.getElementById('zen-break-options').style.display = 'none';
-        
-        updateTimerDisplay();
-        OrbVisuals.setMode(0);
-    }
-    
-    function updateTimerDisplay() { 
-        const m = Math.floor(timeLeft / 60); 
-        const s = timeLeft % 60; 
-        document.getElementById('zen-timer').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`; 
-    }
-
-    // --- 7. THREE.JS AURORA ---
-    function initAurora() { const c = document.getElementById('aurora-canvas'); renderer = new THREE.WebGLRenderer({ canvas: c, antialias: true }); renderer.setSize(window.innerWidth, window.innerHeight); scene = new THREE.Scene(); camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000); camera.position.z = 5; const g = new THREE.BufferGeometry(); const v = []; for(let i=0;i<3000;i++) v.push((Math.random()-0.5)*2000, (Math.random()-0.5)*2000, (Math.random()-0.5)*2000); g.setAttribute('position', new THREE.Float32BufferAttribute(v,3)); stars = new THREE.Points(g, new THREE.PointsMaterial({color:0xffffff, size:0.7, transparent:true, opacity:0.8})); scene.add(stars); const vs=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`; const fs=`uniform float time;varying vec2 vUv;vec3 permute(vec3 x){return mod(((x*34.0)+1.0)*x,289.0);}float snoise(vec2 v){const vec4 C=vec4(0.211324865405187,0.366025403784439,-0.577350269189626,0.024390243902439);vec2 i=floor(v+dot(v,C.yy));vec2 x0=v-i+dot(i,C.xx);vec2 i1;i1=(x0.x>x0.y)?vec2(1.0,0.0):vec2(0.0,1.0);vec4 x12=x0.xyxy+C.xxzz;x12.xy-=i1;i=mod(i,289.0);vec3 p=permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0));vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.0);m=m*m;m=m*m;vec3 x=2.0*fract(p*C.www)-1.0;vec3 h=abs(x)-0.5;vec3 ox=floor(x+0.5);vec3 a0=x-ox;m*=1.79284291400159-0.85373472095314*(a0*a0+h*h);vec3 g;g.x=a0.x*x0.x+h.x*x0.y;g.yz=a0.yz*x12.xz+h.yz*x12.yw;return 130.0*dot(m,g);}void main(){vec2 uv=vUv;float n1=snoise(vec2(uv.x*1.5,uv.y*0.5-time*0.1));float n2=snoise(vec2(uv.x*2.5+time*0.05,uv.y*2.0-time*0.2));float n3=snoise(vec2(uv.x*4.0-time*0.1,uv.y*3.0+time*0.1));float i=smoothstep(0.2,0.8,n1*0.5+n2*0.3+n3*0.2+uv.y*0.3);float m=smoothstep(0.0,0.2,uv.y)*smoothstep(1.0,0.6,uv.y);i*=m;vec3 c=mix(vec3(0.0,1.0,0.6),vec3(0.0,0.4,1.0),uv.y+n1*0.2);c=mix(c,vec3(0.6,0.0,1.0),smoothstep(0.3,0.7,uv.y+n2*0.3));c=mix(c,vec3(1.0,0.2,0.6),smoothstep(0.6,1.0,uv.y));gl_FragColor=vec4(vec3(0.0,0.02,0.05)+c*i*1.5,1.0);}`; auroraMesh = new THREE.Mesh(new THREE.PlaneGeometry(20,12), new THREE.ShaderMaterial({uniforms:{time:{value:0}},vertexShader:vs,fragmentShader:fs,transparent:true,depthWrite:false})); auroraMesh.position.z=-1; scene.add(auroraMesh); animateAurora(); }
-    function animateAurora() { if(isEcoMode) return; requestAnimationFrame(animateAurora); if(auroraMesh) auroraMesh.material.uniforms.time.value += 0.005; if(stars) stars.rotation.y += 0.0001; renderer.render(scene, camera); }
-    window.addEventListener('resize', () => { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); if(OrbVisuals.ctx) OrbVisuals.resize(); });
-    
-    function toggleEcoMode() {
-        isEcoMode = !isEcoMode;
-        const btn = document.getElementById('eco-toggle');
-        if(isEcoMode) {
-            btn.classList.add('active');
-            document.getElementById('aurora-canvas').style.opacity = '0';
-            if(fireworks) fireworks.stop();
-        } else {
-            btn.classList.remove('active');
-            document.getElementById('aurora-canvas').style.opacity = '1';
-            animateAurora();
-        }
-    }
-
-    // --- 8. HELPER UI FUNCTIONS ---
-    function openShareModal() { let p = loadDecryptedData('userProfile', currentInputPin) || {}; document.getElementById('sc-mascot').innerText = selectedMascot; document.getElementById('sc-name').innerText = p.name || "Chưa cập nhật"; document.getElementById('sc-id').innerText = p.id ? `MSSV: ${p.id}` : ""; document.getElementById('sc-gpa').innerText = currentTotalGPA; const b = document.getElementById('academic-rank-area').querySelector('.dash-badge'); const rc = document.getElementById('sc-rank-badge'); rc.innerHTML = ''; if(b) { const c = b.cloneNode(true); c.style.boxShadow = 'none'; rc.appendChild(c); } document.getElementById('shareModal').style.display = 'flex'; }
-    function downloadShareCard() { html2canvas(document.getElementById('capture-area'), { scale: 3, backgroundColor: null, useCORS: true }).then(c => { const l = document.createElement('a'); l.download = `GPA_Share_${Date.now()}.png`; l.href = c.toDataURL("image/png"); l.click(); }); }
-    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('btn-install-app').style.display = 'flex'; });
-    function triggerInstallApp() { if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; }); } else { showInstallGuide(); } }
-    function showInstallGuide() { const m = document.getElementById('installModal'); const c = document.getElementById('install-instructions'); if (window.location.protocol === 'file:') { c.innerHTML = `<div style="color:#ef4444;margin-bottom:15px;font-weight:bold;">⚠️ Lưu ý</div><p>Cần Hosting để cài App.</p>`; m.style.display = 'flex'; return; } c.innerHTML = `<div style="text-align:center;margin-bottom:15px"><i class="fas fa-download" style="font-size:3rem;color:#10b981"></i></div><p>Menu > <b>Thêm vào màn hình chính</b>.</p>`; m.style.display = 'flex'; }
-    
-    // --- SECURITY LOGIC (ENHANCED AES) ---
+    // --- 3. SECURITY LOGIC ---
     function initSecurity() { 
         const m = document.getElementById('gate-msg'); 
         const hint = document.getElementById('setup-hint');
         
-        // Kiểm tra xem đã có dữ liệu mã hóa chưa
         if(!localStorage.getItem(STORAGE_KEY)) { 
             m.innerText = "Chưa có dữ liệu"; 
             m.style.color = "#3b82f6";
@@ -815,7 +348,7 @@
         try {
             const bytes = CryptoJS.AES.decrypt(encrypted, pin);
             const str = bytes.toString(CryptoJS.enc.Utf8);
-            if(!str) return false; // Sai PIN -> không ra chuỗi UTF8
+            if(!str) return false; 
             return JSON.parse(str);
         } catch (e) {
             return false;
@@ -831,16 +364,13 @@
         const g = document.getElementById('security-gate'); 
         const msg = document.getElementById('gate-msg');
         
-        // Trường hợp 1: Chưa có dữ liệu -> Tạo mới với PIN này
         if (!localStorage.getItem(STORAGE_KEY)) {
-            // Không lưu PIN trần! Chỉ dùng PIN này trong phiên làm việc để mã hóa
             msg.innerText = "Đang khởi tạo...";
             g.classList.add('unlocked');
             initApp(); 
             return;
         } 
         
-        // Trường hợp 2: Đã có dữ liệu -> Thử giải mã
         const testLoad = loadDecryptedData(STORAGE_KEY, currentInputPin);
         
         if (testLoad !== false) { 
@@ -857,39 +387,30 @@
     }
     
     function resetPin() { 
-        if(confirm("CẢNH BÁO: Hành động này sẽ xóa toàn bộ dữ liệu Bảng điểm và Tu vi vĩnh viễn vì chúng đã bị mã hóa theo PIN cũ. Bạn có chắc chắn muốn làm mới?")) { 
+        if(confirm("CẢNH BÁO: Hành động này sẽ xóa toàn bộ dữ liệu Bảng điểm vĩnh viễn vì chúng đã bị mã hóa theo PIN cũ. Bạn có chắc chắn muốn làm mới?")) { 
             localStorage.clear(); 
             location.reload(); 
         } 
     }
     
-    // --- 9. MAIN APP INIT ---
+    // --- 4. MAIN APP INIT ---
     function initApp() { 
         document.removeEventListener('keydown', handleKeyboardPin); 
-        
         loadProfile(); 
         
-        // Tải dữ liệu Bảng điểm (Đã giải mã từ bước checkPin)
         let d = loadDecryptedData(STORAGE_KEY, currentInputPin);
         if (d === false) { alert("Lỗi dữ liệu nghiêm trọng!"); return; }
-        
-        if (d) semestersData = d; 
-        else for(let i=1; i<=8; i++) semestersData[i] = []; 
-        
-        // Tải dữ liệu Tu tiên
-        loadCultivation(currentInputPin);
+        if (d) semestersData = d; else for(let i=1; i<=8; i++) semestersData[i] = []; 
         
         renderAllSemesters(); 
         calculateAll(false); 
         if (window.matchMedia('(display-mode: standalone)').matches) document.querySelector('.install-btn').style.display = 'none'; 
-        initFireworks(); initAurora(); OrbVisuals.init(); 
+        initAurora(); 
     }
-    function mascotJoy() { const m = document.getElementById('mascot-display'); m.classList.remove('joyful'); void m.offsetWidth; m.classList.add('joyful'); }
     
-    let fireworks; function initFireworks() { fireworks = new Fireworks.default(document.getElementById('fireworks-container'), { autoresize: true, opacity: 0.5, acceleration: 1.05, friction: 0.97, gravity: 1.5, particles: 150, traceLength: 3, traceSpeed: 10, explosion: 5, intensity: 30, flickering: 50, lineStyle: 'round', hue: { min: 0, max: 360 }, delay: { min: 15, max: 30 }, rocketsPoint: { min: 0, max: 100 }, lineWidth: { explosion: { min: 1, max: 3 }, trace: { min: 1, max: 2 } }, brightness: { min: 50, max: 80 }, decay: { min: 0.015, max: 0.03 }, mouse: { click: false, move: false, max: 1 } }); }
-    function runBigFireworks() { if(isEcoMode) return; if (!fireworks) initFireworks(); fireworks.start(); playRealisticBoom(); setTimeout(() => { fireworks.stop(); }, 8000); }
+    function mascotJoy() { const m = document.getElementById('mascot-display'); m.style.transform = 'scale(1.3) rotate(360deg)'; setTimeout(()=> m.style.transform = 'scale(1) rotate(0deg)', 500); }
     function selectMascot(c) { selectedMascot = c; document.querySelectorAll('.mascot-option').forEach(o => { if(o.innerText === c) o.classList.add('selected'); else o.classList.remove('selected'); }); updateMascotDisplay(); }
-    function updateMascotDisplay() { document.getElementById('mascot-display').innerText = selectedMascot; }
+    function updateMascotDisplay() { document.getElementById('mascot-display').innerText = selectedMascot; document.getElementById('sc-mascot').innerText = selectedMascot; }
     function animateValue(o, s, e, d) { let start = null; const step = (t) => { if (!start) start = t; const p = Math.min((t - start) / d, 1); o.innerHTML = (p * (e - s) + s).toFixed(2); if (p < 1) window.requestAnimationFrame(step); }; window.requestAnimationFrame(step); }
     
     function renderAllSemesters() { const c = document.getElementById('semesters-container'); c.innerHTML = ''; Object.keys(semestersData).map(Number).sort((a,b)=>a-b).forEach(i => { const d = document.createElement('div'); d.className = 'semester-card'; d.id = `sem-card-${i}`; d.innerHTML = `<div class="semester-header" onclick="toggleSemester(${i})"><div class="sem-left"><div class="sem-icon"><i class="fas fa-folder-open"></i></div><div class="sem-title">Học Kỳ ${i}</div></div><div class="sem-actions"><div class="sem-info" id="summary-${i}">...</div><button class="btn-sem-del" onclick="removeSemester(event, ${i})"><i class="fas fa-trash-alt"></i></button></div></div><div class="semester-content" id="content-${i}"><div id="list-${i}"></div><button class="btn-add" onclick="addSubjectRow(${i})"><i class="fas fa-plus"></i> Thêm môn học</button></div>`; c.appendChild(d); if (semestersData[i]) semestersData[i].forEach(row => addSubjectRow(i, row)); }); }
@@ -904,70 +425,46 @@
             const ld = document.getElementById(`list-${i}`); let sp = 0, sc = 0, sd = [];
             if(ld) { 
                 ld.querySelectorAll('.subject-row').forEach(row => { 
-                    const name = row.querySelector('.inp-name').value; 
-                    const creditVal = row.querySelector('.inp-credit').value; 
-                    const credit = creditVal===''?0:parseFloat(creditVal); 
-                    const ratio = row.querySelector('.inp-ratio').value; 
-                    const s1 = parseFloat(row.querySelector('.inp-s1').value); 
-                    const s2 = parseFloat(row.querySelector('.inp-s2').value); 
+                    const name = row.querySelector('.inp-name').value; const creditVal = row.querySelector('.inp-credit').value; const credit = creditVal===''?0:parseFloat(creditVal); 
+                    const ratio = row.querySelector('.inp-ratio').value; const s1 = parseFloat(row.querySelector('.inp-s1').value); const s2 = parseFloat(row.querySelector('.inp-s2').value); 
                     sd.push({name, credit: creditVal, ratio, s1: isNaN(s1)?'':s1, s2: isNaN(s2)?'':s2}); 
                     
                     const p10=row.querySelector('.preview-10'), pC=row.querySelector('.preview-convert'), pR=row.querySelector('.preview-rank'); 
                     if(!isNaN(s1) && (ratio==='100-0'||!isNaN(s2))) { 
-                        const r = ratio.split('-').map(x=>parseInt(x)/100); 
-                        let f10 = (ratio==='100-0')?s1:(s1*r[0]+s2*r[1]); 
-                        f10 = Math.round(f10*10)/10; 
-                        const res = getCourseResult(f10); 
-                        p10.innerText=f10; pC.innerText=`${res.g4} - ${res.char}`; pR.innerHTML=`<span class="result-badge ${res.css}">${res.text}</span>`; 
+                        const r = ratio.split('-').map(x=>parseInt(x)/100); let f10 = (ratio==='100-0')?s1:(s1*r[0]+s2*r[1]); f10 = Math.round(f10*10)/10; 
+                        const res = getCourseResult(f10); p10.innerText=f10; pC.innerText=`${res.g4} - ${res.char}`; pR.innerHTML=`<span class="result-badge ${res.css}">${res.text}</span>`; 
                         if(credit>0){ sp+=res.g4*credit; sc+=credit; } 
                     } else { p10.innerText='...'; pC.innerText='...'; pR.innerHTML='...'; } 
                 }); 
             } else { 
                 sd = semestersData[i] || []; 
                 sd.forEach(subj => { 
-                    const credit = parseFloat(subj.credit) || 0; 
-                    const s1 = parseFloat(subj.s1); 
-                    const s2 = parseFloat(subj.s2); 
+                    const credit = parseFloat(subj.credit) || 0; const s1 = parseFloat(subj.s1); const s2 = parseFloat(subj.s2); 
                     if(!isNaN(s1) && (subj.ratio==='100-0'||!isNaN(s2)) && credit > 0) { 
-                        const r = subj.ratio.split('-').map(x=>parseInt(x)/100); 
-                        let f10 = (subj.ratio==='100-0')?s1:(s1*r[0]+s2*r[1]); 
-                        let f4 = getCourseResult(Math.round(f10*10)/10).g4; 
-                        sp += f4 * credit; sc += credit; 
+                        const r = subj.ratio.split('-').map(x=>parseInt(x)/100); let f10 = (subj.ratio==='100-0')?s1:(s1*r[0]+s2*r[1]); 
+                        let f4 = getCourseResult(Math.round(f10*10)/10).g4; sp += f4 * credit; sc += credit; 
                     } 
                 }); 
             }
             nd[i] = sd; const sumDiv = document.getElementById(`summary-${i}`); 
-            if(sumDiv) { 
-                if(sc > 0) { 
-                    const gpa = (sp/sc).toFixed(2); 
-                    sumDiv.innerHTML = `GPA: <strong>${gpa}</strong> | ${sc} tín | ${getListRankBadge(gpa)}`; 
-                    gp += sp; gc += sc; cd.push(gpa); 
-                } else { sumDiv.innerHTML = `<span style="opacity:0.6; font-style:italic">...</span>`; cd.push(null); } 
-            }
+            if(sumDiv) { if(sc > 0) { const gpa = (sp/sc).toFixed(2); sumDiv.innerHTML = `GPA: <strong>${gpa}</strong> | ${sc} tín | ${getListRankBadge(gpa)}`; gp += sp; gc += sc; cd.push(gpa); } else { sumDiv.innerHTML = `<span style="opacity:0.6; font-style:italic">...</span>`; cd.push(null); } }
         });
         semestersData = nd; currentTotalCredits = gc;
-        if (gc > 0) { 
-            const old = currentTotalGPA; const newG = (gp / gc).toFixed(2); currentTotalGPA = newG; 
-            animateValue(document.getElementById('total-gpa'), parseFloat(old), parseFloat(newG), 1000); 
-            updateDashboardRank(newG); 
-            if(save && parseFloat(newG) >= 3.2) runBigFireworks(); 
-        } else { currentTotalGPA = 0; document.getElementById('total-gpa').innerText = "0.00"; updateDashboardRank(0); }
+        if (gc > 0) { const old = currentTotalGPA; const newG = (gp / gc).toFixed(2); currentTotalGPA = newG; animateValue(document.getElementById('total-gpa'), parseFloat(old), parseFloat(newG), 1000); updateDashboardRank(newG); } 
+        else { currentTotalGPA = 0; document.getElementById('total-gpa').innerText = "0.00"; updateDashboardRank(0); }
         updateChart(cd); updateProgressChart(gc, targetTotalCredits);
-        if (save) { 
-            saveEncryptedData(STORAGE_KEY, nd);
-            saveEncryptedData('cultivationData', cultivationData);
-        }
+        if (save) { saveEncryptedData(STORAGE_KEY, nd); }
     }
 
-    function updateProgressChart(e, t) { const ctx = document.getElementById('progressChart').getContext('2d'); const rem = Math.max(0, t - e); const pct = t > 0 ? Math.round((e / t) * 100) : 0; document.getElementById('progress-percent').innerText = `${pct}%`; document.getElementById('progress-detail').innerText = `${e}/${t} TC`; if (progressChartInstance) progressChartInstance.destroy(); let c = '#3b82f6'; if(pct >= 100) c = '#10b981'; else if(pct >= 50) c = '#f59e0b'; else if(pct < 50) c = '#ef4444'; progressChartInstance = new Chart(ctx, { type: 'doughnut', data: { labels: ['Đã tích lũy', 'Còn lại'], datasets: [{ data: [e, rem], backgroundColor: [c, 'rgba(255,255,255,0.2)'], borderWidth: 0, hoverOffset: 4 }] }, options: { cutout: '80%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
+    function updateProgressChart(e, t) { const ctx = document.getElementById('progressChart').getContext('2d'); const rem = Math.max(0, t - e); const pct = t > 0 ? Math.round((e / t) * 100) : 0; document.getElementById('progress-percent').innerText = `${pct}%`; document.getElementById('progress-detail').innerText = `${e}/${t} TC`; if (progressChartInstance) progressChartInstance.destroy(); let c = '#3b82f6'; if(pct >= 100) c = '#10b981'; else if(pct >= 50) c = '#f59e0b'; else if(pct < 50) c = '#ef4444'; progressChartInstance = new Chart(ctx, { type: 'doughnut', data: { labels: ['Đã tích lũy', 'Còn lại'], datasets: [{ data: [e, rem], backgroundColor: [c, 'rgba(255,255,255,0.2)'], borderWidth: 0 }] }, options: { cutout: '80%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
     function openProfileModal() { document.getElementById('profileModal').style.display = 'flex'; let p = loadDecryptedData('userProfile', currentInputPin) || {}; document.getElementById('profile-target-credits').value = p.targetCredits || 135; selectMascot(p.mascot || '👑'); }
     function saveProfile() { const name = document.getElementById('profile-name').value; const id = document.getElementById('profile-id').value; const t = document.getElementById('profile-target-credits').value; saveEncryptedData('userProfile', { name, id, targetCredits: t, mascot: selectedMascot }); loadProfile(); closeModal('profileModal'); calculateAll(false); }
-    function loadProfile() { let p = loadDecryptedData('userProfile', currentInputPin) || {}; if(p.name) document.getElementById('display-name').innerText=p.name; if(p.id) document.getElementById('display-id').innerText=`MSSV: ${p.id}`; document.getElementById('profile-name').value=p.name||''; document.getElementById('profile-id').value=p.id||''; targetTotalCredits = p.targetCredits || 135; document.getElementById('strat-total-credits').value = targetTotalCredits; if(p.mascot) { selectedMascot = p.mascot; updateMascotDisplay(); } }
+    function loadProfile() { let p = loadDecryptedData('userProfile', currentInputPin) || {}; if(p.name) document.getElementById('display-name').innerText=p.name; if(p.id) document.getElementById('display-id').innerText=`MSSV: ${p.id}`; document.getElementById('profile-name').value=p.name||''; document.getElementById('profile-id').value=p.id||''; targetTotalCredits = p.targetCredits || 135; document.getElementById('strat-total-credits').value = targetTotalCredits; if(p.mascot) { selectMascot(p.mascot); } }
     function toggleSemester(id) { document.getElementById(`content-${id}`).classList.toggle('active'); }
     function addSubjectRow(semId, data = null) { const l = document.getElementById(`list-${semId}`); const d = document.createElement('div'); d.className = 'subject-row'; const n = data ? data.name : ''; const c = data ? data.credit : ''; const r = data ? data.ratio : '40-60'; const s1 = data ? data.s1 : ''; const s2 = data ? data.s2 : ''; d.innerHTML = `<div class="field-group" style="flex:2;min-width:150px;"><label>Tên Môn</label><input type="text" class="inp-name" value="${n}" placeholder="..."></div><div class="field-group"><label>Số TC</label><input type="number" class="inp-credit" value="${c}" min="0" placeholder="..."></div><div class="field-group" style="min-width:100px;"><label>Tỷ lệ</label><select class="inp-ratio" onchange="calculateAll(false)"><option value="40-60" ${r==='40-60'?'selected':''}>40/60</option><option value="50-50" ${r==='50-50'?'selected':''}>50/50</option><option value="30-70" ${r==='30-70'?'selected':''}>30/70</option><option value="100-0" ${r==='100-0'?'selected':''}>100%</option></select></div><div class="field-group"><label>Điểm QT</label><input type="number" class="inp-s1" value="${s1}" step="0.1" placeholder="..." oninput="calculateAll(false)"></div><div class="field-group"><label>Điểm CK</label><input type="number" class="inp-s2" value="${s2}" step="0.1" placeholder="..." oninput="calculateAll(false)"></div><div class="field-group" style="flex:0.8;text-align:center;"><label>Hệ 10</label><div class="preview-box preview-10">...</div></div><div class="field-group" style="flex:1.2;text-align:center;"><label>Hệ 4</label><div class="preview-box preview-convert" style="color:#fff;">...</div></div><div class="field-group" style="flex:0.8;text-align:center;"><label>Xếp Loại</label><div class="preview-rank">...</div></div><div style="display:flex;flex-direction:column;gap:5px;justify-content:center;margin-left:5px;"><button class="btn-icon btn-del" onclick="deleteRow(this, ${semId})"><i class="fas fa-times"></i></button><button class="btn-icon btn-calc-target" onclick="openTargetModal(this)"><i class="fas fa-wand-magic-sparkles"></i></button></div>`; l.appendChild(d); }
     function deleteRow(b, i) { b.closest('.subject-row').remove(); calculateAll(false); }
     function openStrategyModal() { document.getElementById('strategyModal').style.display = 'flex'; }
-    function calcStrategy() { const t = parseFloat(document.getElementById('strat-target-gpa').value); const tc = targetTotalCredits; const r = document.getElementById('strategy-result'); r.style.display = 'block'; if (!t) { r.innerHTML = '<span style="color:#ef4444">Nhập mục tiêu!</span>'; return; } const ec = currentTotalCredits; const cp = currentTotalGPA * ec; const rc = tc - ec; if (rc <= 0) { r.innerHTML = '<span style="color:#f59e0b">Đã học hết!</span>'; return; } const req = ((t * tc) - cp) / rc; let m = `<div>Hiện tại: <b>${currentTotalGPA}</b> | Còn: <b>${rc}</b> tín</div>`; if (req > 4.0) m += `<div style="color:#ef4444;font-weight:bold;">KHÔNG KHẢ THI (${req.toFixed(2)})</div>`; else if (req < 0) m += `<div style="color:#10b981;font-weight:bold;">ĐÃ ĐẠT!</div>`; else m += `<div style="color:#8b5cf6;font-weight:bold;font-size:1.1rem">Cần đạt: <span style="font-size:1.4rem;color:#d97706">${req.toFixed(2)}</span></div>`; r.innerHTML = m; }
+    function calcStrategy() { const t = parseFloat(document.getElementById('strat-target-gpa').value); const tc = targetTotalCredits; const r = document.getElementById('strategy-result'); r.style.display = 'block'; if (!t) return; const ec = currentTotalCredits; const cp = currentTotalGPA * ec; const rc = tc - ec; if (rc <= 0) { r.innerHTML = '<span style="color:#f59e0b">Đã học hết!</span>'; return; } const req = ((t * tc) - cp) / rc; let m = `<div>Hiện tại: <b>${currentTotalGPA}</b> | Còn: <b>${rc}</b> tín</div>`; if (req > 4.0) m += `<div style="color:#ef4444;font-weight:bold;">KHÔNG KHẢ THI (${req.toFixed(2)})</div>`; else if (req < 0) m += `<div style="color:#10b981;font-weight:bold;">ĐÃ ĐẠT!</div>`; else m += `<div style="color:#8b5cf6;font-weight:bold;font-size:1.1rem">Cần đạt: <span style="font-size:1.4rem;color:#d97706">${req.toFixed(2)}</span></div>`; r.innerHTML = m; }
     function openTargetModal(b) { const r = b.closest('.subject-row'); const n = r.querySelector('.inp-name').value || "Môn học"; const s1 = parseFloat(r.querySelector('.inp-s1').value); const rs = r.querySelector('.inp-ratio').value; if (isNaN(s1)) { alert("Nhập điểm QT!"); return; } if (rs === '100-0') { alert("Không thi cuối kỳ!"); return; } const ra = rs.split('-').map(x => parseInt(x)/100); currentCalcData = { s1, r1: ra[0], r2: ra[1] }; document.getElementById('modal-subject-name').innerText = `${n} (QT: ${s1})`; document.getElementById('targetModal').style.display = 'flex'; calcTarget(); }
     function calcTarget() { const t = parseFloat(document.getElementById('target-grade').value); const { s1, r1, r2 } = currentCalcData; const req = (t - (s1 * r1)) / r2; const r = document.getElementById('target-result'); if (req > 10) r.innerHTML = `Không thể! (${req.toFixed(2)})`; else if (req < 0) r.innerHTML = `Đã đạt!`; else r.innerHTML = `Cần thi: <span style="font-size:1.5rem;color:#d97706">${req.toFixed(2)}</span>`; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
@@ -976,19 +473,22 @@
     function updateChart(d) { const c = document.getElementById('gpaChart').getContext('2d'); if(gpaChartInstance) gpaChartInstance.destroy(); const g = c.createLinearGradient(0,0,0,400); g.addColorStop(0, 'rgba(139,92,246,0.5)'); g.addColorStop(1, 'rgba(118,75,162,0)'); gpaChartInstance = new Chart(c, { type: 'line', data: { labels: Object.keys(semestersData).map(k=>`Kỳ ${k}`), datasets: [{ label: 'GPA', data: d, borderColor: '#a78bfa', backgroundColor: g, fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 4.0, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'rgba(255,255,255,0.7)' } }, x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.7)' } } }, plugins: { legend: { display: false } } } }); }
     
     function exportExcel() { 
-        calculateAll(false); 
-        let r = [["Học Kỳ", "Tên Môn", "Số TC", "Tỷ Lệ", "Điểm QT", "Điểm CK"]]; 
+        calculateAll(false); let r = [["Học Kỳ", "Tên Môn", "Số TC", "Tỷ Lệ", "Điểm QT", "Điểm CK"]]; 
         Object.keys(semestersData).map(Number).sort((a,b)=>a-b).forEach(i => { if (semestersData[i]) { semestersData[i].forEach(s => { r.push([i, s.name, s.credit, s.ratio, s.s1, s.s2]); }); } }); 
         let p = loadDecryptedData('userProfile', currentInputPin) || {}; 
-        let i = [["Key", "Value"], ["Name", p.name || ""], ["ID", p.id || ""], ["Theme", 'light'], ["TargetCredits", p.targetCredits || 135]]; 
-        i.push(["CultivationPoints", cultivationData.points || 0]); 
-        i.push(["CultivationGen", cultivationData.generation || 1]);
-        const wb = XLSX.utils.book_new(); const wg = XLSX.utils.aoa_to_sheet(r); const wi = XLSX.utils.aoa_to_sheet(i); XLSX.utils.book_append_sheet(wb, wg, "BangDiem"); XLSX.utils.book_append_sheet(wb, wi, "HoSo"); XLSX.writeFile(wb, `GPA_Backup_${p.name||"User"}.xlsx`); 
+        let i = [["Key", "Value"], ["Name", p.name || ""], ["ID", p.id || ""], ["TargetCredits", p.targetCredits || 135]]; 
+        const wb = XLSX.utils.book_new(); const wg = XLSX.utils.aoa_to_sheet(r); const wi = XLSX.utils.aoa_to_sheet(i); XLSX.utils.book_append_sheet(wb, wg, "BangDiem"); XLSX.utils.book_append_sheet(wb, wi, "HoSo"); XLSX.writeFile(wb, `GPA_${p.name||"Backup"}.xlsx`); 
     }
     
     function triggerImport() { document.getElementById('file-input').click(); }
-    function importExcel(inp) { const f = inp.files[0]; if (!f) return; const r = new FileReader(); r.onload = function(e) { try { const d = new Uint8Array(e.target.result); const wb = XLSX.read(d, {type: 'array'}); const wg = wb.Sheets["BangDiem"]; if (wg) { const j = XLSX.utils.sheet_to_json(wg); semestersData = {}; j.forEach(row => { const s = row["Học Kỳ"]; if (!semestersData[s]) semestersData[s] = []; semestersData[s].push({ name: row["Tên Môn"] || "", credit: row["Số TC"] || "", ratio: row["Tỷ Lệ"] || "40-60", s1: row["Điểm QT"], s2: row["Điểm CK"] }); }); saveEncryptedData(STORAGE_KEY, semestersData); } const wi = wb.Sheets["HoSo"]; if (wi) { const ji = XLSX.utils.sheet_to_json(wi); let p = {}; ji.forEach(row => { if (row.Key === "Name") p.name = row.Value; if (row.Key === "ID") p.id = row.Value; if (row.Key === "TargetCredits") p.targetCredits = row.Value; if (row.Key === "CultivationPoints") cultivationData.points = parseInt(row.Value); if (row.Key === "CultivationGen") cultivationData.generation = parseInt(row.Value); }); saveEncryptedData('userProfile', p); saveEncryptedData('cultivationData', cultivationData); } alert('Thành công! Dữ liệu đã được nạp vào thành.'); location.reload(); } catch (err) { alert('Lỗi file!'); } }; r.readAsArrayBuffer(f); }
+    function importExcel(inp) { const f = inp.files[0]; if (!f) return; const r = new FileReader(); r.onload = function(e) { try { const d = new Uint8Array(e.target.result); const wb = XLSX.read(d, {type: 'array'}); const wg = wb.Sheets["BangDiem"]; if (wg) { const j = XLSX.utils.sheet_to_json(wg); semestersData = {}; j.forEach(row => { const s = row["Học Kỳ"]; if (!semestersData[s]) semestersData[s] = []; semestersData[s].push({ name: row["Tên Môn"] || "", credit: row["Số TC"] || "", ratio: row["Tỷ Lệ"] || "40-60", s1: row["Điểm QT"], s2: row["Điểm CK"] }); }); saveEncryptedData(STORAGE_KEY, semestersData); } const wi = wb.Sheets["HoSo"]; if (wi) { const ji = XLSX.utils.sheet_to_json(wi); let p = {}; ji.forEach(row => { if (row.Key === "Name") p.name = row.Value; if (row.Key === "ID") p.id = row.Value; if (row.Key === "TargetCredits") p.targetCredits = row.Value; }); saveEncryptedData('userProfile', p); } alert('Thành công!'); location.reload(); } catch (err) { alert('Lỗi file!'); } }; r.readAsArrayBuffer(f); }
 
+    function initAurora() { const c = document.getElementById('aurora-canvas'); renderer = new THREE.WebGLRenderer({ canvas: c, antialias: true }); renderer.setSize(window.innerWidth, window.innerHeight); scene = new THREE.Scene(); camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000); camera.position.z = 5; const g = new THREE.BufferGeometry(); const v = []; for(let i=0;i<3000;i++) v.push((Math.random()-0.5)*2000, (Math.random()-0.5)*2000, (Math.random()-0.5)*2000); g.setAttribute('position', new THREE.Float32BufferAttribute(v,3)); stars = new THREE.Points(g, new THREE.PointsMaterial({color:0xffffff, size:0.7, transparent:true, opacity:0.8})); scene.add(stars); const vs=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`; const fs=`uniform float time;varying vec2 vUv;vec3 permute(vec3 x){return mod(((x*34.0)+1.0)*x,289.0);}float snoise(vec2 v){const vec4 C=vec4(0.211324865405187,0.366025403784439,-0.577350269189626,0.024390243902439);vec2 i=floor(v+dot(v,C.yy));vec2 x0=v-i+dot(i,C.xx);vec2 i1;i1=(x0.x>x0.y)?vec2(1.0,0.0):vec2(0.0,1.0);vec4 x12=x0.xyxy+C.xxzz;x12.xy-=i1;i=mod(i,289.0);vec3 p=permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0));vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.0);m=m*m;m=m*m;vec3 x=2.0*fract(p*C.www)-1.0;vec3 h=abs(x)-0.5;vec3 ox=floor(x+0.5);vec3 a0=x-ox;m*=1.79284291400159-0.85373472095314*(a0*a0+h*h);vec3 g;g.x=a0.x*x0.x+h.x*x0.y;g.yz=a0.yz*x12.xz+h.yz*x12.yw;return 130.0*dot(m,g);}void main(){vec2 uv=vUv;float n1=snoise(vec2(uv.x*1.5,uv.y*0.5-time*0.1));float n2=snoise(vec2(uv.x*2.5+time*0.05,uv.y*2.0-time*0.2));float n3=snoise(vec2(uv.x*4.0-time*0.1,uv.y*3.0+time*0.1));float i=smoothstep(0.2,0.8,n1*0.5+n2*0.3+n3*0.2+uv.y*0.3);float m=smoothstep(0.0,0.2,uv.y)*smoothstep(1.0,0.6,uv.y);i*=m;vec3 c=mix(vec3(0.0,1.0,0.6),vec3(0.0,0.4,1.0),uv.y+n1*0.2);c=mix(c,vec3(0.6,0.0,1.0),smoothstep(0.3,0.7,uv.y+n2*0.3));c=mix(c,vec3(1.0,0.2,0.6),smoothstep(0.6,1.0,uv.y));gl_FragColor=vec4(vec3(0.0,0.02,0.05)+c*i*1.5,1.0);}`; auroraMesh = new THREE.Mesh(new THREE.PlaneGeometry(20,12), new THREE.ShaderMaterial({uniforms:{time:{value:0}},vertexShader:vs,fragmentShader:fs,transparent:true,depthWrite:false})); auroraMesh.position.z=-1; scene.add(auroraMesh); animateAurora(); }
+    function animateAurora() { if(isEcoMode) return; requestAnimationFrame(animateAurora); if(auroraMesh) auroraMesh.material.uniforms.time.value += 0.005; if(stars) stars.rotation.y += 0.0001; renderer.render(scene, camera); }
+    window.addEventListener('resize', () => { if(camera){ camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); } });
+    
+    function toggleEcoMode() { isEcoMode = !isEcoMode; document.getElementById('eco-toggle').classList.toggle('active'); document.getElementById('aurora-canvas').style.opacity = isEcoMode ? '0' : '1'; if(!isEcoMode) animateAurora(); }
+    
     initSecurity();
 </script>
 </body>
