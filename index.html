@@ -20,6 +20,7 @@
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.10.0/dist/index.umd.js"></script>
     
     <style>
         :root { 
@@ -30,6 +31,8 @@
         body { font-family: 'Segoe UI', Roboto, sans-serif; background: #000510; color: var(--text-main); margin: 0; padding: 20px; min-height: 100vh; overflow-x: hidden; }
         
         #aurora-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -999; pointer-events: none; opacity: 1; transition: opacity 1s; }
+        /* VÁ LỖI: Container chứa pháo hoa */
+        #fireworks-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; }
 
         /* DASHBOARD & UI */
         .dashboard { padding: 25px; border-radius: 20px; margin-bottom: 25px; display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 20px; align-items: center; background: rgba(20, 30, 50, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); }
@@ -57,26 +60,27 @@
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
         @keyframes pulse { 0% {transform: scale(1); opacity: 1;} 50% {transform: scale(1.1); opacity: 0.8;} 100% {transform: scale(1); opacity: 1;} }
         
-        .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; filter: blur(0); transition: filter 0.5s; z-index: 1; }
-        .top-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; z-index: 99; flex-wrap: wrap; justify-content: flex-end; }
-        .install-btn, .eco-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: #fff; padding: 8px 15px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; box-shadow: var(--shadow); font-weight: 600; backdrop-filter: blur(4px); transition: 0.2s; }
+        .container { max-width: 950px; margin: 0 auto; position: relative; padding-bottom: 50px; z-index: 1; }
+        .top-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; z-index: 99; }
+        .eco-btn, .install-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: #fff; padding: 8px 15px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; backdrop-filter: blur(4px); transition: 0.2s; }
         .install-btn:hover, .eco-btn:hover { transform: scale(1.05); background: rgba(255,255,255,0.2); }
-        .install-btn { background: #8b5cf6; border: none; }
+        .install-btn { background: #8b5cf6; border: none; display: none; } /* Mặc định ẩn, JS sẽ hiện khi khả dụng */
         .eco-btn { background: #64748b; border: none; }
         .eco-btn.active { background: #ef4444; }
         
         .app-header { text-align: center; margin-bottom: 25px; padding-top: 10px; }
-        .app-title { font-size: 1.8rem; font-weight: 800; text-transform: uppercase; color: #fff; letter-spacing: 1px; margin: 0; margin-top: 5px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-        .user-info { font-size: 1.1rem; color: #e2e8f0; font-weight: 600; margin-top: 5px; cursor: pointer; display: inline-block; padding: 5px 15px; border-radius: 15px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); }
-        .app-subtitle { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; color: #cbd5e1; }
+        .mascot-display { font-size: 4.5rem; line-height: 1; margin-bottom: 10px; display: inline-block; cursor: pointer; transition: 0.3s; }
+        .mascot-display:hover { transform: scale(1.2) rotate(-5deg); filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.8)); }
+        .app-title { font-size: 1.8rem; font-weight: 800; text-transform: uppercase; color: #fff; margin-top: 5px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .user-info { font-size: 1.1rem; color: #e2e8f0; font-weight: 600; margin-top: 5px; cursor: pointer; display: inline-block; padding: 5px 15px; border-radius: 15px; background: rgba(255,255,255,0.1); }
+        
         .progress-wrapper { position: relative; width: 140px; height: 140px; }
         .progress-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; pointer-events: none; }
         .progress-percent { font-size: 2.5rem; font-weight: 800; color: #fff; }
         .progress-detail { font-size: 0.85rem; color: rgba(255,255,255,0.8); }
-        .edit-target-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .edit-target-btn:hover { background: rgba(255,255,255,0.3); }
+        .edit-target-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         
-        .semester-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: transparent; transition: background 0.2s; color: #fff; }
+        .semester-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: #fff; transition: 0.2s; }
         .semester-header:hover { background: rgba(255, 255, 255, 0.05); }
         .sem-left { display: flex; align-items: center; gap: 12px; }
         .sem-title { font-weight: 700; font-size: 1.1rem; }
@@ -89,43 +93,41 @@
         .subject-row { display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 10px; align-items: flex-end; }
         .field-group { flex: 1; min-width: 80px; }
         .field-group label { display: block; font-size: 0.7rem; color: #94a3b8; margin-bottom: 5px; font-weight: 700; text-transform: uppercase; }
-        .preview-box { text-align: center; font-weight: bold; padding: 8px 4px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.9rem; color: #cbd5e1; min-height: 20px; display: flex; align-items: center; justify-content: center; }
+        .preview-box { text-align: center; font-weight: bold; padding: 8px 4px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px; color: #cbd5e1; min-height: 20px; display: flex; align-items: center; justify-content: center; }
         
         .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .controls-right { display: flex; gap: 8px; flex-wrap: wrap; }
-        .btn { border: none; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: 0.3s; display: flex; align-items: center; gap: 8px; color: white; font-size: 0.9rem; backdrop-filter: blur(4px); }
+        .btn { border: none; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; color: white; font-size: 0.9rem; transition: 0.3s; }
+        .btn-save { background: #334155; } .btn-strategy { background: var(--btn-strategy-bg); } .btn-excel { background: var(--btn-excel-bg); } .btn-share { background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); }
         .btn:hover { transform: translateY(-3px); opacity: 0.95; }
-        .btn-save { background: #334155; } .btn-strategy { background: var(--btn-strategy-bg); } .btn-excel { background: var(--btn-excel-bg); } .btn-share { background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); color: white; }
-        .btn-add { width: 100%; padding: 12px; border: 2px dashed var(--border-color); background: rgba(255,255,255,0.05); color: #fff; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        .btn-add:hover { border-color: #8b5cf6; color: #8b5cf6; background: rgba(139, 92, 246, 0.1); }
-        .btn-add-sem { width: 100%; padding: 15px; border: 2px dashed rgba(255,255,255,0.3); background: rgba(255,255,255,0.05); color: #fff; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px; text-transform: uppercase; }
+        .btn-add-sem { width: 100%; padding: 15px; border: 2px dashed rgba(255,255,255,0.3); background: rgba(255,255,255,0.05); color: #fff; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px; text-transform: uppercase; transition: 0.2s; }
         .btn-add-sem:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
         .btn-icon { width: 32px; height: 32px; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-left: 5px; }
         .btn-del { background: rgba(239, 68, 68, 0.2); color: #ef4444; } .btn-del:hover { background: #ef4444; color: white; }
-        .btn-sem-del { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1rem; padding: 5px; opacity: 0.6; } .btn-sem-del:hover { opacity: 1; transform: scale(1.2); }
+        .btn-sem-del { background: none; border: none; color: #ef4444; cursor: pointer; opacity: 0.6; transition: 0.2s; } .btn-sem-del:hover { opacity: 1; transform: scale(1.2); }
         .btn-calc-target { background: rgba(59, 130, 246, 0.2); color: #3b82f6; } .btn-calc-target:hover { background: #3b82f6; color: white; }
         
-        .dash-badge { padding: 10px 25px; font-size: 1.5rem; font-weight: 800; border-radius: 40px; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: inline-block; min-width: 140px; text-align: center; border: 2px solid rgba(255,255,255,0.2); }
+        .dash-badge { padding: 10px 25px; font-size: 1.5rem; font-weight: 800; border-radius: 40px; text-transform: uppercase; text-align: center; border: 2px solid rgba(255,255,255,0.2); }
         .rank-gold { background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%); color: #6a4803; }
         .rank-silver { background: linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%); color: #424242; }
         .rank-bronze { background: linear-gradient(135deg, #d98e54 0%, #a0522d 100%); color: white; }
         .rank-gray { background: rgba(255,255,255,0.2); color: white; }
         .list-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; display: inline-block; }
         .bg-xs { background: #16a34a; color: white; } .bg-g { background: #0ea5e9; color: white; } .bg-k { background: #f59e0b; color: white; } .bg-tb { background: #6b7280; color: white; }
-        .result-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 12px; font-weight: 700; text-transform: uppercase; display: inline-block; white-space: nowrap; }
+        .result-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 12px; font-weight: 700; text-transform: uppercase; display: inline-block; }
         .bg-gioi { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; } .bg-kha { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; } .bg-tb { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; } .bg-tbyeu { background: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; } .bg-kem { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
         
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
         .modal { background: rgba(30, 41, 59, 0.9); width: 90%; max-width: 450px; padding: 25px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; border: 1px solid rgba(255,255,255,0.2); animation: popIn 0.3s; }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .modal h3 { margin-top: 0; color: #8b5cf6; margin-bottom: 20px; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
+        .modal h3 { margin-top: 0; color: #8b5cf6; margin-bottom: 20px; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px;}
         .modal-result { margin: 20px 0; padding: 15px; background: rgba(139, 92, 246, 0.1); border-radius: 10px; font-weight: bold; font-size: 1.1rem; color: #8b5cf6; }
         .modal-input-group { margin-bottom: 15px; text-align: left; }
         .modal-input-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; color: #cbd5e1; }
         .modal-close { background: rgba(255,255,255,0.1); color: white; border: none; padding: 8px 25px; border-radius: 20px; cursor: pointer; margin-top: 10px; font-weight: 600; }
-        .btn-calc-modal { width: 100%; background: var(--btn-strategy-bg); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 10px; }
+        .btn-calc-modal { width: 100%; background: var(--btn-strategy-bg); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
         
-        .share-card-container { width: 320px; margin: 0 auto; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(15px); border-radius: 15px; overflow: hidden; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; color: white; font-family: 'Segoe UI', sans-serif; border: 2px solid rgba(255,255,255,0.2); }
+        .share-card-container { width: 320px; margin: 0 auto; background: rgba(15, 23, 42, 0.7); border-radius: 15px; border: 2px solid rgba(255,255,255,0.2); color: white; text-align: center; backdrop-filter: blur(15px); }
         .sc-header { padding: 30px 20px 10px; background: rgba(255,255,255,0.05); }
         .sc-mascot { font-size: 5rem; line-height: 1; filter: drop-shadow(0 0 15px rgba(255,215,0,0.5)); margin-bottom: 10px; }
         .sc-name { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
@@ -135,23 +137,22 @@
         .sc-gpa { font-size: 4.5rem; font-weight: 800; line-height: 1; margin-bottom: 15px; background: -webkit-linear-gradient(#fff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); }
         .sc-footer { padding: 15px; font-size: 0.7rem; opacity: 0.5; border-top: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); }
         
-        .mascot-display { font-size: 4.5rem; line-height: 1; margin-bottom: 10px; display: inline-block; cursor: pointer; transition: all 0.3s; user-select: none; }
-        .mascot-display:hover { transform: scale(1.2) rotate(-5deg); filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.8)); }
         .mascot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
-        .mascot-option { font-size: 2rem; padding: 10px; border-radius: 12px; cursor: pointer; background: rgba(255,255,255,0.1); border: 2px solid transparent; transition: 0.2s; text-align: center; }
+        .mascot-option { font-size: 2rem; padding: 10px; border-radius: 12px; cursor: pointer; background: rgba(255,255,255,0.1); border: 2px solid transparent; text-align: center; transition: 0.2s;}
         .mascot-option:hover { background: rgba(255,255,255,0.2); transform: scale(1.2); }
         .mascot-option.selected { border-color: #8b5cf6; background: rgba(139, 92, 246, 0.2); box-shadow: 0 0 10px rgba(139, 92, 246, 0.5); }
         
-        @media (max-width: 768px) { .dashboard { grid-template-columns: 1fr; gap: 10px; } .stat-item { height: auto; min-height: 120px; flex-direction: row; justify-content: space-between; padding: 15px 20px; } .stat-item:nth-child(2) { flex-direction: column; justify-content: center; } .stat-content-area { justify-content: flex-end; width: auto; flex: none; margin-bottom: 0; } .stat-label { margin-top: 0; order: 1; text-align: left; } .stat-content-area { order: 2; } .stat-value { font-size: 3rem; } .subject-row { flex-direction: column; align-items: stretch; gap: 8px; } .field-group { width: 100%; } .controls { flex-direction: column-reverse; gap: 15px; } .controls-right, .btn-strategy { width: 100%; justify-content: center; } .top-controls { top: 15px; right: 15px; } }
+        @media (max-width: 768px) { .dashboard { grid-template-columns: 1fr; } .subject-row { flex-direction: column; align-items: stretch; gap: 8px; } .controls { flex-direction: column-reverse; } .controls-right { width: 100%; justify-content: center; } }
     </style>
 </head>
 <body>
 
 <canvas id="aurora-canvas"></canvas>
+<div id="fireworks-container"></div>
 
 <div id="security-gate">
     <div class="gate-content" tabindex="0">
-        <div class="gate-icon"><i class="fas fa-fingerprint"></i></div>
+        <div class="gate-icon"><i class="fas fa-shield-alt"></i></div>
         <div class="gate-title">Khu Vực Riêng Tư</div>
         <div class="gate-msg" id="gate-msg">Nhập PIN để mở khóa</div>
         <div class="pin-display" id="pin-display"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div>
@@ -161,7 +162,6 @@
             <div class="num-btn" onclick="enterDigit(7)">7</div><div class="num-btn" onclick="enterDigit(8)">8</div><div class="num-btn" onclick="enterDigit(9)">9</div>
             <div class="num-btn" style="opacity:0"></div><div class="num-btn" onclick="enterDigit(0)">0</div><div class="num-btn" onclick="clearPin()"><i class="fas fa-backspace"></i></div>
         </div>
-        <div style="margin-top:20px; font-size:0.8rem; opacity:0.6"><i class="fas fa-keyboard"></i> Hỗ trợ bàn phím PC</div>
         <div style="margin-top:20px; color:#f59e0b; font-size:0.8rem; display:none" id="setup-hint">Lần đầu: Thiết lập mã PIN mới</div>
     </div>
 </div>
@@ -214,8 +214,8 @@
     <button class="btn-add-sem" onclick="addSemester()">+ Thêm Học Kỳ Mới</button>
 </div>
 
-<div class="modal-overlay" id="shareModal" style="backdrop-filter: blur(10px); background: rgba(0,0,0,0.8);">
-    <div class="modal" style="background: transparent; box-shadow: none; border: none; max-width: 400px;">
+<div class="modal-overlay" id="shareModal">
+    <div class="modal" style="background: transparent; border: none; box-shadow: none;">
         <h3 style="color:white; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Thẻ Bài Hoàng Gia</h3>
         <div id="capture-area" class="share-card-container">
             <div class="sc-header">
@@ -231,17 +231,10 @@
             <div class="sc-footer">Verified by GPA Manager System</div>
         </div>
         <button class="btn-calc-modal" style="margin-top:20px; background: white; color: #4c1d95;" onclick="downloadShareCard()"><i class="fas fa-download"></i> Tải Ảnh Về</button>
-        <button class="modal-close" onclick="closeModal('shareModal')" style="background: rgba(255,255,255,0.2);">Đóng</button>
+        <button class="modal-close" onclick="closeModal('shareModal')">Đóng</button>
     </div>
 </div>
 
-<div class="modal-overlay" id="installModal">
-    <div class="modal">
-        <h3><i class="fas fa-mobile-alt"></i> Hướng Dẫn Cài App</h3>
-        <div id="install-instructions" style="text-align:left; color:var(--text-main); font-size:0.95rem; margin-bottom:20px;">Đang xác định...</div>
-        <button class="modal-close" onclick="closeModal('installModal')">Đã Hiểu</button>
-    </div>
-</div>
 <div class="modal-overlay" id="targetModal">
     <div class="modal">
         <h3><i class="fas fa-magic"></i> Dự Tính Điểm Thi</h3>
@@ -256,16 +249,18 @@
         <button class="modal-close" onclick="closeModal('targetModal')">Đóng</button>
     </div>
 </div>
+
 <div class="modal-overlay" id="strategyModal">
     <div class="modal">
         <h3><i class="fas fa-chess-king"></i> Chiến Lược</h3>
         <div class="modal-input-group"><label>GPA Mục Tiêu:</label><input type="number" id="strat-target-gpa" placeholder="3.6" step="0.01"></div>
-        <div class="modal-input-group"><label>Tổng Tín Chỉ:</label><input type="number" id="strat-total-credits" placeholder="135" disabled style="background:#eee"></div>
+        <div class="modal-input-group"><label>Tổng Tín Chỉ:</label><input type="number" id="strat-total-credits" placeholder="135" disabled style="background:#eee; color:#000;"></div>
         <button class="btn-calc-modal" onclick="calcStrategy()">Phân Tích</button>
         <div class="modal-result" id="strategy-result" style="display:none; font-size: 1rem; text-align: left;"></div>
         <button class="modal-close" onclick="closeModal('strategyModal')">Đóng</button>
     </div>
 </div>
+
 <div class="modal-overlay" id="profileModal">
     <div class="modal">
         <h3><i class="fas fa-user-edit"></i> Thông Tin & Linh Vật</h3>
@@ -282,6 +277,14 @@
         <button class="btn-calc-modal" style="background: #ef4444;" onclick="resetPin()">Xóa Dữ Liệu & PIN</button>
         <button class="btn-calc-modal" style="margin-top:20px" onclick="saveProfile()">Lưu Cài Đặt</button>
         <button class="modal-close" onclick="closeModal('profileModal')">Đóng</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="installModal">
+    <div class="modal">
+        <h3><i class="fas fa-mobile-alt"></i> Hướng Dẫn Cài App</h3>
+        <div id="install-instructions" style="text-align:left; color:var(--text-main); font-size:0.95rem; margin-bottom:20px;">Đang xác định...</div>
+        <button class="modal-close" onclick="closeModal('installModal')">Đã Hiểu</button>
     </div>
 </div>
 
@@ -309,23 +312,62 @@
     let currentTotalCredits = 0;
     let targetTotalCredits = 135;
     let selectedMascot = '👑'; 
-    let deferredPrompt;
     let isEcoMode = false;
     let auroraMesh, stars, renderer, scene, camera;
+    
+    // Khai báo biến PWA & Fireworks (Vá lỗi)
+    let deferredPrompt;
+    let fireworks;
 
-    // --- 3. SECURITY LOGIC ---
+    // --- 3. PWA (CÀI ĐẶT APP) ---
+    window.addEventListener('beforeinstallprompt', (e) => { 
+        e.preventDefault(); 
+        deferredPrompt = e; 
+        document.getElementById('btn-install-app').style.display = 'flex'; 
+    });
+    
+    function triggerInstallApp() { 
+        if (deferredPrompt) { 
+            deferredPrompt.prompt(); 
+            deferredPrompt.userChoice.then(() => { deferredPrompt = null; }); 
+        } else { 
+            showInstallGuide(); 
+        } 
+    }
+    
+    function showInstallGuide() { 
+        const m = document.getElementById('installModal'); 
+        const c = document.getElementById('install-instructions'); 
+        if (window.location.protocol === 'file:') { 
+            c.innerHTML = `<div style="color:#ef4444;margin-bottom:15px;font-weight:bold;">⚠️ Lưu ý</div><p>Bạn đang mở file trực tiếp. Cần Hosting (đưa lên mạng) để cài App.</p>`; 
+        } else {
+            c.innerHTML = `<div style="text-align:center;margin-bottom:15px"><i class="fas fa-download" style="font-size:3rem;color:#10b981"></i></div><p>Trên trình duyệt, hãy chọn menu > <b>Thêm vào màn hình chính</b> (Add to Home Screen).</p>`; 
+        }
+        m.style.display = 'flex'; 
+    }
+
+    // --- 4. FIREWORKS (PHÁO HOA) ---
+    function initFireworks() { 
+        fireworks = new Fireworks.default(document.getElementById('fireworks-container'), { 
+            autoresize: true, opacity: 0.5, acceleration: 1.05, friction: 0.97, gravity: 1.5, particles: 150, traceLength: 3, traceSpeed: 10, explosion: 5, intensity: 30, flickering: 50, lineStyle: 'round', hue: { min: 0, max: 360 }, delay: { min: 15, max: 30 }, rocketsPoint: { min: 0, max: 100 }, lineWidth: { explosion: { min: 1, max: 3 }, trace: { min: 1, max: 2 } }, brightness: { min: 50, max: 80 }, decay: { min: 0.015, max: 0.03 }, mouse: { click: false, move: false, max: 1 } 
+        }); 
+    }
+    
+    function runBigFireworks() { 
+        if(isEcoMode) return; 
+        if (!fireworks) initFireworks(); 
+        fireworks.start(); 
+        setTimeout(() => { fireworks.stop(); }, 8000); 
+    }
+
+    // --- 5. SECURITY LOGIC ---
     function initSecurity() { 
         const m = document.getElementById('gate-msg'); 
         const hint = document.getElementById('setup-hint');
-        
         if(!localStorage.getItem(STORAGE_KEY)) { 
-            m.innerText = "Chưa có dữ liệu"; 
-            m.style.color = "#3b82f6";
-            hint.style.display = "block";
+            m.innerText = "Chưa có dữ liệu"; m.style.color = "#3b82f6"; hint.style.display = "block";
         } else { 
-            m.innerText = "Nhập PIN để giải mã"; 
-            m.style.color = "#94a3b8"; 
-            hint.style.display = "none";
+            m.innerText = "Nhập PIN để giải mã"; m.style.color = "#94a3b8"; hint.style.display = "none";
         } 
         document.addEventListener('keydown', handleKeyboardPin); 
     }
@@ -333,26 +375,18 @@
     function saveEncryptedData(key, data) {
         if (!currentInputPin || currentInputPin.length !== 4) return;
         try {
-            const jsonString = JSON.stringify(data);
-            const encrypted = CryptoJS.AES.encrypt(jsonString, currentInputPin).toString();
+            const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), currentInputPin).toString();
             localStorage.setItem(key, encrypted);
-        } catch (e) {
-            console.error("Encryption failed", e);
-            alert("Lỗi mã hóa! Dữ liệu chưa được lưu.");
-        }
+        } catch (e) { alert("Lỗi mã hóa!"); }
     }
 
     function loadDecryptedData(key, pin) {
         const encrypted = localStorage.getItem(key);
         if (!encrypted) return null;
         try {
-            const bytes = CryptoJS.AES.decrypt(encrypted, pin);
-            const str = bytes.toString(CryptoJS.enc.Utf8);
-            if(!str) return false; 
-            return JSON.parse(str);
-        } catch (e) {
-            return false;
-        }
+            const str = CryptoJS.AES.decrypt(encrypted, pin).toString(CryptoJS.enc.Utf8);
+            return str ? JSON.parse(str) : false;
+        } catch (e) { return false; }
     }
 
     function handleKeyboardPin(e) { if (document.getElementById('security-gate').classList.contains('unlocked')) return; if (e.key >= '0' && e.key <= '9') enterDigit(parseInt(e.key)); else if (e.key === 'Backspace' || e.key === 'Delete') clearPin(); }
@@ -362,50 +396,25 @@
     
     function checkPin() { 
         const g = document.getElementById('security-gate'); 
-        const msg = document.getElementById('gate-msg');
-        
-        if (!localStorage.getItem(STORAGE_KEY)) {
-            msg.innerText = "Đang khởi tạo...";
-            g.classList.add('unlocked');
-            initApp(); 
-            return;
-        } 
-        
-        const testLoad = loadDecryptedData(STORAGE_KEY, currentInputPin);
-        
-        if (testLoad !== false) { 
-            g.classList.add('unlocked'); 
-            initApp(); 
-        } else { 
-            msg.innerText = "Sai PIN! Không thể giải mã."; 
-            msg.style.color = "#ef4444"; 
-            document.querySelector('.gate-icon').classList.add('shake-anim'); 
-            setTimeout(()=>document.querySelector('.gate-icon').classList.remove('shake-anim'),500); 
-            currentInputPin = ""; 
-            updatePinDisplay(); 
-        } 
+        if (!localStorage.getItem(STORAGE_KEY)) { g.classList.add('unlocked'); initApp(); return; } 
+        if (loadDecryptedData(STORAGE_KEY, currentInputPin) !== false) { g.classList.add('unlocked'); initApp(); } 
+        else { document.getElementById('gate-msg').innerText = "Sai PIN!"; document.querySelector('.gate-icon').classList.add('shake-anim'); setTimeout(()=>document.querySelector('.gate-icon').classList.remove('shake-anim'),500); currentInputPin = ""; updatePinDisplay(); } 
     }
     
-    function resetPin() { 
-        if(confirm("CẢNH BÁO: Hành động này sẽ xóa toàn bộ dữ liệu Bảng điểm vĩnh viễn vì chúng đã bị mã hóa theo PIN cũ. Bạn có chắc chắn muốn làm mới?")) { 
-            localStorage.clear(); 
-            location.reload(); 
-        } 
-    }
+    function resetPin() { if(confirm("Cảnh báo: Dữ liệu bị mã hóa cũ sẽ không thể khôi phục. Xóa thiết lập ngay?")) { localStorage.clear(); location.reload(); } }
     
-    // --- 4. MAIN APP INIT ---
+    // --- 6. MAIN APP INIT ---
     function initApp() { 
         document.removeEventListener('keydown', handleKeyboardPin); 
         loadProfile(); 
-        
         let d = loadDecryptedData(STORAGE_KEY, currentInputPin);
-        if (d === false) { alert("Lỗi dữ liệu nghiêm trọng!"); return; }
         if (d) semestersData = d; else for(let i=1; i<=8; i++) semestersData[i] = []; 
+        renderAllSemesters(); calculateAll(false); initAurora(); 
         
-        renderAllSemesters(); 
-        calculateAll(false); 
-        if (window.matchMedia('(display-mode: standalone)').matches) document.querySelector('.install-btn').style.display = 'none'; 
-        initAurora(); 
+        // Ẩn nút cài app nếu đang chạy chế độ standalone (app)
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            document.getElementById('btn-install-app').style.display = 'none';
+        }
     }
     
     function mascotJoy() { const m = document.getElementById('mascot-display'); m.style.transform = 'scale(1.3) rotate(360deg)'; setTimeout(()=> m.style.transform = 'scale(1) rotate(0deg)', 500); }
@@ -428,7 +437,6 @@
                     const name = row.querySelector('.inp-name').value; const creditVal = row.querySelector('.inp-credit').value; const credit = creditVal===''?0:parseFloat(creditVal); 
                     const ratio = row.querySelector('.inp-ratio').value; const s1 = parseFloat(row.querySelector('.inp-s1').value); const s2 = parseFloat(row.querySelector('.inp-s2').value); 
                     sd.push({name, credit: creditVal, ratio, s1: isNaN(s1)?'':s1, s2: isNaN(s2)?'':s2}); 
-                    
                     const p10=row.querySelector('.preview-10'), pC=row.querySelector('.preview-convert'), pR=row.querySelector('.preview-rank'); 
                     if(!isNaN(s1) && (ratio==='100-0'||!isNaN(s2))) { 
                         const r = ratio.split('-').map(x=>parseInt(x)/100); let f10 = (ratio==='100-0')?s1:(s1*r[0]+s2*r[1]); f10 = Math.round(f10*10)/10; 
@@ -441,17 +449,21 @@
                 sd.forEach(subj => { 
                     const credit = parseFloat(subj.credit) || 0; const s1 = parseFloat(subj.s1); const s2 = parseFloat(subj.s2); 
                     if(!isNaN(s1) && (subj.ratio==='100-0'||!isNaN(s2)) && credit > 0) { 
-                        const r = subj.ratio.split('-').map(x=>parseInt(x)/100); let f10 = (subj.ratio==='100-0')?s1:(s1*r[0]+s2*r[1]); 
-                        let f4 = getCourseResult(Math.round(f10*10)/10).g4; sp += f4 * credit; sc += credit; 
+                        const r = subj.ratio.split('-').map(x=>parseInt(x)/100); let f10 = (subj.ratio==='100-0')?s1:(s1*r[0]+s2*r[1]); sp += getCourseResult(Math.round(f10*10)/10).g4 * credit; sc += credit; 
                     } 
                 }); 
             }
             nd[i] = sd; const sumDiv = document.getElementById(`summary-${i}`); 
-            if(sumDiv) { if(sc > 0) { const gpa = (sp/sc).toFixed(2); sumDiv.innerHTML = `GPA: <strong>${gpa}</strong> | ${sc} tín | ${getListRankBadge(gpa)}`; gp += sp; gc += sc; cd.push(gpa); } else { sumDiv.innerHTML = `<span style="opacity:0.6; font-style:italic">...</span>`; cd.push(null); } }
+            if(sumDiv) { if(sc > 0) { const gpa = (sp/sc).toFixed(2); sumDiv.innerHTML = `GPA: <strong>${gpa}</strong> | ${sc} tín`; gp += sp; gc += sc; cd.push(gpa); } else { sumDiv.innerHTML = `...`; cd.push(null); } }
         });
         semestersData = nd; currentTotalCredits = gc;
-        if (gc > 0) { const old = currentTotalGPA; const newG = (gp / gc).toFixed(2); currentTotalGPA = newG; animateValue(document.getElementById('total-gpa'), parseFloat(old), parseFloat(newG), 1000); updateDashboardRank(newG); } 
-        else { currentTotalGPA = 0; document.getElementById('total-gpa').innerText = "0.00"; updateDashboardRank(0); }
+        if (gc > 0) { 
+            const old = currentTotalGPA; const newG = (gp / gc).toFixed(2); currentTotalGPA = newG; 
+            animateValue(document.getElementById('total-gpa'), parseFloat(old), parseFloat(newG), 1000); 
+            updateDashboardRank(newG); 
+            // KÍCH HOẠT PHÁO HOA KHI LƯU VÀ GPA >= 3.2
+            if(save && parseFloat(newG) >= 3.2) runBigFireworks(); 
+        } else { currentTotalGPA = 0; document.getElementById('total-gpa').innerText = "0.00"; updateDashboardRank(0); }
         updateChart(cd); updateProgressChart(gc, targetTotalCredits);
         if (save) { saveEncryptedData(STORAGE_KEY, nd); }
     }
@@ -459,7 +471,7 @@
     function updateProgressChart(e, t) { const ctx = document.getElementById('progressChart').getContext('2d'); const rem = Math.max(0, t - e); const pct = t > 0 ? Math.round((e / t) * 100) : 0; document.getElementById('progress-percent').innerText = `${pct}%`; document.getElementById('progress-detail').innerText = `${e}/${t} TC`; if (progressChartInstance) progressChartInstance.destroy(); let c = '#3b82f6'; if(pct >= 100) c = '#10b981'; else if(pct >= 50) c = '#f59e0b'; else if(pct < 50) c = '#ef4444'; progressChartInstance = new Chart(ctx, { type: 'doughnut', data: { labels: ['Đã tích lũy', 'Còn lại'], datasets: [{ data: [e, rem], backgroundColor: [c, 'rgba(255,255,255,0.2)'], borderWidth: 0 }] }, options: { cutout: '80%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
     function openProfileModal() { document.getElementById('profileModal').style.display = 'flex'; let p = loadDecryptedData('userProfile', currentInputPin) || {}; document.getElementById('profile-target-credits').value = p.targetCredits || 135; selectMascot(p.mascot || '👑'); }
     function saveProfile() { const name = document.getElementById('profile-name').value; const id = document.getElementById('profile-id').value; const t = document.getElementById('profile-target-credits').value; saveEncryptedData('userProfile', { name, id, targetCredits: t, mascot: selectedMascot }); loadProfile(); closeModal('profileModal'); calculateAll(false); }
-    function loadProfile() { let p = loadDecryptedData('userProfile', currentInputPin) || {}; if(p.name) document.getElementById('display-name').innerText=p.name; if(p.id) document.getElementById('display-id').innerText=`MSSV: ${p.id}`; document.getElementById('profile-name').value=p.name||''; document.getElementById('profile-id').value=p.id||''; targetTotalCredits = p.targetCredits || 135; document.getElementById('strat-total-credits').value = targetTotalCredits; if(p.mascot) { selectMascot(p.mascot); } }
+    function loadProfile() { let p = loadDecryptedData('userProfile', currentInputPin) || {}; if(p.name) document.getElementById('display-name').innerText=p.name; if(p.id) document.getElementById('display-id').innerText=`MSSV: ${p.id}`; targetTotalCredits = p.targetCredits || 135; document.getElementById('strat-total-credits').value = targetTotalCredits; if(p.mascot) { selectMascot(p.mascot); } }
     function toggleSemester(id) { document.getElementById(`content-${id}`).classList.toggle('active'); }
     function addSubjectRow(semId, data = null) { const l = document.getElementById(`list-${semId}`); const d = document.createElement('div'); d.className = 'subject-row'; const n = data ? data.name : ''; const c = data ? data.credit : ''; const r = data ? data.ratio : '40-60'; const s1 = data ? data.s1 : ''; const s2 = data ? data.s2 : ''; d.innerHTML = `<div class="field-group" style="flex:2;min-width:150px;"><label>Tên Môn</label><input type="text" class="inp-name" value="${n}" placeholder="..."></div><div class="field-group"><label>Số TC</label><input type="number" class="inp-credit" value="${c}" min="0" placeholder="..."></div><div class="field-group" style="min-width:100px;"><label>Tỷ lệ</label><select class="inp-ratio" onchange="calculateAll(false)"><option value="40-60" ${r==='40-60'?'selected':''}>40/60</option><option value="50-50" ${r==='50-50'?'selected':''}>50/50</option><option value="30-70" ${r==='30-70'?'selected':''}>30/70</option><option value="100-0" ${r==='100-0'?'selected':''}>100%</option></select></div><div class="field-group"><label>Điểm QT</label><input type="number" class="inp-s1" value="${s1}" step="0.1" placeholder="..." oninput="calculateAll(false)"></div><div class="field-group"><label>Điểm CK</label><input type="number" class="inp-s2" value="${s2}" step="0.1" placeholder="..." oninput="calculateAll(false)"></div><div class="field-group" style="flex:0.8;text-align:center;"><label>Hệ 10</label><div class="preview-box preview-10">...</div></div><div class="field-group" style="flex:1.2;text-align:center;"><label>Hệ 4</label><div class="preview-box preview-convert" style="color:#fff;">...</div></div><div class="field-group" style="flex:0.8;text-align:center;"><label>Xếp Loại</label><div class="preview-rank">...</div></div><div style="display:flex;flex-direction:column;gap:5px;justify-content:center;margin-left:5px;"><button class="btn-icon btn-del" onclick="deleteRow(this, ${semId})"><i class="fas fa-times"></i></button><button class="btn-icon btn-calc-target" onclick="openTargetModal(this)"><i class="fas fa-wand-magic-sparkles"></i></button></div>`; l.appendChild(d); }
     function deleteRow(b, i) { b.closest('.subject-row').remove(); calculateAll(false); }
@@ -468,7 +480,6 @@
     function openTargetModal(b) { const r = b.closest('.subject-row'); const n = r.querySelector('.inp-name').value || "Môn học"; const s1 = parseFloat(r.querySelector('.inp-s1').value); const rs = r.querySelector('.inp-ratio').value; if (isNaN(s1)) { alert("Nhập điểm QT!"); return; } if (rs === '100-0') { alert("Không thi cuối kỳ!"); return; } const ra = rs.split('-').map(x => parseInt(x)/100); currentCalcData = { s1, r1: ra[0], r2: ra[1] }; document.getElementById('modal-subject-name').innerText = `${n} (QT: ${s1})`; document.getElementById('targetModal').style.display = 'flex'; calcTarget(); }
     function calcTarget() { const t = parseFloat(document.getElementById('target-grade').value); const { s1, r1, r2 } = currentCalcData; const req = (t - (s1 * r1)) / r2; const r = document.getElementById('target-result'); if (req > 10) r.innerHTML = `Không thể! (${req.toFixed(2)})`; else if (req < 0) r.innerHTML = `Đã đạt!`; else r.innerHTML = `Cần thi: <span style="font-size:1.5rem;color:#d97706">${req.toFixed(2)}</span>`; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function getListRankBadge(g) { let l='Yếu', c='bg-y'; if(g>=3.6){l='Xuất Sắc';c='bg-xs'}else if(g>=3.2){l='Giỏi';c='bg-g'}else if(g>=2.5){l='Khá';c='bg-k'}else if(g>=2.0){l='TB';c='bg-tb'} return `<span class="list-badge ${c}">${l}</span>`; }
     function updateDashboardRank(g) { let l='---', c='rank-gray'; if(g>0){ if(g>=3.6){l='Xuất Sắc';c='rank-gold'}else if(g>=3.2){l='Giỏi';c='rank-silver'}else if(g>=2.5){l='Khá';c='rank-bronze'}else if(g>=2.0){l='Trung Bình';c='rank-gray'}else{l='Yếu';c='rank-red'} } document.getElementById('academic-rank-area').innerHTML = `<span class="dash-badge ${c}">${l}</span>`; }
     function updateChart(d) { const c = document.getElementById('gpaChart').getContext('2d'); if(gpaChartInstance) gpaChartInstance.destroy(); const g = c.createLinearGradient(0,0,0,400); g.addColorStop(0, 'rgba(139,92,246,0.5)'); g.addColorStop(1, 'rgba(118,75,162,0)'); gpaChartInstance = new Chart(c, { type: 'line', data: { labels: Object.keys(semestersData).map(k=>`Kỳ ${k}`), datasets: [{ label: 'GPA', data: d, borderColor: '#a78bfa', backgroundColor: g, fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 4.0, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'rgba(255,255,255,0.7)' } }, x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.7)' } } }, plugins: { legend: { display: false } } } }); }
     
@@ -487,7 +498,7 @@
     function animateAurora() { if(isEcoMode) return; requestAnimationFrame(animateAurora); if(auroraMesh) auroraMesh.material.uniforms.time.value += 0.005; if(stars) stars.rotation.y += 0.0001; renderer.render(scene, camera); }
     window.addEventListener('resize', () => { if(camera){ camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); } });
     
-    function toggleEcoMode() { isEcoMode = !isEcoMode; document.getElementById('eco-toggle').classList.toggle('active'); document.getElementById('aurora-canvas').style.opacity = isEcoMode ? '0' : '1'; if(!isEcoMode) animateAurora(); }
+    function toggleEcoMode() { isEcoMode = !isEcoMode; document.getElementById('eco-toggle').classList.toggle('active'); document.getElementById('aurora-canvas').style.opacity = isEcoMode ? '0' : '1'; if(!isEcoMode) animateAurora(); if(isEcoMode && typeof fireworks !== 'undefined' && fireworks) fireworks.stop(); }
     
     initSecurity();
 </script>
